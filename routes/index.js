@@ -2,7 +2,7 @@
 /*
  * GET home page.
  */
-var mysql=require('mysql');
+var mysql=require("mysql");
 
 exports.index = function(req, res){
     var connection = mysql.createConnection({
