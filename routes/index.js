@@ -6,13 +6,13 @@ var mysql=require("mysql");
 
 exports.index = function(req, res){
     var connection = mysql.createConnection({
-        host:'db4free.org',
-        user:'z900815',
-        password:"zhou900815",
-        database:'xiaowebsql'
+        host:'192.168.2.175',
+        user:'root',
+        password:"123456",
+        database:'test'
     });
     connection.connect();
-    connection.query('SELECT * FROM user',function(err,rows,fields){
+    connection.query('SELECT * FROM test',function(err,rows,fields){
         if(err){
             console.log(err);
         }else{
