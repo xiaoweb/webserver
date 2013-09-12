@@ -13,16 +13,40 @@ $(function(){
 
     ul.width(li.length*li.width());
 
-    li.bind({
-        "touchstart":function(e){
-
-        },
-        "touchend":function(){
+    li.on({'swipeleft':function(){
+        var parent=$(this).parent();
+        var left=parseInt(parent.css("left"));
+        if(left * -1>=ul.width()-li.width()){
+            parent.animate({"left":"0px"});
+        }else{
+            parent.animate({"left":left-li.width()+"px"});
+        }
+    },
+        "swiperight":function(){
             var parent=$(this).parent();
             var left=parseInt(parent.css("left"));
-            parent.animate({"left":left-li.width()+"px"})
+            if(left >=0){
+                parent.animate({"left":"-"+(ul.width()-li.width())+"px"});
+            }else{
+                parent.animate({"left":left+li.width()+"px"});
+            }
         }
     });
+/*
+    li.bind({
+        "touchstart":function(e){
+            console.log(e);
+        },
+        "swipeleft":function(e){
+            var parent=$(this).parent();
+            var left=parseInt(parent.css("left"));
+            if(left * -1>=ul.width()-li.width()){
+                parent.animate({"left":"0px"});
+            }else{
+                parent.animate({"left":left-li.width()+"px"});
+            }
+        }
+    });*/
 
 
 });
