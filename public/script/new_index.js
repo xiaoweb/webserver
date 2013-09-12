@@ -5,22 +5,25 @@
  * Time: 上午10:25
  * To change this template use File | Settings | File Templates.
  */
-$(function(){
+$(function() {
     var slide=document.getElementById("slide"),
         ul=$(slide).find("ul"),
         li=$(slide).find("li"),
         start=0,end=0,scroll=false;
-
-    ul.width(li.length*li.width());
-
-    li.on({'swipeleft':function(){
-        var parent=$(this).parent();
+    function slideto(){
+        var parent=$("#slide").find("li").parent();
         var left=parseInt(parent.css("left"));
         if(left * -1>=ul.width()-li.width()){
             parent.animate({"left":"0px"});
         }else{
             parent.animate({"left":left-li.width()+"px"});
         }
+    }
+
+    ul.width(li.length*li.width());
+
+    li.on({'swipeleft':function(){
+        slideto();
     },
         "swiperight":function(){
             var parent=$(this).parent();
@@ -32,21 +35,7 @@ $(function(){
             }
         }
     });
-/*
-    li.bind({
-        "touchstart":function(e){
-            console.log(e);
-        },
-        "swipeleft":function(e){
-            var parent=$(this).parent();
-            var left=parseInt(parent.css("left"));
-            if(left * -1>=ul.width()-li.width()){
-                parent.animate({"left":"0px"});
-            }else{
-                parent.animate({"left":left-li.width()+"px"});
-            }
-        }
-    });*/
-
-
+    setInterval(function(){
+        slideto();
+    },3000);
 });
