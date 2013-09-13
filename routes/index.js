@@ -5,7 +5,7 @@
 var mysql=require("mysql");
 
 exports.index = function(req, res){
-    var connection = mysql.createConnection({
+    /*var connection = mysql.createConnection({
         host:'192.168.2.175',
         user:'root',
         password:"123456",
@@ -20,6 +20,7 @@ exports.index = function(req, res){
             res.render('index', { title: 'Express','user':rows });
         }
         connection.end();
-    });
+    });*/
+    res.render('index', { title: 'Express'});
 
 };

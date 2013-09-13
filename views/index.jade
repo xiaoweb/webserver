@@ -2,11 +2,25 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
-  each item in user
-    .row
-      .col-md-1= item.Name
-      .col-md-1= item.Age
+  p#node Welcome to #{title}
+  #bottom.container(style="position:absolute;bottom:0;width:1140px;height:50px;background:#ccc;")
+  .demo
+    style
+      #photo-list img  {
+        border: 1px solid grey;
+        padding: 4px;
+        margin: 8px;
+      }
+      .loading {
+        background: transparent url(../../../../source/_static/loading.gif) no-repeat;
+        width: 100px;
+        height: 100px !important;
+        margin: 20px;
+      }
+    button#fetch-btn-anim(autocomplete='off') Fetch Photo
+    #photo-list
+
+
 
 
 
