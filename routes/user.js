@@ -4,5 +4,5 @@
  */
 
 exports.list = function(req, res){
-  res.send("hello nodejs");
+  res.send("hello word");
 };
