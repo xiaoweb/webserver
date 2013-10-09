@@ -45,11 +45,11 @@ exports.regpost=function(req,res){
                      if(err){
                         res.send('注册失败');
                      }else{
-                     res.send('注册成功');
+                        res.send('注册成功');
                      }
                  });
             }else{
-                res.send(body.email+"已被注册");
+                res.send('<script>document.location.href="http://www.baidu.com"</script>');
             }
         });
     }else{

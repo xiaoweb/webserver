@@ -2,7 +2,7 @@ extends layout
 
 block content
   .registration
-    form.form-horizontal#form(role='form',action='/msg',method='post')
+    form.form-horizontal#form(role='form',action='/registration',method='post')
       .form-group
         label.col-sm-2.control-label(for='inputEmail3') Email
         .col-sm-8
@@ -27,27 +27,12 @@ block content
               | Remember me
       .form-group
         .col-sm-offset-2.col-sm-10
-          button#btn.btn.btn-default(type='submit') 注册
-  script.
-    $(".form-group").each(function(i,t){
-      var t=$(t) ;
-      $(t).find("input").blur(function(){
-        if($(this).val()==""){
-          t.addClass("has-error");
-        }else{
-          t.addClass("has-success").removeClass('has-error');
-        }
-      });
-    });
+          button#btn.btn.btn-default(type='submit',data-loading-text="正在加载...") 注册
 
-    $("#btn").click(function(){
-      if($("#inputPassword4").val() != "" && $("#inputPassword3").val() != "" && $("#inputEmail3").val() != "" && $("#inputName1").val() != ""){
-      return ture;
-      }else{
-        alert("HI!,你的信息没输入全吧！");
-        return false;
-      }
-    });
+   //script(type="text/javascript",src="script/userjs/reg.js")
+
+
+
 
 
 
