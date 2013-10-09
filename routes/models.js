@@ -6,7 +6,7 @@
  */
 var mongoose=require('mongoose'),
     schema=mongoose.Schema;
-mongoose.connect('mongodb://192.168.0.208/test',function(err){
+mongoose.connect('mongodb://192.168.2.218/test',function(err){
   err?console.log("连接出错 "+err):console.log("连接mongodb成功");
 });
 
@@ -15,16 +15,8 @@ var _user=new schema({
   email:String,
   password:String,
   name:String,
-  age:Number
+  regtime:Date
 });
 db.user=mongoose.model('user',_user);
-
-var _record=new schema({
-  time:Date,
-  name:String
-});
-db.record=mongoose.model('record',_record);
-
-
 exports.db=db;
 

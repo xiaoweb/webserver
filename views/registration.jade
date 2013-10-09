@@ -1,0 +1,56 @@
+extends layout
+
+block content
+  .registration
+    form.form-horizontal#form(role='form',action='/msg',method='post')
+      .form-group
+        label.col-sm-2.control-label(for='inputEmail3') Email
+        .col-sm-8
+          input#inputEmail3.form-control(type='email', placeholder='Email',name='user[email]')
+      .form-group
+        label.col-sm-2.control-label(for='inputPassword3') Password
+        .col-sm-6
+          input#inputPassword3.form-control(type='password', placeholder='Password',name='user[password1]')
+      .form-group
+        label.col-sm-2.control-label(for='inputPassword3') Password
+        .col-sm-6
+          input#inputPassword4.form-control(type='password', placeholder='Password',name='user[password2]')
+      .form-group
+        label.col-sm-2.control-label(for='inputPassword4') 昵称:
+        .col-sm-6
+          input#inputName1.form-control(type='text',placeholder='name',name='user[name]')
+      .form-group
+        .col-sm-offset-2.col-sm-10
+          .checkbox
+            label
+              input(type='checkbox')
+              | Remember me
+      .form-group
+        .col-sm-offset-2.col-sm-10
+          button#btn.btn.btn-default(type='submit') 注册
+  script.
+    $(".form-group").each(function(i,t){
+      var t=$(t) ;
+      $(t).find("input").blur(function(){
+        if($(this).val()==""){
+          t.addClass("has-error");
+        }else{
+          t.addClass("has-success").removeClass('has-error');
+        }
+      });
+    });
+
+    $("#btn").click(function(){
+      if($("#inputPassword4").val() != "" && $("#inputPassword3").val() != "" && $("#inputEmail3").val() != "" && $("#inputName1").val() != ""){
+      return ture;
+      }else{
+        alert("HI!,你的信息没输入全吧！");
+        return false;
+      }
+    });
+
+
+
+
+
+

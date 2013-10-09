@@ -25,3 +25,34 @@ exports.list=function(req,res){
     });
   });
 };
+
+/*会员注册*/
+exports.reg=function(req,res){
+    res.render("registration",{'title':"帐号注册"});
+};
+exports.regpost=function(req,res){
+    var body= req.body.user;
+    if(req.body.user.password1 === req.body.user.password2){
+        model.db.user.find({email:body.email},function(err,data){
+            if(data.length<=0){
+                var user=new model.db.user({
+                     email:body.email,
+                     password:body.password1,
+                     name:body.name,
+                     regtime:new Date()
+                });
+                 user.save(function(err){
+                     if(err){
+                        res.send('注册失败');
+                     }else{
+                     res.send('注册成功');
+                     }
+                 });
+            }else{
+                res.send(body.email+"已被注册");
+            }
+        });
+    }else{
+        res.send("两次密码输入的不一样，请重新输入");
+    }
+};
