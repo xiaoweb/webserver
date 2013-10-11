@@ -6,7 +6,7 @@
  */
 var mongoose=require('mongoose'),
     schema=mongoose.Schema;
-mongoose.connect('mongodb://192.168.2.218/test',function(err){
+mongoose.connect('mongodb://192.168.2.212/test',function(err){
   err?console.log("连接出错 "+err):console.log("连接mongodb成功");
 });
 

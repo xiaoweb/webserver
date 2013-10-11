@@ -4,11 +4,9 @@
  */
 
 var express = require('express');
-var routes = require('./routes');
-var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-
+var routes=require('./route');
 var app = express();
 
 // all environments
@@ -26,14 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-
-app.get('/', routes.index);
-app.get('/users', user.list);
-
-/*注册会员*/
-app.get('/registration',user.reg);
-app.post('/registration',user.regpost);
-
+routes.route(app);
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
