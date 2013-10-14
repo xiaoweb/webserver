@@ -5,6 +5,7 @@
 
 var express = require('express');
 var http = require('http');
+var webconfig = require('./webconfig');
 var path = require('path');
 var routes=require('./route');
 var app = express();
@@ -24,7 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
+
+webconfig.open();
 routes.route(app);
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });

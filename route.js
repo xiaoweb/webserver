@@ -13,5 +13,9 @@ exports.route=function(app){
 
     /*注册会员*/
     app.get('/registration',user.reg);
-    app.post('/registration',user.regpost);
+    app.post('/registration',user.reg);
+
+    /*test*/
+    app.get("/test",user.test);
+    app.post('/test',user.test);
 };
