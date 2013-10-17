@@ -6,7 +6,7 @@
  */
 
 //连接数据库
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 var config={
     host:'192.168.2.209',
     name:'webserver',
