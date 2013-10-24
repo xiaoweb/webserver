@@ -11,12 +11,12 @@ var config={
     host:'192.168.2.209',
     name:'webserver',
     port:'27017',
-    user:'root',
-    password:'root123'
+    user:'webserver',
+    password:'xiaoweb'
 };
 
 exports.open=function(){
     mongoose.connect('mongodb://'+config.user+':'+config.password+'@'+config.host+':'+config.port+'/'+config.name,function(err){
-        err?console.log("连接出错 "+err):console.log("连接mongodb成功");
+        err?console.log("连接出错("+err+")"):console.log("连接mongodb成功");
     });
 };

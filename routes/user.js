@@ -3,6 +3,7 @@
  * GET users listing.
  */
 var model=require('./models');
+var crypto = require('crypto');
 
 exports.list=function(req,res){
     var one = new model.db.user({
@@ -75,6 +76,30 @@ exports.reg=function(req,res){
         }
     }
 };
+
+/*login*/
+exports.login=function(req,res){
+    if(req.method == 'GET'){
+        res.render('login',{'title':"用户登陆"});
+    }else if(req.method == 'POST'){
+        var cipher=crypto.createCipher("aes192",'xiaozhou');
+        var enc=cipher.update('xiao', 'utf8', 'hex');
+        enc += cipher.final('hex');
+        res.cookie('user',enc);
+        model.db.user.find({email:req.body.email,password:req.body.password},function(err,data){
+                if(err){
+                    console.log(err);
+                }else{
+                    if(data.length <= 0){
+                        res.redirect("/");
+                    }else{
+                        res.redirect("/");
+                    }
+                }
+        });
+    }
+};
+
 exports.test=function(req,res){
     //req.session.messages = ['foo'];
     if(req.method == 'GET'){

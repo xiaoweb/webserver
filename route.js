@@ -18,4 +18,8 @@ exports.route=function(app){
     /*test*/
     app.get("/test",user.test);
     app.post('/test',user.test);
+
+    /*login*/
+    app.get('/login',user.login);
+    app.post('/login',user.login);
 };

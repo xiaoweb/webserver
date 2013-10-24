@@ -2,7 +2,6 @@
 /**
  * Module dependencies.
  */
-
 var express = require('express');
 var http = require('http');
 var webconfig = require('./webconfig');
@@ -18,9 +17,11 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
+app.use(express.cookieParser());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.set('xiao',"xiaoweb");
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());

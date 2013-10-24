@@ -1,0 +1,23 @@
+-//Created by  RD-小小WEB on 13-10-24.
+extends layout
+block content
+  .registration
+    form.form-horizontal#form(role='form',method='post')
+      .form-group
+        label.col-sm-3.control-label(for='inputEmail3') Email
+        .col-sm-6
+          input#inputEmail.form-control(type='email', placeholder='Email',name="email")
+      .form-group
+        label.col-sm-3.control-label(for='inputPassword3') Password
+        .col-sm-6
+          input#inputPassword.form-control(type='password', placeholder='Password',name="password")
+      .form-group
+        .col-sm-offset-3.col-sm-10
+          .checkbox
+            label
+              input(type='checkbox')
+              | Remember me
+      .form-group
+        .col-sm-offset-3.col-sm-10
+          button#btn.btn.btn-default(type='submit') 登录
+
