@@ -26,7 +26,7 @@ $("#btn").click(function(){
     if(email != "" && password1 != "" && password2 != "" && name != ""){
       $("#btn").button('loading');
       $.ajax({
-        url:'/registration',
+        url:'/regist',
         type:'post',
         data:{
           email:email,

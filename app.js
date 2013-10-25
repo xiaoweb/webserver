@@ -8,8 +8,9 @@ var webconfig = require('./webconfig');
 var path = require('path');
 var routes=require('./route');
 var app = express();
+var flash=require('express-flash');
 
-// all environments
+/*all environments*/
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -17,12 +18,16 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
+/*cookie*/
 app.use(express.cookieParser());
+app.use(express.session({secret:"zhou"}));
+/*flash*/
+app.use(flash());
+/*router*/
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.set('xiao',"xiaoweb");
-// development only
+/* development only*/
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }

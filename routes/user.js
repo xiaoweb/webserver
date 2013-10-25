@@ -28,7 +28,7 @@ exports.list=function(req,res){
 };
 
 /*会员注册*/
-exports.reg=function(req,res){
+exports.regist=function(req,res){
     if(req.method == 'GET'){
         //form原生post加参数版
         /*switch(req.query.msg){
@@ -43,7 +43,7 @@ exports.reg=function(req,res){
                 break
         }
         res.render("registration",{'title':"帐号注册",'msg':msg});*/
-        res.render("registration",{'title':"帐号注册"});
+        res.render("regist",{'title':"帐号注册"});
     }else if(req.method == 'POST'){
         var body= req.body;
         if(body.password1 === body.password2){
@@ -91,13 +91,26 @@ exports.login=function(req,res){
                     console.log(err);
                 }else{
                     if(data.length <= 0){
-                        res.redirect("/");
+                        req.flash("msg","登陆错误！请检查用户名密码");
+                        res.redirect("back");
                     }else{
-                        res.redirect("/");
+                        if(req.session.user){
+                            res.redirect("/");
+                        }else{
+                            req.session.user=null;
+                            req.session.user=req.body.email;
+                            res.redirect("/");
+                        }
                     }
                 }
         });
     }
+};
+
+/*logout*/
+exports.logout=function(req,res){
+    req.session.user=null;
+    res.redirect('/login');
 };
 
 exports.test=function(req,res){
@@ -105,7 +118,6 @@ exports.test=function(req,res){
     if(req.method == 'GET'){
         res.render('test',{'title':"test"});
     }else if(req.method == 'POST'){
-        console.log(req);
         res.redirect("back");
     }
 };
