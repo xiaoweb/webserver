@@ -5,12 +5,36 @@
  * Time: 上午11:57
  * To change this template use File | Settings | File Templates.
  */
+KISSY.use("base",function(S,b){
+    function test(){
+        this.x=10;
+    }
+    S.extend(test,b);
+    test.ATTRS={
+        size:{
+            value:10,
+            getter:function(x){
+                console.log(new Date());
+                return x+1;
+            },
+            setter:function(x){
+                return x;
+            },
+            validator:function(x){
+                if(x < 10){
+                    return false;
+                }
+            }
+        }
+    };
+    var obj=new test();
 
-KISSY.use("xiaozhou,button",function(S,x,but){
-    var p =new but({
-        content:"a" ,
-        render: "body",
-        tooltip: "点击我有惊喜~"
+    obj.addAttr("name",{
+        value: test.ATTRS.size.value,
+        getter:test.ATTRS.size.getter,
+        validator:test.ATTRS.size.validator
     });
-    p.render();
+    obj.set("name",8);
+    console.log(obj.get("name"));
 });
+

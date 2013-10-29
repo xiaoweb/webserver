@@ -8,7 +8,7 @@
 //连接数据库
 var mongoose = require("mongoose");
 var config={
-    host:'192.168.2.179',
+    host:'192.168.2.181',
     name:'webserver',
     port:'27017',
     user:'webserver',
