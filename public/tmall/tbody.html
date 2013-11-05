@@ -1,0 +1,61 @@
+<tbody  class="order">
+<tr class="sep-row">
+    <td colspan="9"></td>
+</tr>
+<tr class="order-hd">
+    <td colspan="9">
+        <input class="selector" type="checkbox" id="cb449705452649662" name="biz_order_id" value="449705452649662">
+        <input type="hidden" id="payOrderId_449705452649662" name="payOrderId_449705452649662" value="449705452649662">
+        <input type="hidden" id="tradeStatus_449705452649662" name="tradeStatus_449705452649662" value="WAIT_BUYER_PAY">
+        <input type="hidden" id="inRefundStatus_449705452649662" name="inRefundStatus_449705452649662" value="false">
+        <div class="basic-info">
+        <span class="order-num">
+          <label for="cb449705452649662">订单编号：{TaobaoTradeID}</label>
+        </span>
+            <span class="deal-time">成交时间：{Created}</span>
+
+
+        </div>
+        <div class="more-info">
+            <a class="J_MemoFlag memo-flag" data-orderid="449705452649662" target="_blank" href="http://trade.taobao.com/trade/memo/update_sell_memo.htm?spm=a1z09.1.11.6.dgDrBc&seller_id=288885616&biz_order_id=449705452649662&user_type=1&page_num=null&auction_title=&biz_order_time_begin=&biz_order_time_end=&comment_status=&buyer_nick=&auction_status=&logistics_service=" title="" data-spm-anchor-id="a1z09.1.11.6">
+                <img alt="" src="http://a.tbcdn.cn/sys/common/icon/trade/op_memo_0.png">
+            </a>
+        </div>
+        <input type="hidden" name="sellerId" value="288885616">
+        <input type="hidden" name="buyerId" value="893396296">
+    </td>
+</tr>
+<!--start 子订单list start-->
+<tr  class="order-item
+  last
+ ">
+
+    <td class="price" ><span style="color:red;">单价：</span>￥{Payment}</td>
+    <td class="num" title="1">
+        1
+    </td>
+    <td class="trouble">
+        <strong class="J_OrderPrice"><b>￥{Payment}</b></strong>
+        <div class="post-info">
+
+            (含
+            <span class="post-type">快递</span>
+            :
+            <span class="J_PostFee">0.00</span>
+            )
+
+        </div>
+    </td>
+    <td class="contact" rowspan="1" sumrows="1">
+        <a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?spm=a1z09.1.11.9.dgDrBc&userID=ysj579979949" target="_blank" data-spm-anchor-id="a1z09.1.11.9">{BuyerNick}</a>
+        <a title="查询该买家订单" class="J_filterTrigger" data-nick="ysj579979949" target="_blank" href="javascript:void(0);" data-spm-anchor-id="a1z09.1.11.10">
+            <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单" class="J_MakePoint" data-point-url="http://gm.mmstat.com/listsold.1.2">
+        </a>
+
+    </td>
+    <td colspan="5" class="trade-status" style="text-align:left;padding-left:10px;">
+        <span style="color:red;">收货地址：</span>    <br><br>
+        {ReceiverAddress}
+</tr>
+<!--end 子订单list end-->
+</tbody>
