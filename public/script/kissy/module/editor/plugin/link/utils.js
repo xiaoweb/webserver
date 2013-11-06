@@ -1,9 +1,16 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:45
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/link/utils
+*/
+
 /**
+ * @ignore
  * link utils
  * @author yiminghe@gmail.com
  */
@@ -94,3 +101,4 @@ KISSY.add("editor/plugin/link/utils", function (S, Editor) {
 }, {
     requires:['editor']
 });
+

@@ -1,25 +1,23 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:08
+build time: Nov 5 15:06
 */
 /**
  * @ignore
  * A seed where KISSY grows up from, KISS Yeah !
- * @author https://github.com/kissyteam?tab=members
+ * @author https://github.com/kissyteam/kissy/contributors
  */
 
 /**
  * The KISSY global namespace object. you can use
  *
- * for example:
- *      @example
+ *
  *      KISSY.each/mix
  *
  * to do basic operation. or
  *
- * for example:
- *      @example
+ *
  *      KISSY.use('overlay,node', function(S, Overlay, Node){
  *          //
  *      });
@@ -29,21 +27,27 @@ build time: Aug 15 00:08
  * @class KISSY
  */
 var KISSY = (function (undefined) {
-
     var host = this,
         S,
         guid = 0,
         EMPTY = '';
 
-    S = {
+    var loggerLevel = {
+        'debug': 10,
+        'info': 20,
+        'warn': 30,
+        'error': 40
+    };
 
+    S = {
         /**
          * The build time of the library.
-         * NOTICE: '20130815000847' will replace with current timestamp when compressing.
+         * NOTICE: '20131105150616' will replace with current timestamp when compressing.
          * @private
          * @type {String}
          */
-        __BUILD_TIME: '20130815000847',
+        __BUILD_TIME: '20131105150616',
+
         /**
          * KISSY Environment.
          * @private
@@ -52,6 +56,7 @@ var KISSY = (function (undefined) {
         Env: {
             host: host
         },
+
         /**
          * KISSY Config.
          * If load kissy.js, Config.debug defaults to true.
@@ -68,23 +73,34 @@ var KISSY = (function (undefined) {
 
         /**
          * The version of the library.
-         * NOTICE: '1.31' will replace with current version when compressing.
+         * NOTICE: '1.40' will replace with current version when compressing.
          * @type {String}
          */
-        version: '1.31',
+        version: '1.40',
 
         /**
          * set KISSY configuration
-         * @param {Object|String}   configName Config object or config key.
-         * @param {String} configName.base   KISSY 's base path. Default: get from kissy(-min).js or seed(-min).js
-         * @param {String} configName.tag    KISSY 's timestamp for native module. Default: KISSY 's build time.
-         * @param {Boolean} configName.debug     whether to enable debug mod.
-         * @param {Boolean} configName.combine   whether to enable combo.
+         * @param {Object|String} configName Config object or config key.
+         * @param {String} configName.base KISSY 's base path. Default: get from kissy(-min).js or seed(-min).js
+         * @param {String} configName.tag KISSY 's timestamp for native module. Default: KISSY 's build time.
+         * @param {Boolean} configName.debug whether to enable debug mod.
+         * @param {Boolean} configName.combine whether to enable combo.
+         * @param {Object} configName.logger logger config
+         * @param {Object[]} configName.logger.excludes  exclude configs
+         * @param {Object} configName.logger.excludes.0 a single exclude config
+         * @param {RegExp} configName.logger.excludes.0.logger  matched logger will be excluded from logging
+         * @param {KISSY.Logger.Level} configName.logger.excludes.0.minLevel  minimum logger level
+         * @param {KISSY.Logger.Level} configName.logger.excludes.0.maxLevel  maximum logger level
+         * @param {Object[]} configName.logger.includes include configs
+         * @param {Object} configName.logger.includes.0 a single include config
+         * @param {RegExp} configName.logger.includes.0.logger  matched logger will be included from logging
+         * @param {KISSY.Logger.Level} configName.logger.excludes.0.minLevel  minimum logger level
+         * @param {KISSY.Logger.Level} configName.logger.excludes.0.maxLevel  maximum logger level
          * @param {Object} configName.packages Packages definition with package name as the key.
-         * @param {String} configName.packages.base    Package base path.
-         * @param {String} configName.packages.tag     Timestamp for this package's module file.
-         * @param {String} configName.packages.debug     Whether force debug mode for current package.
-         * @param {String} configName.packages.combine     Whether allow combine for current package modules.
+         * @param {String} configName.packages.base Package base path.
+         * @param {String} configName.packages.tag  Timestamp for this package's module file.
+         * @param {String} configName.packages.debug Whether force debug mode for current package.
+         * @param {String} configName.packages.combine Whether allow combine for current package modules.
          * @param {String} [configName.packages.ignorePackageNameInUri=false] whether remove packageName from module request uri,
          * can only be used in production mode.
          * @param {Array[]} configName.map file map      File url map configs.
@@ -150,24 +166,67 @@ var KISSY = (function (undefined) {
          * @param msg {String} the message to log.
          * @param {String} [cat] the log category for the message. Default
          *        categories are 'info', 'warn', 'error', 'time' etc.
-         * @param {String} [src] the source of the the message (opt)
+         * @param {String} [logger] the logger of the the message (opt)
          */
-        log: function (msg, cat, src) {
-            if (S.Config.debug) {
-                if (src) {
-                    msg = src + ': ' + msg;
+        log: function (msg, cat, logger) {
+            if ('@DEBUG@') {
+                var matched = 1;
+                if (logger) {
+                    var loggerCfg = S.Config.logger || {},
+                        list, i, l, level, minLevel, maxLevel, reg;
+                    cat = cat || 'debug';
+                    level = loggerLevel[cat] || loggerLevel['debug'];
+                    if (list = loggerCfg.includes) {
+                        matched = 0;
+                        for (i = 0; i < list.length; i++) {
+                            l = list[i];
+                            reg = l.logger;
+                            maxLevel = loggerLevel[l.maxLevel] || loggerLevel['error'];
+                            minLevel = loggerLevel[l.minLevel] || loggerLevel['debug'];
+                            if (minLevel <= level && maxLevel >= level && logger.match(reg)) {
+                                matched = 1;
+                                break;
+                            }
+                        }
+                    } else if (list = loggerCfg.excludes) {
+                        matched = 1;
+                        for (i = 0; i < list.length; i++) {
+                            l = list[i];
+                            reg = l.logger;
+                            maxLevel = loggerLevel[l.maxLevel] || loggerLevel['error'];
+                            minLevel = loggerLevel[l.minLevel] || loggerLevel['debug'];
+                            if (minLevel <= level && maxLevel >= level && logger.match(reg)) {
+                                matched = 0;
+                                break;
+                            }
+                        }
+                    }
+                    if (matched) {
+                        msg = logger + ': ' + msg;
+                    }
                 }
-                if (host['console'] !== undefined && console.log) {
+                if (host['console'] !== undefined && console.log && matched) {
                     console[cat && console[cat] ? cat : 'log'](msg);
+                    return msg;
                 }
             }
+            return undefined;
+        },
+
+        /**
+         * get log instance for specified logger
+         * @param {String} logger logger name
+         * @returns {KISSY.Logger} log instance
+         */
+        'getLogger': function (logger) {
+            return getLogger(logger);
         },
 
         /**
          * Throws error message.
          */
         error: function (msg) {
-            if (S.Config.debug) {
+            if ('@DEBUG@') {
                 // with stack info!
                 throw msg instanceof  Error ? msg : new Error(msg);
             }
@@ -183,8 +242,93 @@ var KISSY = (function (undefined) {
         }
     };
 
-    return S;
+    if ('@DEBUG@') {
+        S.Config.logger = {
+            excludes: [
+                {
+                    logger: /^s\/.*/,
+                    maxLevel: 'info',
+                    minLevel: 'debug'
+                }
+            ]
+        };
 
+        /**
+         * Log class for specified logger
+         * @class KISSY.Logger
+         * @private
+         */
+        function Logger() {
+
+        }
+
+        /**
+         * print debug log
+         * @method
+         * @param {String} str log str
+         */
+        Logger.prototype.debug = function (str) {
+        };
+        /**
+         * print info log
+         * @method
+         * @param {String} str log str
+         */
+        Logger.prototype.info = function (str) {
+        };
+        /**
+         * print warn log
+         * @method
+         * @param {String} str log str
+         */
+        Logger.prototype.warn = function (str) {
+        };
+        /**
+         * print error log
+         * @method
+         * @param {String} str log str
+         */
+        Logger.prototype.error = function (str) {
+        };
+    }
+
+    function getLogger(logger) {
+        var obj = {};
+        S.each(loggerLevel, function (_, cat) {
+            obj[cat] = function (msg) {
+                return S.log(msg, cat, logger);
+            };
+        });
+        return obj;
+    }
+
+
+    /**
+     * Logger level enum
+     * @enum {String} KISSY.Logger.Level
+     */
+    S.Logger = /**@type Function
+     @ignore */{};
+    S.Logger.Level = {
+        /**
+         * debug level
+         */
+        'DEBUG': 'debug',
+        /**
+         * info level
+         */
+        INFO: 'info',
+        /**
+         * warn level
+         */
+        WARN: 'warn',
+        /**
+         * error level
+         */
+        ERROR: 'error'
+    };
+
+    return S;
 })();/**
  * @ignore
  * object utilities of lang
@@ -198,7 +342,8 @@ var KISSY = (function (undefined) {
         host = this,
         TRUE = true,
         EMPTY = '',
-        ObjectCreate = Object.create,
+        Obj = Object,
+        ObjectCreate = Obj.create,
     // error in native ie678, not in simulated ie9
         hasEnumBug = !({toString: 1}['propertyIsEnumerable']('toString')),
         enumProperties = [
@@ -243,11 +388,14 @@ var KISSY = (function (undefined) {
          * @return {Array}
          * @member KISSY
          */
-        keys: function (o) {
+        keys: Obj.keys || function (o) {
             var result = [], p, i;
 
             for (p in o) {
-                result.push(p);
+                // S.keys(new XX())
+                if (o.hasOwnProperty(p)) {
+                    result.push(p);
+                }
             }
 
             if (hasEnumBug) {
@@ -348,6 +496,8 @@ var KISSY = (function (undefined) {
             var args = S.makeArray(arguments),
                 len = args.length - 2,
                 i = 1,
+                proto,
+                arg,
                 ov = args[len],
                 wl = args[len + 1];
 
@@ -362,7 +512,11 @@ var KISSY = (function (undefined) {
             }
 
             for (; i < len; i++) {
-                S.mix(r.prototype, args[i].prototype || args[i], ov, wl);
+                arg = args[i];
+                if (proto = arg.prototype) {
+                    arg = S.mix({}, proto, true, removeConstructor);
+                }
+                S.mix(r.prototype, arg, ov, wl);
             }
 
             return r;
@@ -387,10 +541,14 @@ var KISSY = (function (undefined) {
             var sp = s.prototype,
                 rp;
 
+            // in case parent does not set constructor
+            // eg: parent.prototype={};
+            sp.constructor = s;
+
             // add prototype chain
             rp = createObject(sp, r);
             r.prototype = S.mix(rp, r.prototype);
-            r.superclass = createObject(sp, s);
+            r.superclass = sp;
 
             // add prototype overrides
             if (px) {
@@ -484,6 +642,10 @@ var KISSY = (function (undefined) {
         return r;
     }
 
+    function removeConstructor(k, v) {
+        return k == 'constructor' ? undefined : v;
+    }
+
     function _mix(p, r, s, ov, wl, deep, cache) {
         // 要求覆盖
         // 或者目的不存在
@@ -554,7 +716,8 @@ var KISSY = (function (undefined) {
                     keys,
                     i = 0,
                     length = object && object.length,
-                    isObj = length === undefined || S.type(object) === 'function';
+                // do not use typeof obj == 'function': bug in phantomjs
+                    isObj = length === undefined || S.type(object) == 'function';
 
                 context = context || null;
 
@@ -569,7 +732,10 @@ var KISSY = (function (undefined) {
                     }
                 } else {
                     for (val = object[0];
-                         i < length && fn.call(context, val, i, object) !== FALSE; val = object[++i]) {
+                         i < length; val = object[++i]) {
+                        if (fn.call(context, val, i, object) === FALSE) {
+                            break;
+                        }
                     }
                 }
             }
@@ -673,7 +839,6 @@ var KISSY = (function (undefined) {
          * @param [context] {Object} optional context object
          * @return {Array} The items on which the supplied function returned TRUE.
          * If no items matched an empty array is returned.
-         * @member KISSY
          */
         filter: filter ?
             function (arr, fn, context) {
@@ -873,10 +1038,12 @@ var KISSY = (function (undefined) {
     var SEP = '&',
         EMPTY = '',
         EQ = '=',
+        logger= S.getLogger('s/lang'),
         TRUE = true,
     // FALSE = false,
         HEX_BASE = 16,
     // http://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
+    // http://wonko.com/post/html-escaping
         htmlEntities = {
             '&amp;': '&',
             '&gt;': '>',
@@ -1101,7 +1268,8 @@ var KISSY = (function (undefined) {
                     try {
                         val = decode(val);
                     } catch (e) {
-                        S.log(e + 'decodeURIComponent error : ' + val, 'error');
+                        logger.error('decodeURIComponent error : ' + val);
+                        logger.error(e);
                     }
                     if (S.endsWith(key, '[]')) {
                         key = key.substring(0, key.length - 2);
@@ -1130,7 +1298,7 @@ var KISSY = (function (undefined) {
  *
  */
 (function (S, undefined) {
-
+    // ios Function.prototype.bind === undefined
     function bindFn(r, fn, obj) {
         var slice = [].slice,
             args = slice.call(arguments, 3),
@@ -1375,7 +1543,6 @@ var KISSY = (function (undefined) {
                         try {
                             delete v[CLONE_MARKER];
                         } catch (e) {
-                            // S.log('delete CLONE_MARKER error : ');
                             v[CLONE_MARKER] = undefined;
                         }
                     }
@@ -1590,14 +1757,15 @@ var KISSY = (function (undefined) {
     });
 })(KISSY);/**
  * @ignore
- *   type of land
- * @author  lifesinger@gmail.com, yiminghe@gmail.com
+ * type judgement
+ * @author yiminghe@gmail.com, lifesinger@gmail.com
  *
  */
 (function (S, undefined) {
     // [[Class]] -> type pairs
     var class2type = {},
         FALSE = false,
+        noop = S.noop,
         OP = Object.prototype,
         toString = OP.toString;
 
@@ -1605,8 +1773,86 @@ var KISSY = (function (undefined) {
         return OP.hasOwnProperty.call(o, p);
     }
 
-    S.mix(S,
-        {
+    S.mix(S, {
+        /**
+         * Determine the internal JavaScript [[Class]] of an object.
+         * @member KISSY
+         */
+        type: function (o) {
+            return o == null ?
+                String(o) :
+                class2type[toString.call(o)] || 'object';
+        },
+
+        /**
+         * whether o === null
+         * @param o
+         * @member KISSY
+         */
+        isNull: function (o) {
+            return o === null;
+        },
+
+        /**
+         * whether o === undefined
+         * @param o
+         * @member KISSY
+         */
+        isUndefined: function (o) {
+            return o === undefined;
+        },
+
+        /**
+         * Checks to see if an object is empty.
+         * @member KISSY
+         */
+        isEmptyObject: function (o) {
+            for (var p in o) {
+                if (p !== undefined) {
+                    return FALSE;
+                }
+            }
+            return true;
+        },
+
+        /**
+         * Checks to see if an object is a plain object (created using '{}'
+         * or 'new Object()' but not 'new FunctionClass()').
+         * @member KISSY
+         */
+        isPlainObject: function (obj) {
+            // Must be an Object.
+            // Because of IE, we also have to check the presence of the constructor property.
+            // Make sure that Dom nodes and window objects don't pass through, as well
+            if (!obj || S.type(obj) !== "object" || obj.nodeType || obj.window == obj) {
+                return FALSE;
+            }
+
+            var key, objConstructor;
+
+            try {
+                // Not own constructor property must be Object
+                if ((objConstructor = obj.constructor) && !hasOwnProperty(obj, "constructor") && !hasOwnProperty(objConstructor.prototype, "isPrototypeOf")) {
+                    return FALSE;
+                }
+            } catch (e) {
+                // IE8,9 Will throw exceptions on certain host objects
+                return FALSE;
+            }
+
+            // Own properties are enumerated firstly, so to speed up,
+            // if last one is own, then all properties are own.
+
+
+            for (key in obj) {
+            }
+
+            return key === undefined || hasOwnProperty(obj, key);
+        }
+    });
+
+    if ('@DEBUG@') {
+        S.mix(S, {
             /**
              * test whether o is boolean
              * @method
@@ -1614,7 +1860,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isBoolean: 0,
+            isBoolean: noop,
             /**
              * test whether o is number
              * @method
@@ -1622,7 +1868,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isNumber: 0,
+            isNumber: noop,
             /**
              * test whether o is String
              * @method
@@ -1630,7 +1876,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isString: 0,
+            isString: noop,
             /**
              * test whether o is function
              * @method
@@ -1638,7 +1884,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isFunction: 0,
+            isFunction: noop,
             /**
              * test whether o is Array
              * @method
@@ -1646,7 +1892,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isArray: 0,
+            isArray: noop,
             /**
              * test whether o is Date
              * @method
@@ -1654,7 +1900,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isDate: 0,
+            isDate: noop,
             /**
              * test whether o is RegExp
              * @method
@@ -1662,7 +1908,7 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isRegExp: 0,
+            isRegExp: noop,
             /**
              * test whether o is Object
              * @method
@@ -1670,529 +1916,113 @@ var KISSY = (function (undefined) {
              * @return {Boolean}
              * @member KISSY
              */
-            isObject: 0,
-
-            /**
-             * Determine the internal JavaScript [[Class]] of an object.
-             * @member KISSY
-             */
-            type: function (o) {
-                return o == null ?
-                    String(o) :
-                    class2type[toString.call(o)] || 'object';
-            },
-
-            /**
-             * whether o === null
-             * @param o
-             * @member KISSY
-             */
-            isNull: function (o) {
-                return o === null;
-            },
-
-            /**
-             * whether o === undefined
-             * @param o
-             * @member KISSY
-             */
-            isUndefined: function (o) {
-                return o === undefined;
-            },
-
-            /**
-             * Checks to see if an object is empty.
-             * @member KISSY
-             */
-            isEmptyObject: function (o) {
-                for (var p in o) {
-                    if (p !== undefined) {
-                        return FALSE;
-                    }
-                }
-                return true;
-            },
-
-            /**
-             * Checks to see if an object is a plain object (created using '{}'
-             * or 'new Object()' but not 'new FunctionClass()').
-             * @member KISSY
-             */
-            isPlainObject: function (obj) {
-                // credits to jq
-
-                // Must be an Object.
-                // Because of IE, we also have to check the presence of the constructor property.
-                // Make sure that Dom nodes and window objects don't pass through, as well
-                if (!obj || S.type(obj) !== "object" || obj.nodeType || obj.window == obj) {
-                    return FALSE;
-                }
-
-                var key, objConstructor;
-
-                try {
-                    // Not own constructor property must be Object
-                    if ((objConstructor = obj.constructor) && !hasOwnProperty(obj, "constructor") && !hasOwnProperty(objConstructor.prototype, "isPrototypeOf")) {
-                        return FALSE;
-                    }
-                } catch (e) {
-                    // IE8,9 Will throw exceptions on certain host objects
-                    return FALSE;
-                }
-
-                // Own properties are enumerated firstly, so to speed up,
-                // if last one is own, then all properties are own.
-
-
-                for (key in obj) {
-                }
-
-                return key === undefined || hasOwnProperty(obj, key);
-            }
+            isObject: noop
         });
+    }
 
-    S.each('Boolean Number String Function Array Date RegExp Object'.split(' '),
-        function (name, lc) {
-            // populate the class2type map
-            class2type['[object ' + name + ']'] = (lc = name.toLowerCase());
+    S.each('Boolean Number String Function Date RegExp Object Array'.split(' '), function (name, lc) {
+        // populate the class2type map
+        class2type['[object ' + name + ']'] = (lc = name.toLowerCase());
 
-            // add isBoolean/isNumber/...
-            S['is' + name] = function (o) {
-                return S.type(o) == lc;
-            }
-        });
-
-})(KISSY);/**
- * @ignore
- * implement Promise specification by KISSY
- * @author yiminghe@gmail.com
+        // add isBoolean/isNumber/...
+        S['is' + name] = function (o) {
+            return S.type(o) == lc;
+        }
+    });
+    S.isArray = Array.isArray || S.isArray;
+})(KISSY);/*
+ setImmediate polyfill inspired by Q
+ @author yiminghe@gmail.com
  */
-(function (S, undefined) {
+(function (S) {
+    var queue = [];
 
-    var PROMISE_VALUE = '__promise_value',
-        PROMISE_PENDINGS = '__promise_pendings';
+    var flushing = 0;
+
+    function flush() {
+        var i = 0, item;
+        while (item = queue[i++]) {
+            try {
+                item();
+            } catch (e) {
+                setTimeout(function () {
+                    throw e;
+                }, 0);
+            }
+        }
+        if (i > 1) {
+            queue = [];
+        }
+        flushing = 0;
+    }
 
     /*
-     two effects:
-     1. call fulfilled with immediate value
-     2. push fulfilled in right promise
+      setImmediate for loader and promise
+      @param {Function} fn async function to call
+      @private
      */
-    function promiseWhen(promise, fulfilled, rejected) {
-        // simply call rejected
-        if (promise instanceof Reject) {
-            // if there is a rejected , should always has! see when()
-            if (!rejected) {
-                S.error('no rejected callback!');
-            }
-            return rejected(promise[PROMISE_VALUE]);
-        }
-
-        var v = promise[PROMISE_VALUE],
-            pendings = promise[PROMISE_PENDINGS];
-
-        // unresolved
-        // pushed to pending list
-        if (pendings) {
-            pendings.push([fulfilled, rejected]);
-        }
-        // rejected or nested promise
-        else if (isPromise(v)) {
-            promiseWhen(v, fulfilled, rejected);
-        } else {
-            // fulfilled value
-            // normal value represents ok
-            // need return user's return value
-            // if return promise then forward
-            return fulfilled && fulfilled(v);
-        }
-        return undefined;
-    }
-
-    /**
-     * @class KISSY.Defer
-     * Defer constructor For KISSY,implement Promise specification.
-     */
-    function Defer(promise) {
-        var self = this;
-        if (!(self instanceof Defer)) {
-            return new Defer(promise);
-        }
-        // http://en.wikipedia.org/wiki/Object-capability_model
-        // principal of least authority
-        /**
-         * defer object's promise
-         * @type {KISSY.Promise}
-         */
-        self.promise = promise || new Promise();
-    }
-
-    Defer.prototype = {
-        constructor: Defer,
-        /**
-         * fulfill defer object's promise
-         * note: can only be called once
-         * @param value defer object's value
-         * @return {KISSY.Promise} defer object's promise
-         */
-        resolve: function (value) {
-            var promise = this.promise,
-                pendings;
-            if (!(pendings = promise[PROMISE_PENDINGS])) {
-                return null;
-            }
-            // set current promise 's resolved value
-            // maybe a promise or instant value
-            promise[PROMISE_VALUE] = value;
-            pendings = [].concat(pendings);
-            promise[PROMISE_PENDINGS] = undefined;
-            S.each(pendings, function (p) {
-                promiseWhen(promise, p[0], p[1]);
-            });
-            return value;
-        },
-        /**
-         * reject defer object's promise
-         * @param reason
-         * @return {KISSY.Promise} defer object's promise
-         */
-        reject: function (reason) {
-            return this.resolve(new Reject(reason));
+    S.setImmediate = function (fn) {
+        queue.push(fn);
+        if (!flushing) {
+            flushing = 1;
+            requestFlush();
         }
     };
 
-    function isPromise(obj) {
-        return  obj && obj instanceof Promise;
+    var requestFlush;
+    if (typeof setImmediate === "function") {
+        requestFlush = function () {
+            setImmediate(flush);
+        };
+    } else if (typeof process !== 'undefined' && typeof  process.nextTick == 'function') {
+        requestFlush = function () {
+            process.nextTick(flush);
+        };
+    } else if (typeof MessageChannel !== "undefined") {
+        // modern browsers
+        // http://msdn.microsoft.com/en-us/library/windows/apps/hh441303.aspx
+        var channel = new MessageChannel();
+        // At least Safari Version 6.0.5 (8536.30.1) intermittently cannot create
+        // working message ports the first time a page loads.
+        channel.port1.onmessage = function () {
+            requestFlush = realRequestFlush;
+            channel.port1.onmessage = flush;
+            flush();
+        };
+        var realRequestFlush = function () {
+            // Opera requires us to provide a message payload, regardless of
+            // whether we use it.
+            channel.port2.postMessage(0);
+        };
+        requestFlush = function () {
+            setTimeout(flush, 0);
+            realRequestFlush();
+        };
+
+    } else {
+        // old browsers
+        requestFlush = function () {
+            setTimeout(flush, 0);
+        };
     }
-
-    /**
-     * @class KISSY.Promise
-     * Promise constructor.
-     * This class should not be instantiated manually.
-     * Instances will be created and returned as needed by {@link KISSY.Defer#promise}
-     * @param [v] promise 's resolved value
-     */
-    function Promise(v) {
-        var self = this;
-        // maybe internal value is also a promise
-        self[PROMISE_VALUE] = v;
-        if (v === undefined) {
-            // unresolved
-            self[PROMISE_PENDINGS] = [];
-        }
-    }
-
-    Promise.prototype = {
-        constructor: Promise,
-        /**
-         * register callbacks when this promise object is resolved
-         * @param {Function} fulfilled called when resolved successfully,pass a resolved value to this function and
-         * return a value (could be promise object) for the new promise 's resolved value.
-         * @param {Function} [rejected] called when error occurs,pass error reason to this function and
-         * return a new reason for the new promise 's error reason
-         * @return {KISSY.Promise} a new promise object
-         */
-        then: function (fulfilled, rejected) {
-            return when(this, fulfilled, rejected);
-        },
-        /**
-         * call rejected callback when this promise object is rejected
-         * @param {Function} rejected called with rejected reason
-         * @return {KISSY.Promise} a new promise object
-         */
-        fail: function (rejected) {
-            return when(this, 0, rejected);
-        },
-        /**
-         * call callback when this promise object is rejected or resolved
-         * @param {Function} callback the second parameter is
-         * true when resolved and false when rejected
-         * @@return {KISSY.Promise} a new promise object
-         */
-        fin: function (callback) {
-            return when(this, function (value) {
-                return callback(value, true);
-            }, function (reason) {
-                return callback(reason, false);
-            });
-        },
-
-        /**
-         * register callbacks when this promise object is resolved,
-         * and throw error at next event loop if promise
-         * (current instance if no fulfilled and rejected parameter or
-         * new instance caused by call this.then(fulfilled, rejected))
-         * fails.
-         * @param {Function} [fulfilled] called when resolved successfully,pass a resolved value to this function and
-         * return a value (could be promise object) for the new promise 's resolved value.
-         * @param {Function} [rejected] called when error occurs,pass error reason to this function and
-         * return a new reason for the new promise 's error reason
-         */
-        done: function (fulfilled, rejected) {
-            var self = this,
-                onUnhandledError = function (error) {
-                    setTimeout(function () {
-                        throw error;
-                    }, 0);
-                },
-                promiseToHandle = fulfilled || rejected ?
-                    self.then(fulfilled, rejected) :
-                    self;
-            promiseToHandle.fail(onUnhandledError);
-        },
-
-        /**
-         * whether the given object is a resolved promise
-         * if it is resolved with another promise,
-         * then that promise needs to be resolved as well.
-         * @member KISSY.Promise
-         */
-        isResolved: function () {
-            return isResolved(this);
-        },
-        /**
-         * whether the given object is a rejected promise
-         */
-        isRejected: function () {
-            return isRejected(this);
-        }
-    };
-
-    function Reject(reason) {
-        if (reason instanceof Reject) {
-            return reason;
-        }
-        var self = this;
-        Promise.apply(self, arguments);
-        if (self[PROMISE_VALUE] instanceof Promise) {
-            S.error('assert.not(this.__promise_value instanceof promise) in Reject constructor');
-        }
-        return self;
-    }
-
-    S.extend(Reject, Promise);
-
-    /**
-     * wrap for promiseWhen
-     * @param value
-     * @ignore
-     * @param fulfilled
-     * @param [rejected]
-     */
-    function when(value, fulfilled, rejected) {
-        var defer = new Defer(),
-            done = 0;
-
-        // wrap user's callback to catch exception
-        function _fulfilled(value) {
-            try {
-                return fulfilled ? fulfilled(value) :
-                    // propagate
-                    value;
-            } catch (e) {
-                // print stack info for firefox/chrome
-                S.log(e.stack || e, 'error');
-                return new Reject(e);
-            }
-        }
-
-        function _rejected(reason) {
-            try {
-                return rejected ?
-                    // error recovery
-                    rejected(reason) :
-                    // propagate
-                    new Reject(reason);
-            } catch (e) {
-                // print stack info for firefox/chrome
-                S.log(e.stack || e, 'error');
-                return new Reject(e);
-            }
-        }
-
-        function finalFulfill(value) {
-            if (done) {
-                S.error('already done at fulfilled');
-                return;
-            }
-            if (value instanceof Promise) {
-                S.error('assert.not(value instanceof Promise) in when')
-            }
-            done = 1;
-            defer.resolve(_fulfilled(value));
-        }
-
-        if (value instanceof  Promise) {
-            promiseWhen(value, finalFulfill, function (reason) {
-                if (done) {
-                    S.error('already done at rejected');
-                    return;
-                }
-                done = 1;
-                // _reject may return non-Reject object for error recovery
-                defer.resolve(_rejected(reason));
-            });
-        } else {
-            finalFulfill(value);
-        }
-
-        // chained and leveled
-        // wait for value's resolve
-        return defer.promise;
-    }
-
-    function isResolved(obj) {
-        // exclude Reject at first
-        return !isRejected(obj) &&
-            isPromise(obj) &&
-            // self is resolved
-            (obj[PROMISE_PENDINGS] === undefined) &&
-            // value is a resolved promise or value is immediate value
-            (
-                // immediate value
-                !isPromise(obj[PROMISE_VALUE]) ||
-                    // resolved with a resolved promise !!! :)
-                    // Reject.__promise_value is string
-                    isResolved(obj[PROMISE_VALUE])
-                );
-    }
-
-    function isRejected(obj) {
-        return isPromise(obj) &&
-            (obj[PROMISE_PENDINGS] === undefined) &&
-            (obj[PROMISE_VALUE] instanceof Reject);
-    }
-
-    KISSY.Defer = Defer;
-    KISSY.Promise = Promise;
-    Promise.Defer = Defer;
-
-    S.mix(Promise,
-        /**
-         * @class KISSY.PromiseMix
-         * @override KISSY.Promise
-         */
-        {
-            /**
-             * register callbacks when obj as a promise is resolved
-             * or call fulfilled callback directly when obj is not a promise object
-             * @param {KISSY.Promise|*} obj a promise object or value of any type
-             * @param {Function} fulfilled called when obj resolved successfully,pass a resolved value to this function and
-             * return a value (could be promise object) for the new promise 's resolved value.
-             * @param {Function} [rejected] called when error occurs in obj,pass error reason to this function and
-             * return a new reason for the new promise 's error reason
-             * @return {KISSY.Promise} a new promise object
-             *
-             * for example:
-             *      @example
-             *      function check(p) {
-             *          S.Promise.when(p, function(v){
-             *              alert(v === 1);
-             *          });
-             *      }
-             *
-             *      var defer = S.Defer();
-             *      defer.resolve(1);
-             *
-             *      check(1); // => alert(true)
-             *
-             *      check(defer.promise); //=> alert(true);
-             *
-             * @static
-             * @method
-             */
-            when: when,
-            /**
-             * whether the given object is a promise
-             * @method
-             * @static
-             * @param obj the tested object
-             * @return {Boolean}
-             */
-            isPromise: isPromise,
-            /**
-             * whether the given object is a resolved promise
-             * @method
-             * @static
-             * @param obj the tested object
-             * @return {Boolean}
-             */
-            isResolved: isResolved,
-            /**
-             * whether the given object is a rejected promise
-             * @method
-             * @static
-             * @param obj the tested object
-             * @return {Boolean}
-             */
-            isRejected: isRejected,
-            /**
-             * return a new promise
-             * which is resolved when all promises is resolved
-             * and rejected when any one of promises is rejected
-             * @param {KISSY.Promise[]} promises list of promises
-             * @static
-             * @return {KISSY.Promise}
-             */
-            all: function (promises) {
-                var count = promises.length;
-                if (!count) {
-                    return null;
-                }
-                var defer = Defer();
-                for (var i = 0; i < promises.length; i++) {
-                    (function (promise, i) {
-                        when(promise, function (value) {
-                            promises[i] = value;
-                            if (--count === 0) {
-                                // if all is resolved
-                                // then resolve final returned promise with all value
-                                defer.resolve(promises);
-                            }
-                        }, function (r) {
-                            // if any one is rejected
-                            // then reject final return promise with first reason
-                            defer.reject(r);
-                        });
-                    })(promises[i], i);
-                }
-                return defer.promise;
-            }
-        });
-
-})(KISSY);
-
-/*
- refer:
- - http://wiki.commonjs.org/wiki/Promises
- - http://en.wikipedia.org/wiki/Futures_and_promises#Read-only_views
- - http://en.wikipedia.org/wiki/Object-capability_model
- - https://github.com/kriskowal/q
- - http://www.sitepen.com/blog/2010/05/03/robust-promises-with-dojo-deferred-1-5/
- - http://dojotoolkit.org/documentation/tutorials/1.6/deferreds/
- *//**
+})(KISSY);/**
  * @ignore
  * Port Node Utils For KISSY.
  * Note: Only posix mode.
  * @author yiminghe@gmail.com
  */
 (function (S) {
-
     // [root, dir, basename, ext]
     var splitPathRe = /^(\/?)([\s\S]+\/(?!$)|\/)?((?:\.{1,2}$|[\s\S]+?)?(\.[^.\/]*)?)$/;
 
-    /**
-     * Remove .. and . in path array
-     * @ignore
-     * @param parts
-     * @param allowAboveRoot
-     * @return {*}
-     */
+
+    // Remove .. and . in path array
     function normalizeArray(parts, allowAboveRoot) {
         // level above root
         var up = 0,
             i = parts.length - 1,
-            // splice costs a lot in ie
-            // use new array instead
+        // splice costs a lot in ie
+        // use new array instead
             newParts = [],
             last;
 
@@ -2225,11 +2055,10 @@ var KISSY = (function (undefined) {
      * @class KISSY.Path
      * @singleton
      */
-    var Path = {
+    var Path = S.Path = {
 
         /**
          * resolve([from ...], to)
-         *
          * @return {String} Resolved path.
          */
         resolve: function () {
@@ -2260,8 +2089,7 @@ var KISSY = (function (undefined) {
          * normalize .. and . in path
          * @param {String} path Path tobe normalized
          *
-         * for example:
-         *      @example
+         *
          *      'x/y/../z' => 'x/z'
          *      'x/y/z/../' => 'x/y/'
          *
@@ -2303,8 +2131,7 @@ var KISSY = (function (undefined) {
          * @param {String} from
          * @param {String} to
          *
-         * for example:
-         *      @example
+         *
          *      relative('x/','x/y/z') => 'y/z'
          *      relative('x/t/z','x/') => '../../'
          *
@@ -2362,6 +2189,7 @@ var KISSY = (function (undefined) {
 
         /**
          * Get dirname of path
+         * @param {String} path
          * @return {String}
          */
         dirname: function (path) {
@@ -2390,11 +2218,7 @@ var KISSY = (function (undefined) {
         extname: function (path) {
             return (path.match(splitPathRe) || [])[4] || '';
         }
-
     };
-    if (Path) {
-        S.Path = Path;
-    }
 })(KISSY);
 /*
  Refer
@@ -2405,9 +2229,9 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S, undefined) {
-
     var reDisallowedInSchemeOrUserInfo = /[#\/\?@]/g,
         reDisallowedInPathName = /[#\?]/g,
+        logger= S.getLogger('s/uri'),
     // ?? combo of taobao
         reDisallowedInQuery = /[#@]/g,
         reDisallowedInFragment = /#/g,
@@ -2489,7 +2313,6 @@ var KISSY = (function (undefined) {
     function Query(query) {
         this._query = query || '';
     }
-
 
     Query.prototype = {
         constructor: Query,
@@ -2628,14 +2451,7 @@ var KISSY = (function (undefined) {
             var self = this,
                 _queryMap,
                 currentValue;
-            if (S.isObject(key)) {
-                if (key instanceof Query) {
-                    key = key.get();
-                }
-                S.each(key, function (v, k) {
-                    self.add(k, v);
-                });
-            } else {
+            if (typeof key == 'string') {
                 parseQuery(self);
                 _queryMap = self._queryMap;
                 currentValue = _queryMap[key];
@@ -2645,6 +2461,13 @@ var KISSY = (function (undefined) {
                     currentValue = [].concat(currentValue).concat(value);
                 }
                 _queryMap[key] = currentValue;
+            } else {
+                if (key instanceof Query) {
+                    key = key.get();
+                }
+                for (var k in key) {
+                    self.add(k, key[k]);
+                }
             }
             return self;
         },
@@ -2681,7 +2504,6 @@ var KISSY = (function (undefined) {
             return '%' + padding2(m.charCodeAt(0).toString(16));
         });
     }
-
 
     /**
      * @class KISSY.Uri
@@ -2747,7 +2569,7 @@ var KISSY = (function (undefined) {
                 try {
                     v = S.urlDecode(v);
                 } catch (e) {
-                    S.log(e + 'urlDecode error : ' + v, 'error');
+                    logger.error(e + 'urlDecode error : ' + v);
                 }
                 // need to decode to get data structure in memory
                 self[key] = v;
@@ -2758,7 +2580,6 @@ var KISSY = (function (undefined) {
     }
 
     Uri.prototype = {
-
         constructor: Uri,
 
         /**
@@ -3068,7 +2889,6 @@ var KISSY = (function (undefined) {
     };
 
     S.Uri = Uri;
-
 })(KISSY);
 /*
  Refer
@@ -3110,7 +2930,7 @@ var KISSY = (function (undefined) {
 
     function getIEVersion(ua) {
         var m, v;
-        if ((m = ua.match(/MSIE ([^;]*)|Trident.*; rv ([0-9.]+)/)) &&
+        if ((m = ua.match(/MSIE ([^;]*)|Trident.*; rv(?:\s|:)?([0-9.]+)/)) &&
             (v = (m[1] || m[2]))) {
             return numberify(v);
         }
@@ -3132,7 +2952,6 @@ var KISSY = (function (undefined) {
             s = [];
         /**
          * KISSY UA
-         * @member KISSY
          * @class KISSY.UA
          * @singleton
          */
@@ -3264,7 +3083,8 @@ var KISSY = (function (undefined) {
             nodejs: undefined
         };
 
-        if (div) {
+        // ejecta
+        if (div && div.getElementsByTagName) {
             // try to use IE-Conditional-Comment detect IE more accurately
             // IE10 doesn't support this method, @ref: http://blogs.msdn.com/b/ie/archive/2011/07/06/html5-parsing-in-ie10.aspx
             div.innerHTML = IE_DETECT_TPL.replace(VERSION_PLACEHOLDER, '');
@@ -3325,7 +3145,7 @@ var KISSY = (function (undefined) {
                     if (m && m[0]) {
                         UA[m[0].toLowerCase()] = UA.ios;
                     }
-                } else if (/ Android/.test(ua)) {
+                } else if (/ Android/i.test(ua)) {
                     if (/Mobile/.test(ua)) {
                         os = UA.mobile = 'android';
                     }
@@ -3419,6 +3239,7 @@ var KISSY = (function (undefined) {
     }
 
     var UA = KISSY.UA = getDescriptorFromUserAgent(ua);
+
     // nodejs
     if (typeof process === 'object') {
         var versions, nodeVersion;
@@ -3490,26 +3311,63 @@ var KISSY = (function (undefined) {
  * detect if current browser supports various features.
  * @author yiminghe@gmail.com
  */
-(function (S) {
-
+(function (S, undefined) {
     var Env = S.Env,
         win = Env.host,
         UA = S.UA,
+        VENDORS = [
+            '',
+            'Webkit',
+            'Moz',
+            'O',
+            // ms is special .... !
+            'ms'
+        ],
     // nodejs
         doc = win.document || {},
-    // phantomjs issue: http://code.google.com/p/phantomjs/issues/detail?id=375
-        isTouchSupported = ('ontouchstart' in doc) && !(UA.phantomjs),
         documentMode = doc.documentMode,
-        ie = documentMode || UA.ie,
-        isNativeJSONSupported = ((Env.nodejs && typeof global === 'object') ? global : win).JSON;
+        isMsPointerSupported,
+        transitionProperty,
+        transformProperty,
+        transitionPrefix,
+        transformPrefix,
+        documentElement = doc.documentElement,
+        documentElementStyle,
+        isClassListSupportedState = true,
+        isQuerySelectorSupportedState = false,
+    // phantomjs issue: http://code.google.com/p/phantomjs/issues/detail?id=375
+        isTouchEventSupportedState = ('ontouchstart' in doc) && !(UA.phantomjs),
+        ie = documentMode || UA.ie;
 
-    // ie 8.0.7600.16315@win7 json bug!
-    if (documentMode && documentMode < 9) {
-        isNativeJSONSupported = 0;
+    if (documentElement) {
+        if (documentElement.querySelector &&
+            // broken ie8
+            ie != 8) {
+            isQuerySelectorSupportedState = true;
+        }
+        documentElementStyle = documentElement.style;
+
+        S.each(VENDORS, function (val) {
+            var transition = val ? val + 'Transition' : 'transition',
+                transform = val ? val + 'Transform' : 'transform';
+            if (transitionPrefix === undefined &&
+                transition in documentElementStyle) {
+                transitionPrefix = val;
+                transitionProperty = transition;
+            }
+            if (transformPrefix === undefined &&
+                transform in documentElementStyle) {
+                transformPrefix = val;
+                transformProperty = transform;
+            }
+        });
+
+        isClassListSupportedState = 'classList' in documentElement;
+        isMsPointerSupported = "msPointerEnabled" in (win.navigator || {});
     }
 
     /**
-     * test browser features
+     * browser features detection
      * @class KISSY.Features
      * @private
      * @singleton
@@ -3517,24 +3375,33 @@ var KISSY = (function (undefined) {
     S.Features = {
         // http://blogs.msdn.com/b/ie/archive/2011/09/20/touch-input-for-ie10-and-metro-style-apps.aspx
         /**
-         * @ignore
-         * whether support win8 pointer event.
+         * whether support microsoft pointer event.
          * @type {Boolean}
          */
-        // isMsPointerEnabled: "msPointerEnabled" in (win.navigator || {}),
-        /**
-         * whether support touch event.
-         * @method
-         * @return {Boolean}
-         */
-        isTouchSupported: function () {
-            return isTouchSupported;
+        isMsPointerSupported: function () {
+            return isMsPointerSupported;
         },
 
+        /**
+         * whether support touch event.
+         * @return {Boolean}
+         */
+        isTouchEventSupported: function () {
+            return isTouchEventSupportedState;
+        },
+
+        /**
+         * whether support device motion event
+         * @returns {boolean}
+         */
         isDeviceMotionSupported: function () {
             return !!win['DeviceMotionEvent'];
         },
 
+        /**
+         * whether support hashchange event
+         * @returns {boolean}
+         */
         'isHashChangeSupported': function () {
             // ie8 支持 hashchange
             // 但 ie8 以上切换浏览器模式到 ie7（兼容模式），
@@ -3543,22 +3410,86 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         * whether support native json
-         * @method
-         * @return {Boolean}
+         * whether support css transition
+         * @returns {boolean}
          */
-        isNativeJSONSupported: function () {
-            return isNativeJSONSupported;
+        'isTransitionSupported': function () {
+            return transitionPrefix !== undefined;
+        },
+
+        /**
+         * whether support css transform
+         * @returns {boolean}
+         */
+        'isTransformSupported': function () {
+            return transformPrefix !== undefined;
+        },
+
+        /**
+         * whether support class list api
+         * @returns {boolean}
+         */
+        'isClassListSupported': function () {
+            return isClassListSupportedState
+        },
+
+        /**
+         * whether support querySelectorAll
+         * @returns {boolean}
+         */
+        'isQuerySelectorSupported': function () {
+            // force to use js selector engine
+            return !S.config('dom/selector') &&
+                isQuerySelectorSupportedState;
+        },
+
+        /**
+         * whether is ie and ie version is less than specified version
+         * @param {Number} v specified ie version to be compared
+         * @returns {boolean}
+         */
+        'isIELessThan': function (v) {
+            return !!(ie && ie < v);
+        },
+
+        /**
+         * get css transition browser prefix if support css transition
+         * @returns {String}
+         */
+        'getTransitionPrefix': function () {
+            return transitionPrefix;
+        },
+
+        /**
+         * get css transform browser prefix if support css transform
+         * @returns {String}
+         */
+        'getTransformPrefix': function () {
+            return transformPrefix;
+        },
+
+        /**
+         * get css transition property if support css transition
+         * @returns {String}
+         */
+        'getTransitionProperty': function () {
+            return transitionProperty;
+        },
+
+        /**
+         * get css transform property if support css transform
+         * @returns {String}
+         */
+        'getTransformProperty': function () {
+            return transformProperty;
         }
     };
-
 })(KISSY);/**
  * @ignore
  * setup data structure for kissy loader
  * @author yiminghe@gmail.com
  */
 (function (S) {
-
     var Loader = S.Loader = {};
 
     /**
@@ -3583,16 +3514,15 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S) {
-
     var Loader = S.Loader,
         Path = S.Path,
+        logger = S.getLogger('s/loader'),
         host = S.Env.host,
         startsWith = S.startsWith,
         data = Loader.Status,
         ATTACHED = data.ATTACHED,
         LOADED = data.LOADED,
         ERROR = data.ERROR,
-    // LOADING = data.LOADING,
         /**
          * @class KISSY.Loader.Utils
          * Utils for KISSY Loader
@@ -3626,8 +3556,25 @@ var KISSY = (function (undefined) {
         return s;
     }
 
-    S.mix(Utils, {
+    function pluginAlias(runtime, name) {
+        var index = name.indexOf('!');
+        if (index != -1) {
+            var pluginName = name.substring(0, index);
+            name = name.substring(index + 1);
+            S.use(pluginName, {
+                sync: true,
+                success: function (S, Plugin) {
+                    if (Plugin.alias) {
+                        //noinspection JSReferencingMutableVariableFromClosure
+                        name = Plugin.alias(runtime, name, pluginName);
+                    }
+                }
+            });
+        }
+        return name;
+    }
 
+    S.mix(Utils, {
         /**
          * get document head
          * @return {HTMLElement}
@@ -3638,9 +3585,9 @@ var KISSY = (function (undefined) {
 
         /**
          * Get absolute path of dep module.similar to {@link KISSY.Path#resolve}
-         * @param moduleName current module 's name
-         * @param depName dep module 's name
-         * @return {string|Array}
+         * @param {String} moduleName current module 's name
+         * @param {String|String[]} depName dependency module 's name
+         * @return {String|String[]} normalized dependency module 's name
          */
         normalDepModuleName: function (moduleName, depName) {
             var i = 0, l;
@@ -3666,8 +3613,8 @@ var KISSY = (function (undefined) {
 
         /**
          * create modules info
-         * @param runtime
-         * @param modNames
+         * @param runtime Module container, such as KISSY
+         * @param {String[]} modNames to be created module names
          */
         createModulesInfo: function (runtime, modNames) {
             S.each(modNames, function (m) {
@@ -3677,9 +3624,9 @@ var KISSY = (function (undefined) {
 
         /**
          * create single module info
-         * @param runtime
-         * @param modName
-         * @param [cfg]
+         * @param runtime Module container, such as KISSY
+         * @param {String} modName to be created module name
+         * @param {Object} [cfg] module config
          * @return {KISSY.Loader.Module}
          */
         createModuleInfo: function (runtime, modName, cfg) {
@@ -3703,7 +3650,7 @@ var KISSY = (function (undefined) {
 
         /**
          * Whether modNames is attached.
-         * @param runtime
+         * @param runtime Module container, such as KISSY
          * @param modNames
          * @return {Boolean}
          */
@@ -3713,9 +3660,9 @@ var KISSY = (function (undefined) {
 
         /**
          * Get module values
-         * @param runtime
-         * @param modNames
-         * @return {Array}
+         * @param runtime Module container, such as KISSY
+         * @param {String[]} modNames module names
+         * @return {Array} module values
          */
         getModules: function (runtime, modNames) {
             var mods = [runtime], mod,
@@ -3743,56 +3690,80 @@ var KISSY = (function (undefined) {
             return mods;
         },
 
-        attachModsRecursively: function (modNames, runtime, stack, errorList) {
+        /**
+         * attach modules and their dependency modules recursively
+         * @param {String[]} modNames module names
+         * @param runtime Module container, such as KISSY
+         * @param {String[]} [stack] stack for detecting circular dependency
+         * @param {Array} [errorList] errors when attach mods
+         * @param {Object} [cache] cached modules to avoid duplicate check
+         * @returns whether success attach all modules
+         */
+        attachModsRecursively: function (modNames, runtime, stack, errorList, cache) {
+            // for debug. prevent circular dependency
             stack = stack || [];
+            // for efficiency. avoid duplicate non-attach check
+            cache = cache || {};
             var i,
                 s = 1,
                 l = modNames.length,
                 stackDepth = stack.length;
             for (i = 0; i < l; i++) {
-                s = Utils.attachModRecursively(modNames[i], runtime, stack, errorList) && s;
+                s = s && Utils.attachModRecursively(modNames[i], runtime, stack, errorList, cache);
                 stack.length = stackDepth;
             }
             return s;
         },
 
-        attachModRecursively: function (modName, runtime, stack, errorList) {
+        /**
+         * attach module and its dependency modules recursively
+         * @param {String} modName module name
+         * @param runtime Module container, such as KISSY
+         * @param {String[]} [stack] stack for detecting circular dependency
+         * @param {Array} [errorList] errors when attach mods
+         * @param {Object} [cache] cached modules to avoid duplicate check
+         * @returns whether success attach all modules
+         */
+        attachModRecursively: function (modName, runtime, stack, errorList, cache) {
             var mods = runtime.Env.mods,
                 status,
                 m = mods[modName];
+            if (modName in cache) {
+                return cache[modName];
+            }
             if (!m) {
-                return 0;
+                return cache[modName] = 0;
             }
             status = m.status;
             if (status == ATTACHED) {
-                return 1;
+                return cache[modName] = 1;
             }
             if (status == ERROR) {
                 errorList.push(m);
             }
             if (status != LOADED) {
-                return 0;
+                return cache[modName] = 0;
             }
             if ('@DEBUG@') {
                 if (S.inArray(modName, stack)) {
                     stack.push(modName);
                     S.error('find cyclic dependency between mods: ' + stack);
-                    return 0;
+                    return cache[modName] = 0;
                 }
                 stack.push(modName);
             }
             if (Utils.attachModsRecursively(m.getNormalizedRequires(),
-                runtime, stack, errorList)) {
+                runtime, stack, errorList, cache)) {
                 Utils.attachMod(runtime, m);
-                return 1;
+                return cache[modName] = 1;
             }
-            return 0;
+            return cache[modName] = 0;
         },
 
         /**
          * Attach specified mod.
-         * @param runtime
-         * @param mod
+         * @param runtime Module container, such as KISSY
+         * @param {KISSY.Loader.Module} mod module instance
          */
         attachMod: function (runtime, mod) {
             if (mod.status != LOADED) {
@@ -3814,7 +3785,7 @@ var KISSY = (function (undefined) {
 
         /**
          * Get mod names as array.
-         * @param modNames
+         * @param {String|String[]} modNames module names array or  module names string separated by ','
          * @return {String[]}
          */
         getModNamesAsArray: function (modNames) {
@@ -3825,7 +3796,7 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         * Three effects:
+         * normalize module names
          * 1. add index : / => /index
          * 2. unalias : core => dom,event,ua
          * 3. relative to absolute : ./x => y/x
@@ -3833,7 +3804,7 @@ var KISSY = (function (undefined) {
          * @param {String|String[]} modNames Array of module names
          *  or module names string separated by comma
          * @param {String} [refModName]
-         * @return {String[]}
+         * @return {String[]} normalized module names
          */
         normalizeModNames: function (runtime, modNames, refModName) {
             return Utils.unalias(runtime,
@@ -3842,9 +3813,9 @@ var KISSY = (function (undefined) {
 
         /**
          * unalias module name.
-         * @param runtime
-         * @param names
-         * @return {Array}
+         * @param runtime Module container, such as KISSY
+         * @param {String} names moduleNames
+         * @return {String[]} unaliased module names
          */
         unalias: function (runtime, names) {
             var ret = [].concat(names),
@@ -3872,11 +3843,11 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         * normalize module names
-         * @param runtime
-         * @param modNames
-         * @param [refModName]
-         * @return {Array}
+         * normalize module names with alias
+         * @param runtime Module container, such as KISSY
+         * @param {String[]} modNames module names
+         * @param [refModName] module to be referred if module name path is relative
+         * @return {String[]} normalize module names with alias
          */
         normalizeModNamesWithAlias: function (runtime, modNames, refModName) {
             var ret = [], i, l;
@@ -3886,7 +3857,7 @@ var KISSY = (function (undefined) {
                     // conditional loader
                     // requires:[window.localStorage?"local-storage":""]
                     if (modNames[i]) {
-                        ret.push(indexMap(modNames[i]));
+                        ret.push(pluginAlias(runtime, indexMap(modNames[i])));
                     }
                 }
             }
@@ -3899,20 +3870,19 @@ var KISSY = (function (undefined) {
 
         /**
          * register module with factory
-         * @param runtime
-         * @param name
-         * @param fn
-         * @param [config]
+         * @param runtime Module container, such as KISSY
+         * @param {String} name module name
+         * @param {Function|*} fn module's factory or value
+         * @param [config] module config, such as dependency
          */
         registerModule: function (runtime, name, fn, config) {
-
             name = indexMapStr(name);
 
             var mods = runtime.Env.mods,
                 mod = mods[name];
 
             if (mod && mod.fn) {
-                S.log(name + ' is defined more than once');
+                S.log(name + ' is defined more than once', 'warn');
                 return;
             }
 
@@ -3930,15 +3900,14 @@ var KISSY = (function (undefined) {
             });
 
             S.mix(mod, config);
-            // S.log(name + ' is loaded', 'info');
         },
 
         /**
          * Get mapped path.
-         * @param runtime
-         * @param path
-         * @param [rules]
-         * @return {String}
+         * @param runtime Module container, such as KISSY
+         * @param {String} path module path
+         * @param [rules] map rules
+         * @return {String} mapped path
          */
         getMappedPath: function (runtime, path, rules) {
             var mappedRules = rules ||
@@ -3976,7 +3945,6 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S) {
-
     var Loader = S.Loader,
         Path = S.Path,
         IGNORE_PACKAGE_NAME_IN_URI = 'ignorePackageNameInUri',
@@ -3998,7 +3966,6 @@ var KISSY = (function (undefined) {
     }
 
     S.augment(Package, {
-
         reset: function (cfg) {
             S.mix(this, cfg);
         },
@@ -4038,12 +4005,15 @@ var KISSY = (function (undefined) {
                 );
         },
 
-        getPackageUri:function(){
-            var self=this;
-            if(self.packageUri){
+        /**
+         * get package uri
+         */
+        getPackageUri: function () {
+            var self = this;
+            if (self.packageUri) {
                 return self.packageUri;
             }
-            return self.packageUri=new S.Uri(this.getPrefixUriForCombo());
+            return self.packageUri = new S.Uri(this.getPrefixUriForCombo());
         },
 
         /**
@@ -4063,7 +4033,7 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         *  whether request mod file without package name
+         *  whether request mod file without insert package name into package base
          *  @return {Boolean}
          */
         isIgnorePackageNameInUri: function () {
@@ -4105,21 +4075,20 @@ var KISSY = (function (undefined) {
     function Module(cfg) {
         this.status = Loader.Status.INIT;
         S.mix(this, cfg);
-        this.callbacks = [];
+        this.waitedCallbacks = [];
     }
 
     S.augment(Module, {
-
-        addCallback: function (callback) {
-            this.callbacks.push(callback);
+        wait: function (callback) {
+            this.waitedCallbacks.push(callback);
         },
 
         notifyAll: function () {
             var callback;
-            var len = this.callbacks.length,
+            var len = this.waitedCallbacks.length,
                 i = 0;
             for (; i < len; i++) {
-                callback = this.callbacks[i];
+                callback = this.waitedCallbacks[i];
                 try {
                     callback(this);
                 } catch (e) {
@@ -4128,14 +4097,14 @@ var KISSY = (function (undefined) {
                     }, 0);
                 }
             }
-            this.callbacks = [];
+            this.waitedCallbacks = [];
         },
 
         /**
          * Set the value of current module
          * @param v value to be set
          */
-        setValue: function (v) {
+        'setValue': function (v) {
             this.value = v;
         },
 
@@ -4158,33 +4127,51 @@ var KISSY = (function (undefined) {
         },
 
         /**
+         * Get the fullpath uri of current module if load dynamically
+         * @return {KISSY.Uri}
+         */
+        getFullPathUri: function () {
+            var self = this,
+                t,
+                fullPathUri,
+                packageBaseUri,
+                packageInfo,
+                packageName,
+                path;
+            if (!self.fullPathUri) {
+                if (self.fullpath) {
+                    fullPathUri = new S.Uri(self.fullpath);
+                } else {
+                    packageInfo = self.getPackage();
+                    packageBaseUri = packageInfo.getBaseUri();
+                    path = self.getPath();
+                    // #262
+                    if (packageInfo.isIgnorePackageNameInUri() &&
+                        // native mod does not allow ignore package name
+                        (packageName = packageInfo.getName())) {
+                        path = Path.relative(packageName, path);
+                    }
+                    fullPathUri = packageBaseUri.resolve(path);
+                    if (t = self.getTag()) {
+                        t += '.' + self.getType();
+                        fullPathUri.query.set('t', t);
+                    }
+                }
+                self.fullPathUri = fullPathUri;
+            }
+            return self.fullPathUri;
+        },
+
+        /**
          * Get the fullpath of current module if load dynamically
          * @return {String}
          */
         getFullPath: function () {
             var self = this,
-                t,
-                fullpathUri,
-                packageBaseUri,
-                packageInfo,
-                packageName,
-                path;
+                fullPathUri;
             if (!self.fullpath) {
-                packageInfo = self.getPackage();
-                packageBaseUri = packageInfo.getBaseUri();
-                path = self.getPath();
-                // #262
-                if (packageInfo.isIgnorePackageNameInUri() &&
-                    // native mod does not allow ignore package name
-                    (packageName = packageInfo.getName())) {
-                    path = Path.relative(packageName, path);
-                }
-                fullpathUri = packageBaseUri.resolve(path);
-                if (t = self.getTag()) {
-                    t += '.' + self.getType();
-                    fullpathUri.query.set('t', t);
-                }
-                self.fullpath = Utils.getMappedPath(self.runtime, fullpathUri.toString());
+                fullPathUri = self.getFullPathUri();
+                self.fullpath = Utils.getMappedPath(self.runtime, fullPathUri.toString());
             }
             return self.fullpath;
         },
@@ -4244,9 +4231,8 @@ var KISSY = (function (undefined) {
             return self.charset || self.getPackage().getCharset();
         },
 
-
         /**
-         * Get module objects required by this one
+         * Get module objects required by this module
          * @return {KISSY.Loader.Module[]}
          */
         'getRequiredMods': function () {
@@ -4270,7 +4256,10 @@ var KISSY = (function (undefined) {
             return requiresWithAlias;
         },
 
-
+        /**
+         * Get module names required by this module
+         * @return {KISSY.Loader.Module[]}
+         */
         getNormalizedRequires: function () {
             var self = this,
                 normalizedRequires,
@@ -4307,38 +4296,32 @@ var KISSY = (function (undefined) {
         return name + min + extname;
     }
 
-    var systemPackage = new Loader.Package({
+    var systemPackage = new Package({
         name: '',
         runtime: S
     });
 
     function getPackage(self, modName) {
         var packages = self.config('packages'),
+            modNameSlash = modName + '/',
             pName = '',
             p;
-
         for (p in packages) {
-
-            // longest match
-            if (S.startsWith(modName, p) &&
-                p.length > pName.length) {
+            if (S.startsWith(modNameSlash, p + '/') && p.length > pName.length) {
                 pName = p;
             }
-
         }
-
         return packages[pName] || systemPackage;
     }
-
 })(KISSY);/**
  * @ignore
  * script/css load across browser
  * @author yiminghe@gmail.com
  */
 (function (S) {
-
     var CSS_POLL_INTERVAL = 30,
-        UA= S.UA,
+        UA = S.UA,
+        logger = S.getLogger('s/loader/getScript'),
         Utils = S.Loader.Utils,
     // central poll for link node
         timer = 0,
@@ -4346,274 +4329,265 @@ var KISSY = (function (undefined) {
             // node.id:{callback:callback,node:node}
         };
 
-
-    /**
-     * @ignore
-     * References:
-     *  - http://unixpapa.com/js/dyna.html
-     *  - http://www.blaze.io/technical/ies-premature-execution-problem/
-     *
-     * `onload` event is supported in WebKit since 535.23
-     *  - https://bugs.webkit.org/show_activity.cgi?id=38995
-     * `onload/onerror` event is supported since Firefox 9.0
-     *  - https://bugzilla.mozilla.org/show_bug.cgi?id=185236
-     *  - https://developer.mozilla.org/en/HTML/Element/link#Stylesheet_load_events
-     *
-     * monitor css onload across browsers.issue about 404 failure.
-     *
-     *  - firefox not ok（4 is wrong）：
-     *    - http://yearofmoo.com/2011/03/cross-browser-stylesheet-preloading/
-     *  - all is ok
-     *    - http://lifesinger.org/lab/2011/load-js-css/css-preload.html
-     *  - others
-     *    - http://www.zachleat.com/web/load-css-dynamically/
-     */
-
     function startCssTimer() {
         if (!timer) {
-            // S.log('start css polling');
+            logger.debug('start css poll timer');
             cssPoll();
         }
     }
 
-    // single thread is ok
-    function cssPoll() {
-
-        for (var url in monitors) {
-
-            var callbackObj = monitors[url],
-                node = callbackObj.node,
-                exName,
-                loaded = 0;
-            if (UA.webkit) {
-                // http://www.w3.org/TR/Dom-Level-2-Style/stylesheets.html
-                if (node['sheet']) {
-                    S.log('webkit loaded : ' + url);
+    function isCssLoaded(node, url) {
+        var loaded = 0;
+        if (UA.webkit) {
+            // http://www.w3.org/TR/Dom-Level-2-Style/stylesheets.html
+            if (node['sheet']) {
+                logger.debug('webkit css poll loaded: ' + url);
+                loaded = 1;
+            }
+        } else if (node['sheet']) {
+            try {
+                var cssRules = node['sheet'].cssRules;
+                if (cssRules) {
+                    logger.debug('same domain css poll loaded: ' + url);
                     loaded = 1;
                 }
-            } else if (node['sheet']) {
-                try {
-                    var cssRules = node['sheet'].cssRules;
-                    if (cssRules) {
-                        S.log('same domain firefox loaded : ' + url);
-                        loaded = 1;
-                    }
-                } catch (ex) {
-                    exName = ex.name;
-                    S.log('firefox getStyle : ' + exName + ' ' + ex.code + ' ' + url);
-                    // http://www.w3.org/TR/dom/#dom-domexception-code
-                    if (// exName == 'SecurityError' ||
-                    // for old firefox
-                        exName == 'NS_ERROR_DOM_SECURITY_ERR') {
-                        S.log(exName + ' firefox loaded : ' + url);
-                        loaded = 1;
-                    }
+            } catch (ex) {
+                var exName = ex.name;
+                logger.debug('css poll exception: ' + exName + ' ' + ex.code + ' ' + url);
+                // http://www.w3.org/TR/dom/#dom-domexception-code
+                if (// exName == 'SecurityError' ||
+                // for old firefox
+                    exName == 'NS_ERROR_DOM_SECURITY_ERR') {
+                    logger.debug('css poll exception: ' + exName + 'loaded : ' + url);
+                    loaded = 1;
                 }
             }
+        }
+        return loaded;
+    }
 
-            if (loaded) {
+    // single thread is ok
+    function cssPoll() {
+        for (var url in monitors) {
+            var callbackObj = monitors[url],
+                node = callbackObj.node;
+            if (isCssLoaded(node, url)) {
                 if (callbackObj.callback) {
                     callbackObj.callback.call(node);
                 }
                 delete monitors[url];
             }
-
         }
 
         if (S.isEmptyObject(monitors)) {
+            logger.debug('clear css poll timer');
             timer = 0;
-            // S.log('end css polling');
         } else {
             timer = setTimeout(cssPoll, CSS_POLL_INTERVAL);
         }
     }
 
-    S.mix(Utils, {
-        pollCss: // refer : http://lifesinger.org/lab/2011/load-js-css/css-preload.html
-        // 暂时不考虑如何判断失败，如 404 等
-            function (node, callback) {
-                var href = node.href,
-                    arr;
-                arr = monitors[href] = {};
-                arr.node = node;
-                arr.callback = callback;
-                startCssTimer();
-            }
+    // refer : http://lifesinger.org/lab/2011/load-js-css/css-preload.html
+    // 暂时不考虑如何判断失败，如 404 等
+    Utils.pollCss = function (node, callback) {
+        var href = node.href,
+            arr;
+        arr = monitors[href] = {};
+        arr.node = node;
+        arr.callback = callback;
+        startCssTimer();
+    };
 
-    });
-})(KISSY);/**
+    Utils.isCssLoaded = isCssLoaded;
+})(KISSY);
+/*
+ References:
+ - http://unixpapa.com/js/dyna.html
+ - http://www.blaze.io/technical/ies-premature-execution-problem/
+
+ `onload` event is supported in WebKit since 535.23
+ - https://bugs.webkit.org/show_activity.cgi?id=38995
+ `onload/onerror` event is supported since Firefox 9.0
+ - https://bugzilla.mozilla.org/show_bug.cgi?id=185236
+ - https://developer.mozilla.org/en/HTML/Element/link#Stylesheet_load_events
+
+ monitor css onload across browsers.issue about 404 failure.
+ - firefox not ok（4 is wrong）：
+ - http://yearofmoo.com/2011/03/cross-browser-stylesheet-preloading/
+ - all is ok
+ - http://lifesinger.org/lab/2011/load-js-css/css-preload.html
+ - others
+ - http://www.zachleat.com/web/load-css-dynamically/
+ *//**
  * @ignore
  * getScript support for css and js callback after load
  * @author yiminghe@gmail.com
  */
 (function (S) {
-
     var MILLISECONDS_OF_SECOND = 1000,
         doc = S.Env.host.document,
         Utils = S.Loader.Utils,
         Path = S.Path,
         jsCssCallbacks = {},
-        UA = S.UA,
-    // onload for webkit 535.23  Firefox 9.0
-    // https://bugs.webkit.org/show_activity.cgi?id=38995
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=185236
-    // https://developer.mozilla.org/en/HTML/Element/link#Stylesheet_load_events
-    // phantomjs 1.7 == webkit 534.34
-        isOldWebKit = UA.webkit < 536;
+        headNode,
+        UA = S.UA;
 
-    S.mix(S, {
-        /**
-         * Load a javascript/css file from the server using a GET HTTP request,
-         * then execute it.
-         *
-         * for example:
-         *      @example
-         *      getScript(url, success, charset);
-         *      // or
-         *      getScript(url, {
-         *          charset: string
-         *          success: fn,
-         *          error: fn,
-         *          timeout: number
-         *      });
-         *
-         * Note 404/500 status in ie<9 will trigger success callback.
-         * If you want a jsonp operation, please use {@link KISSY.IO} instead.
-         *
-         * @param {String} url resource's url
-         * @param {Function|Object} [success] success callback or config
-         * @param {Function} [success.success] success callback
-         * @param {Function} [success.error] error callback
-         * @param {Number} [success.timeout] timeout (s)
-         * @param {String} [success.charset] charset of current resource
-         * @param {String} [charset] charset of current resource
-         * @return {HTML} script/style node
-         * @member KISSY
-         */
-        getScript: function (url, success, charset) {
-            // can not use KISSY.Uri, url can not be encoded for some url
-            // eg: /??dom.js,event.js , ? , should not be encoded
-            var config = success,
-                css = 0,
-                error,
-                timeout,
-                attrs,
-                callbacks,
-                timer;
+    /**
+     * Load a javascript/css file from the server using a GET HTTP request,
+     * then execute it.
+     *
+     * for example:
+     *      @example
+     *      getScript(url, success, charset);
+     *      // or
+     *      getScript(url, {
+     *          charset: string
+     *          success: fn,
+     *          error: fn,
+     *          timeout: number
+     *      });
+     *
+     * Note 404/500 status in ie<9 will trigger success callback.
+     * If you want a jsonp operation, please use {@link KISSY.IO} instead.
+     *
+     * @param {String} url resource's url
+     * @param {Function|Object} [success] success callback or config
+     * @param {Function} [success.success] success callback
+     * @param {Function} [success.error] error callback
+     * @param {Number} [success.timeout] timeout (s)
+     * @param {String} [success.charset] charset of current resource
+     * @param {String} [charset] charset of current resource
+     * @return {HTMLElement} script/style node
+     * @member KISSY
+     */
+    S.getScript = function (url, success, charset) {
+        // can not use KISSY.Uri, url can not be encoded for some url
+        // eg: /??dom.js,event.js , ? , should not be encoded
+        var config = success,
+            css = 0,
+            error,
+            timeout,
+            attrs,
+            callbacks,
+            timer;
 
-            if (S.startsWith(Path.extname(url).toLowerCase(), '.css')) {
-                css = 1;
-            }
-
-            if (S.isPlainObject(config)) {
-                success = config['success'];
-                error = config['error'];
-                timeout = config['timeout'];
-                charset = config['charset'];
-                attrs = config['attrs'];
-            }
-
-            callbacks = jsCssCallbacks[url] = jsCssCallbacks[url] || [];
-
-            callbacks.push([success, error]);
-
-            if (callbacks.length > 1) {
-                // S.log(' queue js : ' + callbacks.length + ' : for :' + url + ' by ' + (config.source || ''));
-                return callbacks.node;
-            } else {
-                // S.log('init getScript : by ' + config.source);
-            }
-
-            var head = Utils.docHead(),
-                node = doc.createElement(css ? 'link' : 'script'),
-                clearTimer = function () {
-                    if (timer) {
-                        timer.cancel();
-                        timer = undefined;
-                    }
-                };
-
-            if (attrs) {
-                S.each(attrs, function (v, n) {
-                    node.setAttribute(n, v);
-                });
-            }
-
-            if (charset) {
-                node.charset = charset;
-            }
-
-            if (css) {
-                node.href = url;
-                node.rel = 'stylesheet';
-            } else {
-                node.src = url;
-                node.async = true;
-            }
-
-            callbacks.node = node;
-
-            var end = function (error) {
-                    var index = error,
-                        fn;
-                    clearTimer();
-                    S.each(jsCssCallbacks[url], function (callback) {
-                        if (fn = callback[index]) {
-                            fn.call(node);
-                        }
-                    });
-                    delete jsCssCallbacks[url];
-                },
-                useNative = 'onload' in node;
-
-            if (css && isOldWebKit) {
-                useNative = false;
-            }
-
-            function onload() {
-                var readyState = node.readyState;
-                if (!readyState ||
-                    readyState == "loaded" ||
-                    readyState == "complete") {
-                    node.onreadystatechange = node.onload = null;
-                    end(0)
-                }
-            }
-
-            //标准浏览器 css and all script
-            if (useNative) {
-                node.onload = onload;
-                node.onerror = function () {
-                    node.onerror = null;
-                    end(1);
-                };
-            }
-            // old chrome/firefox for css
-            else if (css) {
-                Utils.pollCss(node, function () {
-                    end(0);
-                });
-            } else {
-                node.onreadystatechange = onload;
-            }
-
-            if (timeout) {
-                timer = S.later(function () {
-                    end(1);
-                }, timeout * MILLISECONDS_OF_SECOND);
-            }
-            if (css) {
-                // css order matters
-                // so can not use css in head
-                head.appendChild(node);
-            } else {
-                // can use js in head
-                head.insertBefore(node, head.firstChild);
-            }
-            return node;
+        if (S.startsWith(Path.extname(url).toLowerCase(), '.css')) {
+            css = 1;
         }
-    });
 
+        if (S.isPlainObject(config)) {
+            success = config['success'];
+            error = config['error'];
+            timeout = config['timeout'];
+            charset = config['charset'];
+            attrs = config['attrs'];
+        }
+
+        callbacks = jsCssCallbacks[url] = jsCssCallbacks[url] || [];
+
+        callbacks.push([success, error]);
+
+        if (callbacks.length > 1) {
+            return callbacks.node;
+        }
+
+        var node = doc.createElement(css ? 'link' : 'script'),
+            clearTimer = function () {
+                if (timer) {
+                    timer.cancel();
+                    timer = undefined;
+                }
+            };
+
+        if (attrs) {
+            S.each(attrs, function (v, n) {
+                node.setAttribute(n, v);
+            });
+        }
+
+        if (charset) {
+            node.charset = charset;
+        }
+
+        if (css) {
+            node.href = url;
+            node.rel = 'stylesheet';
+        } else {
+            node.src = url;
+            node.async = true;
+        }
+
+        callbacks.node = node;
+
+        var end = function (error) {
+            var index = error,
+                fn;
+            clearTimer();
+            S.each(jsCssCallbacks[url], function (callback) {
+                if (fn = callback[index]) {
+                    fn.call(node);
+                }
+            });
+            delete jsCssCallbacks[url];
+        };
+
+        var useNative = 'onload' in node;
+        // onload for webkit 535.23  Firefox 9.0
+        // https://bugs.webkit.org/show_activity.cgi?id=38995
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=185236
+        // https://developer.mozilla.org/en/HTML/Element/link#Stylesheet_load_events
+        // phantomjs 1.7 == webkit 534.34
+        var forceCssPoll = S.Config['forceCssPoll'] || (UA.webkit && UA.webkit < 536);
+
+        if (css && forceCssPoll && useNative) {
+            useNative = false;
+        }
+
+        function onload() {
+            var readyState = node.readyState;
+            if (!readyState ||
+                readyState == "loaded" ||
+                readyState == "complete") {
+                node.onreadystatechange = node.onload = null;
+                end(0);
+            }
+        }
+
+        //标准浏览器 css and all script
+        if (useNative) {
+            node.onload = onload;
+            node.onerror = function () {
+                node.onerror = null;
+                end(1);
+            };
+        }
+        // old chrome/firefox for css
+        else if (css) {
+            Utils.pollCss(node, function () {
+                end(0);
+            });
+        } else {
+            node.onreadystatechange = onload;
+        }
+
+        if (timeout) {
+            timer = S.later(function () {
+                end(1);
+            }, timeout * MILLISECONDS_OF_SECOND);
+        }
+        if (!headNode) {
+            headNode = Utils.docHead();
+        }
+        if (css) {
+            // css order matters
+            // so can not use css in head
+            headNode.appendChild(node);
+        } else {
+            // can use js in head
+            headNode.insertBefore(node, headNode.firstChild);
+        }
+        return node;
+    };
 })(KISSY);
 /*
  yiminghe@gmail.com refactor@2012-03-29
@@ -4629,7 +4603,6 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S, undefined) {
-
     var Loader = S.Loader,
         Utils = Loader.Utils,
         host = S.Env.host,
@@ -4642,17 +4615,10 @@ var KISSY = (function (undefined) {
         simulatedLocation = new S.Uri(locationHref)
     }
 
-    /*
-     modify current module path
+    S.Config.loadModsFn = function (rs, config) {
+        S.getScript(rs.fullpath, config);
+    };
 
-     [
-     [/(.+-)min(.js(\?t=\d+)?)$/, '$1$2'],
-     [/(.+-)min(.js(\?t=\d+)?)$/, function(_,m1,m2){
-     return m1+m2;
-     }]
-     ]
-
-     */
     configFns.map = function (rules) {
         var Config = this.Config;
         if (rules === false) {
@@ -4669,19 +4635,12 @@ var KISSY = (function (undefined) {
         return Config.mappedComboRules = (Config.mappedComboRules || []).concat(rules || []);
     };
 
-    /*
-     包声明
-     biz -> .
-     表示遇到 biz/x
-     在当前网页路径找 biz/x.js
-     @private
-     */
-    configFns.packages = function (cfgs) {
+    configFns.packages = function (config) {
         var name,
             Config = this.Config,
             ps = Config.packages = Config.packages || {};
-        if (cfgs) {
-            S.each(cfgs, function (cfg, key) {
+        if (config) {
+            S.each(config, function (cfg, key) {
                 // 兼容数组方式
                 name = cfg.name || key;
 
@@ -4700,7 +4659,7 @@ var KISSY = (function (undefined) {
                 }
             });
             return undefined;
-        } else if (cfgs === false) {
+        } else if (config === false) {
             Config.packages = {
             };
             return undefined;
@@ -4709,47 +4668,19 @@ var KISSY = (function (undefined) {
         }
     };
 
-    /*
-     只用来指定模块依赖信息.
-     <code>
-
-     KISSY.config({
-     base: '',
-     // dom-min.js
-     debug: '',
-     combine: true,
-     tag: '',
-     packages: {
-     'biz1': {
-     // path change to base
-     base: 'haha',
-     // x.js
-     debug: '',
-     tag: '',
-     combine: false,
-     }
-     },
-     modules: {
-     'biz1/main': {
-     requires: ['biz1/part1', 'biz1/part2']
-     }
-     }
-     });
-     */
     configFns.modules = function (modules) {
-        var self = this,
-            Env = self.Env;
+        var self = this;
         if (modules) {
             S.each(modules, function (modCfg, modName) {
-                Utils.createModuleInfo(self, modName, modCfg);
-                S.mix(Env.mods[modName], modCfg);
+                var mod = Utils.createModuleInfo(self, modName, modCfg);
+                // #485, invalid after add
+                if (mod.status == Loader.Status.INIT) {
+                    S.mix(mod, modCfg);
+                }
             });
         }
     };
 
-    /*
-     KISSY 's base path.
-     */
     configFns.base = function (base) {
         var self = this,
             Config = self.Config,
@@ -4762,7 +4693,6 @@ var KISSY = (function (undefined) {
         Config.baseUri = baseUri;
         return undefined;
     };
-
 
     function normalizeBase(base) {
         var baseUri;
@@ -4782,271 +4712,17 @@ var KISSY = (function (undefined) {
         }
         return baseUri;
     }
-
-})(KISSY);/**
- * simple loader for KISSY. one module on request.
- * @ignore
- * @author yiminghe@gmail.com
- */
-(function (S, undefined) {
-
-    var Loader, Status, Utils, UA,
-    // standard browser 如果 add 没有模块名，模块定义先暂存这里
-        currentMod = undefined,
-    // ie 开始载入脚本的时间
-        startLoadTime = 0,
-    // ie6,7,8开始载入脚本对应的模块名
-        startLoadModName,
-        LOADING, LOADED, ERROR, ATTACHED;
-
-    Loader = S.Loader;
-    Status = Loader.Status;
-    Utils = Loader.Utils;
-    UA = S.UA;
-    LOADING = Status.LOADING;
-    LOADED = Status.LOADED;
-    ERROR = Status.ERROR;
-    ATTACHED = Status.ATTACHED;
-
-    /**
-     * @class KISSY.Loader.SimpleLoader
-     * one module one request
-     * @param runtime KISSY
-     * @param waitingModules load checker
-     * @private
-     */
-    function SimpleLoader(runtime, waitingModules) {
-        S.mix(this, {
-            runtime: runtime,
-            requireLoadedMods: {},
-            waitingModules: waitingModules
-        });
-    }
-
-    S.augment(SimpleLoader, {
-
-        use: function (normalizedModNames) {
-            var i,
-                l = normalizedModNames.length;
-            for (i = 0; i < l; i++) {
-                this.loadModule(normalizedModNames[i]);
-            }
-        },
-
-        // only load mod requires once
-        // prevent looping dependency sub tree more than once for one use()
-        loadModRequires: function (mod) {
-            // 根据每次 use 缓存子树
-            var self = this,
-                requireLoadedMods = self.requireLoadedMods,
-                modName = mod.name,
-                requires;
-            if (!requireLoadedMods[modName]) {
-                requireLoadedMods[modName] = 1;
-                requires = mod.getNormalizedRequires();
-                self.use(requires);
-            }
-        },
-
-        loadModule: function (modName) {
-            var self = this,
-                waitingModules = self.waitingModules,
-                runtime = self.runtime,
-                status,
-                isWait,
-                mod = Utils.createModuleInfo(runtime, modName);
-
-            status = mod.status;
-
-            if (status == ATTACHED || status == ERROR) {
-                return;
-            }
-
-            // 已经静态存在在页面上
-            // 或者该模块不是根据自身模块名动态加载来的(io.js包含 io/base,io/form)
-            if (status === LOADED) {
-                self.loadModRequires(mod);
-            } else {
-                isWait = waitingModules.contains(modName);
-
-                // prevent duplicate listen for this use
-                //  use('a,a') or
-                //  user('a,c') a require b, c require b
-                // listen b only once
-                // already waiting, will notify loadReady in the future
-                if (isWait) {
-                    return;
-                }
-
-                mod.addCallback(function () {
-                    // 只在 LOADED 后加载依赖项一次
-                    // 防止 config('modules') requires 和模块中 requires 不一致
-                    self.loadModRequires(mod);
-                    waitingModules.remove(modName);
-                    // notify current loader instance
-                    waitingModules.notifyAll();
-                });
-
-                waitingModules.add(modName);
-
-                // in case parallel use (more than one use)
-                if (status < LOADING) {
-                    // load and attach this module
-                    self.fetchModule(mod);
-                }
-            }
-        },
-
-        // Load a single module.
-        fetchModule: function (mod) {
-
-            var self = this,
-                runtime = self.runtime,
-                modName = mod.getName(),
-                charset = mod.getCharset(),
-                url = mod.getFullPath(),
-                ie = UA.ie,
-                isCss = mod.getType() == 'css';
-
-            mod.status = LOADING;
-
-            if (ie && !isCss) {
-                startLoadModName = modName;
-                startLoadTime = Number(+new Date());
-            }
-
-            S.getScript(url, {
-                attrs: ie ? {
-                    'data-mod-name': modName
-                } : undefined,
-                // syntaxError in all browser will trigger this
-                // same as #111 : https://github.com/kissyteam/kissy/issues/111
-                success: function () {
-
-                    if (isCss) {
-                        // css does not set LOADED because no add for css! must be set manually
-                        Utils.registerModule(runtime, modName, S.noop);
-                    } else {
-                        // does not need this step for css
-                        // standard browser(except ie9) fire load after KISSY.add immediately
-                        if (currentMod) {
-                            // S.log('standard browser get mod name after load : ' + modName);
-                            Utils.registerModule(runtime,
-                                modName, currentMod.fn,
-                                currentMod.config);
-                            currentMod = undefined;
-                        }
-                    }
-
-                    // nodejs is synchronous,
-                    // use('x,y')
-                    // need x,y filled into waitingMods first
-                    // x,y waiting -> x -> load -> y -> load -> check
-                    S.later(checkHandler);
-                },
-                error: checkHandler,
-                // source:mod.name + '-init',
-                charset: charset
-            });
-
-            function checkHandler() {
-                if (mod.fn) {
-                    var msg = 'load remote module: "' + modName +
-                        '" from: "' + url + '"';
-                    S.log(msg, 'info');
-                } else {
-                    // ie will call success even when getScript error(404)
-                    _modError();
-                }
-                // notify all loader instance
-                mod.notifyAll();
-            }
-
-            function _modError() {
-                var msg = modName +
-                    ' is not loaded! can not find module in path : ' +
-                    url;
-                S.log(msg, 'error');
-                mod.status = ERROR;
-            }
-
-        }
-
-    });
-
-// ie 特有，找到当前正在交互的脚本，根据脚本名确定模块名
-// 如果找不到，返回发送前那个脚本
-    function findModuleNameByInteractive() {
-        var scripts = S.Env.host.document.getElementsByTagName('script'),
-            re,
-            i,
-            name,
-            script;
-
-        for (i = scripts.length - 1; i >= 0; i--) {
-            script = scripts[i];
-            if (script.readyState == 'interactive') {
-                re = script;
-                break;
-            }
-        }
-        if (re) {
-            name = re.getAttribute('data-mod-name');
-        } else {
-            // sometimes when read module file from cache,
-            // interactive status is not triggered
-            // module code is executed right after inserting into dom
-            // i has to preserve module name before insert module script into dom,
-            // then get it back here
-            // S.log('can not find interactive script,time diff : ' + (+new Date() - self.__startLoadTime), 'error');
-            // S.log('old_ie get mod name from cache : ' + self.__startLoadModName);
-            name = startLoadModName;
-        }
-        return name;
-    }
-
-    SimpleLoader.add = function (name, fn, config, runtime) {
-        if (typeof name === 'function') {
-            config = fn;
-            fn = name;
-            if (UA.ie) {
-                // http://groups.google.com/group/commonjs/browse_thread/thread/5a3358ece35e688e/43145ceccfb1dc02#43145ceccfb1dc02
-                name = findModuleNameByInteractive();
-                // S.log('ie get modName by interactive: ' + name);
-                Utils.registerModule(runtime, name, fn, config);
-                startLoadModName = null;
-                startLoadTime = 0;
-            } else {
-                // 其他浏览器 onload 时，关联模块名与模块定义
-                currentMod = {
-                    fn: fn,
-                    config: config
-                };
-            }
-        }
-    };
-
-    Loader.SimpleLoader = SimpleLoader;
-
 })(KISSY);
-
-/*
- 2013-06-04 yiminghe@gmail.com
- - refactor merge combo loader and simple loader
- - support error callback
-
- 2012-10-08 yiminghe@gmail.com refactor
- - use 调用先统一 load 再统一 attach
-
- 2012-09-20 yiminghe@gmail.com refactor
- - 参考 async 重构，去除递归回调
- *//**
+/**
  * combo loader for KISSY. using combo to load module files.
  * @ignore
  * @author yiminghe@gmail.com
  */
-(function (S) {
-    function loadScripts(rss, callback, charset) {
+(function (S, undefined) {
+    // ie11 is a new one!
+    var oldIE = S.UA.ie && S.UA.ie < 10;
+
+    function loadScripts(runtime, rss, callback, charset, timeout) {
         var count = rss && rss.length,
             errorList = [],
             successList = [];
@@ -5058,9 +4734,17 @@ var KISSY = (function (undefined) {
         }
 
         S.each(rss, function (rs) {
-            S.getScript(rs.fullpath, {
+            var mod;
+            var config = {
+                timeout: timeout,
                 success: function () {
                     successList.push(rs);
+                    if (mod && currentMod) {
+                        // standard browser(except ie9) fire load after KISSY.add immediately
+                        logger.debug('standard browser get mod name after load : ' + mod.name);
+                        Utils.registerModule(runtime, mod.name, currentMod.fn, currentMod.config);
+                        currentMod = undefined;
+                    }
                     complete();
                 },
                 error: function () {
@@ -5068,11 +4752,26 @@ var KISSY = (function (undefined) {
                     complete();
                 },
                 charset: charset
-            });
+            };
+            if (!rs.combine) {
+                mod = rs.mods[0];
+                if (mod.getType() == 'css') {
+                    mod = undefined;
+                }
+                else if (oldIE) {
+                    startLoadModName = mod.name;
+                    startLoadModTime = S.now();
+                    config.attrs = {
+                        'data-mod-name': mod.name
+                    };
+                }
+            }
+            S.Config.loadModsFn(rs, config);
         });
     }
 
     var Loader = S.Loader,
+        logger = S.getLogger('s/loader'),
         Status = Loader.Status,
         Utils = Loader.Utils,
         LOADING = Status.LOADING,
@@ -5097,6 +4796,70 @@ var KISSY = (function (undefined) {
         });
     }
 
+    var currentMod;
+    var startLoadModName;
+    var startLoadModTime;
+
+    ComboLoader.add = function (name, fn, config, runtime) {
+        if (typeof name === 'function') {
+            config = fn;
+            fn = name;
+            if (oldIE) {
+                // http://groups.google.com/group/commonjs/browse_thread/thread/5a3358ece35e688e/43145ceccfb1dc02#43145ceccfb1dc02
+                name = findModuleNameByInteractive();
+                // S.log('oldIE get modName by interactive: ' + name);
+                Utils.registerModule(runtime, name, fn, config);
+                startLoadModName = null;
+                startLoadModTime = 0;
+            } else {
+                // 其他浏览器 onload 时，关联模块名与模块定义
+                currentMod = {
+                    fn: fn,
+                    config: config
+                };
+            }
+        } else {
+            if (oldIE) {
+                startLoadModName = null;
+                startLoadModTime = 0;
+            } else {
+                currentMod = undefined;
+            }
+            Utils.registerModule(runtime, name, fn, config);
+        }
+    };
+
+    // oldIE 特有，找到当前正在交互的脚本，根据脚本名确定模块名
+    // 如果找不到，返回发送前那个脚本
+    function findModuleNameByInteractive() {
+        var scripts = S.Env.host.document.getElementsByTagName('script'),
+            re,
+            i,
+            name,
+            script;
+
+        for (i = scripts.length - 1; i >= 0; i--) {
+            script = scripts[i];
+            if (script.readyState == 'interactive') {
+                re = script;
+                break;
+            }
+        }
+        if (re) {
+            name = re.getAttribute('data-mod-name');
+        } else {
+            // sometimes when read module file from cache,
+            // interactive status is not triggered
+            // module code is executed right after inserting into dom
+            // i has to preserve module name before insert module script into dom,
+            // then get it back here
+            logger.debug('can not find interactive script,time diff : ' + (S.now() - startLoadModTime));
+            logger.debug('old_ie get mod name from cache : ' + startLoadModName);
+            name = startLoadModName;
+        }
+        return name;
+    }
+
     function debugRemoteModules(rss) {
         S.each(rss, function (rs) {
             var ms = [];
@@ -5106,7 +4869,7 @@ var KISSY = (function (undefined) {
                 }
             });
             if (ms.length) {
-                S.log('load remote modules: "' + ms.join(', ') + '" from: "' + rs.fullpath + '"');
+                logger.info('load remote modules: "' + ms.join(', ') + '" from: "' + rs.fullpath + '"');
             }
         });
     }
@@ -5123,13 +4886,8 @@ var KISSY = (function (undefined) {
         return str1.slice(0, i).join('/') + '/';
     }
 
-    /**
-     * Returns hash code of a string
-     * djb2 algorithm
-     * @param {String} str string to be hashed
-     * @private
-     * @return {String} the hash code
-     */
+
+    // Returns hash code of a stringdjb2 algorithm
     function getHash(str) {
         var hash = 5381,
             i;
@@ -5140,16 +4898,15 @@ var KISSY = (function (undefined) {
         return hash + '';
     }
 
-    // ----------------------- private end
     S.augment(ComboLoader, {
-
         /**
-         * use, _forceSync for kissy.js, initialize dom,event sync
+         * load modules asynchronously
          */
         use: function (normalizedModNames) {
             var self = this,
                 allModNames,
                 comboUrls,
+                timeout = S.Config.timeout,
                 runtime = self.runtime;
 
             allModNames = S.keys(self.calculate(normalizedModNames));
@@ -5160,7 +4917,7 @@ var KISSY = (function (undefined) {
 
             // load css first to avoid page blink
             S.each(comboUrls.css, function (cssOne) {
-                loadScripts(cssOne, function (success, error) {
+                loadScripts(runtime, cssOne, function (success, error) {
                     if ('@DEBUG@') {
                         debugRemoteModules(success);
                     }
@@ -5184,12 +4941,12 @@ var KISSY = (function (undefined) {
                             mod.notifyAll();
                         });
                     });
-                }, cssOne.charset);
+                }, cssOne.charset, timeout);
             });
 
             // jss css download in parallel
             S.each(comboUrls['js'], function (jsOne) {
-                loadScripts(jsOne, function (success) {
+                loadScripts(runtime, jsOne, function (success) {
                     if ('@DEBUG@') {
                         debugRemoteModules(success);
                     }
@@ -5209,16 +4966,12 @@ var KISSY = (function (undefined) {
                             mod.notifyAll();
                         });
                     });
-                }, jsOne.charset);
+                }, jsOne.charset, timeout);
             });
         },
 
         /**
          * calculate dependency
-         * @param modNames
-         * @param [cache]
-         * @param ret
-         * @return {Array}
          */
         calculate: function (modNames, cache, ret) {
             var i,
@@ -5242,16 +4995,16 @@ var KISSY = (function (undefined) {
                 cache[m] = 1;
                 mod = Utils.createModuleInfo(runtime, m);
                 modStatus = mod.status;
-                if (modStatus === ERROR) {
+                if (modStatus === ERROR || modStatus === ATTACHED) {
                     continue;
                 }
-                if (modStatus != LOADED && modStatus != ATTACHED) {
+                if (modStatus != LOADED) {
                     if (!waitingModules.contains(m)) {
                         if (modStatus != LOADING) {
                             mod.status = LOADING;
                             ret[m] = 1;
                         }
-                        mod.addCallback(function (mod) {
+                        mod.wait(function (mod) {
                             waitingModules.remove(mod.getName());
                             // notify current loader instance
                             waitingModules.notifyAll();
@@ -5265,7 +5018,9 @@ var KISSY = (function (undefined) {
             return ret;
         },
 
-
+        /**
+         * get combo mods for modNames
+         */
         getComboMods: function (modNames, comboPrefixes) {
             var comboMods = {},
                 packageUri,
@@ -5275,6 +5030,7 @@ var KISSY = (function (undefined) {
                 modName, mod, packageInfo, type, typedCombos, mods,
                 tag, charset, packagePath,
                 packageName, group, fullpath;
+
             for (; i < l; ++i) {
                 modName = modNames[i];
                 mod = Utils.createModuleInfo(runtime, modName);
@@ -5325,13 +5081,12 @@ var KISSY = (function (undefined) {
                 }
                 mods.push(mod);
             }
+
             return comboMods;
         },
 
         /**
          * Get combo urls
-         * @param modNames
-         * @return {Object}
          */
         getComboUrls: function (modNames) {
             var runtime = this.runtime,
@@ -5342,7 +5097,6 @@ var KISSY = (function (undefined) {
                 maxUrlLength = Config.comboMaxUrlLength;
 
             var comboPrefixes = {};
-
             // {type, {comboName, [modInfo]}}}
             var comboMods = this.getComboMods(modNames, comboPrefixes);
             // {type, {comboName, [url]}}}
@@ -5373,6 +5127,7 @@ var KISSY = (function (undefined) {
                         // map the whole combo path
                         //noinspection JSReferencingMutableVariableFromClosure
                         res.push({
+                            combine: 1,
                             fullpath: Utils.getMappedPath(runtime, prefix +
                                 currentComboUrls.join(comboSep) + suffix,
                                 Config.mappedComboRules),
@@ -5387,6 +5142,7 @@ var KISSY = (function (undefined) {
                         var fullpath = currentMod.getFullPath();
                         if (!currentMod.canBeCombined) {
                             res.push({
+                                combine: 0,
                                 fullpath: fullpath,
                                 mods: [currentMod]
                             });
@@ -5419,6 +5175,9 @@ var KISSY = (function (undefined) {
     Loader.ComboLoader = ComboLoader;
 })(KISSY);
 /*
+ 2013-09-11
+ - union simple loader and combo loader
+
  2013-07-25 阿古, yiminghe
  - support group combo for packages
 
@@ -5433,15 +5192,15 @@ var KISSY = (function (undefined) {
  ATTACHED: fn executed
  *//**
  * @ignore
- * mix loader into S and infer KISSY baseUrl if not set
+ * mix loader into KISSY and infer KISSY baseUrl if not set
  * @author yiminghe@gmail.com
  */
 (function (S, undefined) {
-
-    var Loader = KISSY.Loader,
+    var Loader = S.Loader,
         Env = S.Env,
+        logger = S.getLogger('s/loader'),
         Utils = Loader.Utils,
-        SimpleLoader = Loader.SimpleLoader,
+        processImmediate = S.setImmediate,
         ComboLoader = Loader.ComboLoader;
 
     function WaitingModules(fn) {
@@ -5452,7 +5211,6 @@ var KISSY = (function (undefined) {
     }
 
     WaitingModules.prototype = {
-
         constructor: WaitingModules,
 
         notifyAll: function () {
@@ -5475,7 +5233,6 @@ var KISSY = (function (undefined) {
         contains: function (modName) {
             return this.waitMods[modName];
         }
-
     };
 
     Loader.WaitingModules = WaitingModules;
@@ -5492,21 +5249,16 @@ var KISSY = (function (undefined) {
          * @param {String[]} cfg.requires this module's required module name list
          * @member KISSY
          *
-         * for example:
-         *      @example
+         *
          *      // dom module's definition
          *      KISSY.add('dom', function(S, xx){
-             *          return {css: function(el, name, val){}};
-             *      },{
-             *          requires:['xx']
-             *      });
+         *          return {css: function(el, name, val){}};
+         *      },{
+         *          requires:['xx']
+         *      });
          */
         add: function (name, fn, cfg) {
-            if (typeof name == 'string') {
-                Utils.registerModule(S, name, fn, cfg);
-            } else {
-                SimpleLoader.add(name, fn, cfg, S);
-            }
+            ComboLoader.add(name, fn, cfg, S);
         },
         /**
          * Attached one or more modules to global KISSY instance.
@@ -5517,22 +5269,24 @@ var KISSY = (function (undefined) {
          * @param success.x... used module values
          * @member KISSY
          *
-         * for example:
-         *      @example
+         *
          *      // loads and attached overlay,dd and its dependencies
          *      KISSY.use('overlay,dd', function(S, Overlay){});
          */
         use: function (modNames, success) {
-            var Config = S.Config,
-                normalizedModNames,
+            var normalizedModNames,
                 loader,
                 error,
                 sync,
+                tryCount = 0,
                 waitingModules = new WaitingModules(loadReady);
 
             if (S.isPlainObject(success)) {
+                //noinspection JSUnresolvedVariable
                 sync = success.sync;
+                //noinspection JSUnresolvedVariable
                 error = success.error;
+                //noinspection JSUnresolvedVariable
                 success = success.success;
             }
 
@@ -5542,18 +5296,21 @@ var KISSY = (function (undefined) {
             normalizedModNames = Utils.unalias(S, modNames);
 
             function loadReady() {
+                ++tryCount;
                 var errorList = [],
+                    start = S.now(),
                     ret;
                 ret = Utils.attachModsRecursively(normalizedModNames, S, undefined, errorList);
+                logger.debug(tryCount + ' check duration ' + (S.now() - start));
                 if (ret) {
                     if (success) {
                         if (sync) {
                             success.apply(S, Utils.getModules(S, modNames));
                         } else {
                             // standalone error trace
-                            setTimeout(function () {
+                            processImmediate(function () {
                                 success.apply(S, Utils.getModules(S, modNames));
-                            }, 0);
+                            });
                         }
                     }
                 } else if (errorList.length) {
@@ -5561,22 +5318,19 @@ var KISSY = (function (undefined) {
                         if (sync) {
                             error.apply(S, errorList);
                         } else {
-                            setTimeout(function () {
+                            processImmediate(function () {
                                 error.apply(S, errorList);
-                            }, 0);
+                            });
                         }
                     }
                 } else {
+                    logger.debug(tryCount + ' reload ' + modNames);
                     waitingModules.fn = loadReady;
                     loader.use(normalizedModNames);
                 }
             }
 
-            if (Config.combine && !S.UA.nodejs) {
-                loader = new ComboLoader(S, waitingModules);
-            } else {
-                loader = new SimpleLoader(S, waitingModules);
-            }
+            loader = new ComboLoader(S, waitingModules);
 
             // in case modules is loaded statically
             // synchronous check
@@ -5584,18 +5338,42 @@ var KISSY = (function (undefined) {
             if (sync) {
                 waitingModules.notifyAll();
             } else {
-                setTimeout(function () {
+                processImmediate(function () {
                     waitingModules.notifyAll();
-                }, 0);
+                });
             }
             return S;
         },
 
-        require: function (name) {
-            return Utils.getModules(S,
-                Utils.normalizeModNamesWithAlias(S, [name]))[1];
+        /**
+         * get module value from KISSY module cache
+         * @param {String} moduleName module name
+         * @member KISSY
+         * @return {*} value of module which name is moduleName
+         */
+        require: function (moduleName) {
+            var moduleNames = Utils.unalias(S, Utils.normalizeModNamesWithAlias(S, [moduleName]));
+            if (Utils.attachModsRecursively(moduleNames, S)) {
+                return Utils.getModules(S, moduleNames)[1];
+            }
+            return undefined;
         }
     });
+
+    Env.mods = {}; // all added mods
+})(KISSY);
+
+/*
+ 2013-06-04 yiminghe@gmail.com
+ - refactor merge combo loader and simple loader
+ - support error callback
+ *//**
+ * @ignore
+ * init loader, set config
+ */
+(function (S) {
+    var doc = S.Env.host && S.Env.host.document;
+    var logger = S.getLogger('s/loader');
 
     function returnJson(s) {
         return (new Function('return ' + s))();
@@ -5666,7 +5444,7 @@ var KISSY = (function (undefined) {
     function getBaseInfo() {
         // get base from current script file path
         // notice: timestamp
-        var scripts = Env.host.document.getElementsByTagName('script'),
+        var scripts = doc.getElementsByTagName('script'),
             i,
             info;
 
@@ -5676,84 +5454,74 @@ var KISSY = (function (undefined) {
             }
         }
 
-        S.error('must load kissy by file name: seed.js or seed-min.js');
+        S.log('must load kissy by file name in browser environment: seed.js or seed-min.js','error');
         return null;
     }
 
+    S.config({
+        charset: 'utf-8',
+        lang: 'zh-cn',
+        tag: '20131105150616'
+    });
+
     if (S.UA.nodejs) {
         // nodejs: no tag
+        // noinspection JSUnresolvedVariable
         S.config({
             charset: 'utf-8',
             base: __dirname.replace(/\\/g, '/').replace(/\/$/, '') + '/'
         });
-    } else {
+        // ejecta
+    } else if (doc && doc.getElementsByTagName) {
         // will transform base to absolute path
         S.config(S.mix({
             // 2k(2048) url length
             comboMaxUrlLength: 2000,
             // file limit number for a single combo url
-            comboMaxFileNum: 40,
-            charset: 'utf-8',
-            tag: '20130815000847'
+            comboMaxFileNum: 40
         }, getBaseInfo()));
     }
-
-    // Initializes loader.
-    Env.mods = {}; // all added mods
-
-})(KISSY);
-
-/*
- 2013-06-04 yiminghe@gmail.com
- - refactor merge combo loader and simple loader
- - support error callback
- *//**
+})(KISSY);/**
  * @ignore
- * web.js
- * @author lifesinger@gmail.com, yiminghe@gmail.com
+ * i18n plugin for kissy loader
+ * @author yiminghe@gmail.com
+ */
+KISSY.add('i18n', {
+    alias: function (S, name) {
+        return name + '/i18n/' + S.Config.lang;
+    }
+});/**
  * this code can only run at browser environment
+ * @ignore
+ * @author lifesinger@gmail.com, yiminghe@gmail.com
  */
 (function (S, undefined) {
-
     var win = S.Env.host,
-
+        logger = S.getLogger('s/web'),
         UA = S.UA,
-
         doc = win['document'],
-
         docElem = doc && doc.documentElement,
-
         location = win.location,
-
         EMPTY = '',
-
-        readyDefer = new S.Defer(),
-
-        readyPromise = readyDefer.promise,
-
+        domReady = 0,
+        callbacks = [],
     // The number of poll times.
         POLL_RETIRES = 500,
-
     // The poll interval in milliseconds.
         POLL_INTERVAL = 40,
-
     // #id or id
         RE_ID_STR = /^#?([\w-]+)$/,
-
         RE_NOT_WHITESPACE = /\S/,
-
         standardEventModel = !!(doc && doc.addEventListener),
         DOM_READY_EVENT = 'DOMContentLoaded',
         READY_STATE_CHANGE_EVENT = 'readystatechange',
         LOAD_EVENT = 'load',
         COMPLETE = 'complete',
-
         addEventListener = standardEventModel ? function (el, type, fn) {
             el.addEventListener(type, fn, false);
         } : function (el, type, fn) {
             el.attachEvent('on' + type, fn);
         },
-
         removeEventListener = standardEventModel ? function (el, type, fn) {
             el.removeEventListener(type, fn, false);
         } : function (el, type, fn) {
@@ -5761,8 +5529,6 @@ var KISSY = (function (undefined) {
         };
 
     S.mix(S, {
-
-
         /**
          * A crude way of determining if an object is a window
          * @member KISSY
@@ -5770,7 +5536,6 @@ var KISSY = (function (undefined) {
         isWindow: function (obj) {
             return obj != null && obj == obj.window;
         },
-
 
         /**
          * get xml representation of data
@@ -5793,8 +5558,8 @@ var KISSY = (function (undefined) {
                     xml.loadXML(data);
                 }
             } catch (e) {
-                S.log('parseXML error : ');
-                S.log(e);
+                logger.error('parseXML error :');
+                logger.error(e);
                 xml = undefined;
             }
             if (!xml || !xml.documentElement || xml.getElementsByTagName('parsererror').length) {
@@ -5820,18 +5585,21 @@ var KISSY = (function (undefined) {
         /**
          * Specify a function to execute when the Dom is fully loaded.
          * @param fn {Function} A function to execute after the Dom is ready
-         *
-         * for example:
-         *      @example
-         *      KISSY.ready(function(S){});
-         *
          * @chainable
          * @member KISSY
          */
         ready: function (fn) {
-
-            readyPromise.done(fn);
-
+            if (domReady) {
+                try {
+                    fn(S);
+                } catch (e) {
+                    setTimeout(function () {
+                        throw e;
+                    }, 0);
+                }
+            } else {
+                callbacks.push(fn);
+            }
             return this;
         },
 
@@ -5843,31 +5611,43 @@ var KISSY = (function (undefined) {
          */
         available: function (id, fn) {
             id = (id + EMPTY).match(RE_ID_STR)[1];
-            var retryCount = 1,
-                node,
-                timer = S.later(function () {
-                    if ((node = doc.getElementById(id)) && (fn(node) || 1) ||
-                        ++retryCount > POLL_RETIRES) {
-                        timer.cancel();
-                    }
-                }, POLL_INTERVAL, true);
+            var retryCount = 1;
+            var timer = S.later(function () {
+                if (++retryCount > POLL_RETIRES) {
+                    timer.cancel();
+                    return;
+                }
+                var node = doc.getElementById(id);
+                if (node) {
+                    fn(node);
+                    timer.cancel();
+                }
+            }, POLL_INTERVAL, true);
         }
     });
 
     function fireReady() {
+        if (domReady) {
+            return;
+        }
         // nodejs
         if (doc && !UA.nodejs) {
             removeEventListener(win, LOAD_EVENT, fireReady);
         }
-        readyDefer.resolve(S);
+        domReady = 1;
+        for (var i = 0; i < callbacks.length; i++) {
+            try {
+                callbacks[i](S);
+            } catch (e) {
+                setTimeout(function () {
+                    throw e;
+                }, 0);
+            }
+        }
     }
 
-    /**
-     * Binds ready events.
-     * @ignore
-     */
+    //  Binds ready events.
     function bindReady() {
-
         // Catch cases where ready() is called after the
         // browser event has already occurred.
         if (!doc || doc.readyState === COMPLETE) {
@@ -5889,7 +5669,6 @@ var KISSY = (function (undefined) {
         }
         // IE event model is used
         else {
-
             var stateChange = function () {
                 if (doc.readyState === COMPLETE) {
                     removeEventListener(doc, READY_STATE_CHANGE_EVENT, stateChange);
@@ -5920,7 +5699,6 @@ var KISSY = (function (undefined) {
                         doScroll('left');
                         fireReady();
                     } catch (ex) {
-                        //S.log('detect document ready : ' + ex);
                         setTimeout(readyScroll, POLL_INTERVAL);
                     }
                 };
@@ -5934,7 +5712,6 @@ var KISSY = (function (undefined) {
         S.Config.debug = true;
     }
 
-
     // bind on start
     // in case when you bind but the DOMContentLoaded has triggered
     // then you has to wait onload
@@ -5947,7 +5724,6 @@ var KISSY = (function (undefined) {
         } catch (e) {
         }
     }
-
 })(KISSY, undefined);
 /**
  * @ignore
@@ -5955,10 +5731,17 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S) {
+    // compatibility
     S.config({
         modules: {
             core: {
-                alias: ['dom', 'event', 'ajax', 'anim', 'base', 'node', 'json', 'ua', 'cookie']
+                alias: ['dom', 'event', 'io', 'anim', 'base', 'node', 'json', 'ua', 'cookie']
+            },
+            ajax: {
+                alias: ['io']
+            },
+            'rich-base': {
+                alias: ['base']
             }
         }
     });
@@ -5979,96 +5762,129 @@ var KISSY = (function (undefined) {
 })(KISSY);
 
 (function(config,Features,UA){
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'ajax': {requires: ['dom','json','event']}
+'anim': {requires: ['dom','anim/base','anim/timer',KISSY.Features.isTransitionSupported() ? "anim/transition" : ""]}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'anim': {requires: ['dom','event']}
+'anim/base': {requires: ['dom','promise']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
+config({
+'anim/timer': {requires: ['dom','anim/base']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'anim/transition': {requires: ['dom','event/dom','anim/base']}
+});
+/*Generated By KISSY Module Compiler*/
 config({
 'base': {requires: ['event/custom']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'button': {requires: ['component/base','event']}
+'button': {requires: ['node','component/control']}
 });
-/*Generated by KISSY Module Compiler*/
-config({
-'calendar': {requires: ['node','event']}
-});
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'color': {requires: ['base']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'combobox': {requires: ['dom','component/base','node','menu','ajax']}
+'combobox': {requires: ['node','component/control','menu','base','io']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'component/base': {requires: ['rich-base','node','event']}
+'component/container': {requires: ['component/control','component/manager']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'component/extension': {requires: ['dom','node']}
+'component/control': {requires: ['node','base','promise','component/manager','xtemplate/runtime']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'component/plugin/drag': {requires: ['rich-base','dd/base']}
+'component/extension/align': {requires: ['node']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
+config({
+'component/extension/delegate-children': {requires: ['node','component/manager']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'component/plugin/drag': {requires: ['base','dd']}
+});
+/*Generated By KISSY Module Compiler*/
 config({
 'component/plugin/resize': {requires: ['resizable']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'datalazyload': {requires: ['dom','event','base']}
+'date/format': {requires: ['date/gregorian','i18n!date']}
 });
+/*Generated By KISSY Module Compiler*/
 config({
-    'dd': {alias: ['dd/base', 'dd/droppable']}
+'date/gregorian': {requires: ['i18n!date']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'dd/base': {requires: ['dom','node','event','rich-base','base']}
+'date/picker': {requires: ['node','date/gregorian','i18n!date/picker','component/control','date/format']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'dd/droppable': {requires: ['dd/base','dom','node','rich-base']}
+'date/popup-picker': {requires: ['date/picker','component/extension/align','component/extension/shim']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
+config({
+'dd': {requires: ['node','base']}
+});
+/*Generated By KISSY Module Compiler*/
 config({
 'dd/plugin/constrain': {requires: ['base','node']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'dd/plugin/proxy': {requires: ['node','base','dd/base']}
+'dd/plugin/proxy': {requires: ['node','base','dd']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'dd/plugin/scroll': {requires: ['dd/base','base','node','dom']}
+'dd/plugin/scroll': {requires: ['dd','base','node']}
 });
-// consider documentMode
-var oldIE = UA.ie && (UA.ie < 9 || document.documentMode < 9);
 config({
+    "dom/basic": {
+        "alias": [
+            'dom/base',
+            Features.isIELessThan(9) ? 'dom/ie' : '',
+            Features.isClassListSupported() ? '' : 'dom/class-list'
+        ]
+    },
     "dom": {
-        "alias": ['dom/base', oldIE ? 'dom/ie' : '']
+        "alias": [
+            'dom/basic',
+            !Features.isQuerySelectorSupported() ? 'dom/selector' : ''
+        ]
     }
-});/*Generated by KISSY Module Compiler*/
+});/*Generated By KISSY Module Compiler*/
+config({
+'dom/class-list': {requires: ['dom/base']}
+});
+/*Generated By KISSY Module Compiler*/
 config({
 'dom/ie': {requires: ['dom/base']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'editor': {requires: ['node','htmlparser','component/base','core']}
+'dom/selector': {requires: ['dom/basic']}
 });
+/*Generated By KISSY Module Compiler*/
 config({
-    "event": {
-        "alias": ["event/base", "event/dom", "event/custom"]
-    }
-});/*Generated by KISSY Module Compiler*/
+'editor': {requires: ['node','html-parser','component/control','event']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'event': {requires: ['event/dom','event/custom']}
+});
+/*Generated By KISSY Module Compiler*/
 config({
 'event/custom': {requires: ['event/base']}
 });
@@ -6076,124 +5892,143 @@ config({
     "event/dom": {
         "alias": [
             "event/dom/base",
-            Features.isTouchSupported() ? 'event/dom/touch' : '',
-            Features.isDeviceMotionSupported() ? 'event/dom/shake' : '',
-            Features.isHashChangeSupported() ? '' : 'event/dom/hashchange',
-            UA.ie < 9 ? 'event/dom/ie' : '',
+            Features.isTouchEventSupported() || Features.isMsPointerSupported() ?
+                'event/dom/touch' : '',
+            Features.isDeviceMotionSupported() ?
+                'event/dom/shake' : '',
+            Features.isHashChangeSupported() ?
+                '' : 'event/dom/hashchange',
+            Features.isIELessThan(9) ?
+                'event/dom/ie' : '',
             UA.ie ? '' : 'event/dom/focusin'
         ]
     }
-});/*Generated by KISSY Module Compiler*/
+});/*Generated By KISSY Module Compiler*/
 config({
-'event/dom/base': {requires: ['dom','event/base']}
+'event/dom/base': {requires: ['event/base','dom']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'event/dom/focusin': {requires: ['event/dom/base']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'event/dom/hashchange': {requires: ['event/dom/base','dom']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'event/dom/ie': {requires: ['event/dom/base','dom']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'event/dom/shake': {requires: ['event/dom/base']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'event/dom/touch': {requires: ['event/dom/base','dom']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'imagezoom': {requires: ['node','overlay']}
+'filter-menu': {requires: ['menu','node','component/extension/content-render']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'json': {requires: [KISSY.Features.isNativeJSONSupported() ? "" : "json/json2"]}
+'io': {requires: ['dom','event/custom','promise','event']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'kison': {requires: ['base']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'menu': {requires: ['component/extension','node','component/base','event']}
+'menu': {requires: ['node','component/container','component/extension/delegate-children','component/control','component/extension/content-render','component/extension/align','component/extension/shim']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'menubutton': {requires: ['node','menu','button','component/base']}
+'menubutton': {requires: ['node','button','component/extension/content-render','menu']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'mvc': {requires: ['event','base','ajax','json','node']}
+'mvc': {requires: ['base','node','io','json']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'node': {requires: ['dom','event/dom','anim']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'overlay': {requires: ['node','component/base','component/extension','event']}
+'overlay': {requires: ['component/container','component/extension/shim','component/extension/align','node','component/extension/content-render']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'resizable': {requires: ['node','rich-base','dd/base']}
+'resizable': {requires: ['node','base','dd']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'rich-base': {requires: ['base']}
+'resizable/plugin/proxy': {requires: ['base','node']}
 });
-/*Generated by KISSY Module Compiler*/
 config({
-'separator': {requires: ['component/base']}
-});
-/*Generated by KISSY Module Compiler*/
+    "scroll-view": {
+        "alias": [
+            Features.isTouchEventSupported()||Features.isMsPointerSupported()
+            ? 'scroll-view/drag' : 'scroll-view/base'
+        ]
+    }
+});/*Generated By KISSY Module Compiler*/
 config({
-'split-button': {requires: ['component/base','button','menubutton']}
+'scroll-view/base': {requires: ['node','anim','component/container','component/extension/content-render']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
+config({
+'scroll-view/drag': {requires: ['scroll-view/base','node','anim']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'scroll-view/plugin/pull-to-refresh': {requires: ['base']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'scroll-view/plugin/scrollbar': {requires: ['base','node','component/control']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'separator': {requires: ['component/control']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'split-button': {requires: ['component/container','button','menubutton']}
+});
+/*Generated By KISSY Module Compiler*/
 config({
 'stylesheet': {requires: ['dom']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'swf': {requires: ['dom','json','base']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'switchable': {requires: ['dom','event','anim',KISSY.Features.isTouchSupported() ? "dd/base" : ""]}
+'tabs': {requires: ['component/container','toolbar','button']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'tabs': {requires: ['button','toolbar','component/base']}
+'toolbar': {requires: ['component/container','component/extension/delegate-children','node']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'toolbar': {requires: ['component/base','node']}
+'tree': {requires: ['node','component/container','component/extension/content-render','component/extension/delegate-children']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'tree': {requires: ['node','component/base','event']}
+'xtemplate': {requires: ['xtemplate/runtime','xtemplate/compiler']}
 });
-/*Generated by KISSY Module Compiler*/
-config({
-'waterfall': {requires: ['node','base']}
-});
-config({
-    xtemplate: {
-        alias: ['xtemplate/facade']
-    }
-});/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
 'xtemplate/compiler': {requires: ['xtemplate/runtime']}
 });
-/*Generated by KISSY Module Compiler*/
+/*Generated By KISSY Module Compiler*/
 config({
-'xtemplate/facade': {requires: ['xtemplate/runtime','xtemplate/compiler']}
+'xtemplate/nodejs': {requires: ['xtemplate']}
 });
 
                 })(function(c){
@@ -6205,38 +6040,71 @@ config({
  * 2. export light-weighted json parse
  */
 (function (S) {
+    // empty mod for conditional loading
+    S.add('empty', S.noop);
 
-    /**
-     * @ignore
-     * export KISSY 's functionality to module system
-     */
-    (function (S) {
+    S.add('ua', function () {
+        return S.UA;
+    });
 
-        // empty mod for conditional loading
-        S.add('empty', S.noop);
+    S.add('uri', function () {
+        return S.Uri;
+    });
 
-        S.add('promise', function () {
-            return S.Promise;
+    S.add('path', function () {
+        return S.Path
+    });
+
+    var UA = S.UA,
+        Env = S.Env,
+        win = Env.host,
+        doc = win.document || {},
+        documentMode = doc.documentMode,
+        nativeJson = ((UA.nodejs && typeof global === 'object') ? global : win).JSON;
+
+    // ie 8.0.7600.16315@win7 json bug!
+    if (documentMode && documentMode < 9) {
+        nativeJson = null;
+    }
+
+    if (nativeJson) {
+        S.add('json', function () {
+            return S.JSON = nativeJson;
         });
+        // light weight json parse
+        S.parseJson = function (data) {
+            return nativeJson.parse(data);
+        };
+    } else {
+        // Json RegExp
+        var INVALID_CHARS_REG = /^[\],:{}\s]*$/,
+            INVALID_BRACES_REG = /(?:^|:|,)(?:\s*\[)+/g,
+            INVALID_ESCAPES_REG = /\\(?:["\\\/bfnrt]|u[\da-fA-F]{4})/g,
+            INVALID_TOKENS_REG = /"[^"\\\r\n]*"|true|false|null|-?(?:\d+\.|)\d+(?:[eE][+-]?\d+|)/g;
+        S.parseJson = function (data) {
+            if (data === null) {
+                return data;
+            }
+            if (typeof data === "string") {
+                // for ie
+                data = S.trim(data);
+                if (data) {
+                    // from json2
+                    if (INVALID_CHARS_REG.test(data.replace(INVALID_ESCAPES_REG, "@")
+                        .replace(INVALID_TOKENS_REG, "]")
+                        .replace(INVALID_BRACES_REG, ""))) {
 
-        S.add('ua', function () {
-            return S.UA;
-        });
-
-        S.add('uri', function () {
-            return S.Uri;
-        });
-
-        S.add('path', function () {
-            return S.Path
-        });
-
-    })(KISSY);
+                        return ( new Function("return " + data) )();
+                    }
+                }
+            }
+            return S.error("Invalid Json: " + data);
+        };
+    }
 
     // exports for nodejs
     if (S.UA.nodejs) {
         S.KISSY = S;
         module.exports = S;
     }
-
 })(KISSY);

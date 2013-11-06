@@ -1,9 +1,16 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:44
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/italic/cmd
+*/
+
 /**
+ * @ignore
  * italic command.
  * @author yiminghe@gmail.com
  */
@@ -31,3 +38,4 @@ KISSY.add("editor/plugin/italic/cmd", function (S, Editor, Cmd) {
 }, {
     requires:['editor', '../font/cmd']
 });
+

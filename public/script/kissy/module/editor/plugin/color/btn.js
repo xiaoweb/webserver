@@ -1,14 +1,20 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:41
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/color/btn
+*/
+
 /**
+ * @ignore
  * color button.
  * @author yiminghe@gmail.com
  */
 KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, DialogLoader) {
-
     var Node = S.Node;
 
     var COLORS = [
@@ -25,7 +31,7 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
     ], html;
 
 
-    function initHtml() {
+    function initHTML() {
         html = "<div class='{prefixCls}editor-color-panel'>" +
             "<a class='{prefixCls}editor-color-remove' " +
             "href=\"javascript:void('清除');\">" +
@@ -58,10 +64,9 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
             "</div>";
     }
 
-    initHtml();
+    initHTML();
 
     var ColorButton = Button.extend({
-
         initializer: function () {
             var self = this;
             self.on("blur", function () {
@@ -96,7 +101,7 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
                     prefixCls: prefixCls
                 }),
                 width: 172,
-                zIndex: Editor.baseZIndex(Editor.zIndexManager.POPUP_MENU)
+                zIndex: Editor.baseZIndex(Editor.ZIndexManager.POPUP_MENU)
             }).render();
 
             var colorWin = self.colorWin;
@@ -109,7 +114,7 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
             others.on("click", function (ev) {
                 ev.halt();
                 colorWin.hide();
-                DialogLoader.useDialog(editor, "color/color-picker", undefined, self);
+                DialogLoader.useDialog(editor, "color", undefined, self);
             });
             self._prepare = self._show;
             self._show();
@@ -160,7 +165,7 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
                 value: true
             },
             mode: {
-                value: Editor.WYSIWYG_MODE
+                value: Editor.Mode.WYSIWYG_MODE
             }
         }
     });
@@ -188,7 +193,7 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
                 icon: prefix + 'item ' + prefix + cmdType,
                 indicator: prefix + 'color-indicator'
             }),
-            mode: Editor.WYSIWYG_MODE,
+            mode: Editor.Mode.WYSIWYG_MODE,
             tooltip: "设置" + tooltip
         });
 
@@ -210,7 +215,7 @@ KISSY.add("editor/plugin/color/btn", function (S, Editor, Button, Overlay4E, Dia
     };
 
     return ColorButton;
-
 }, {
-    requires: ['editor', '../button/', '../overlay/', '../dialog-loader/']
+    requires: ['editor', '../button', '../overlay', '../dialog-loader']
 });
+

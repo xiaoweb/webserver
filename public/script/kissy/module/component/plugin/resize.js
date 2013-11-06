@@ -1,8 +1,14 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 00:01
+build time: Sep 17 22:58
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ component/plugin/resize
+*/
+
 /**
  * @ignore
  * resize plugin for kissy component
@@ -32,15 +38,16 @@ KISSY.add('component/plugin/resize', function (S, Resize) {
      */
     return Resize.extend({
         pluginBindUI: function (component) {
-            var el = component.get('el'),
+            var $el = component.$el,
                 self = this;
-            self.set('node', el);
+            self.set('node', $el);
+            self.set('prefixCls',component.get('prefixCls'));
             // sync
             self.on('resizeEnd', function () {
-                var offset = el.offset();
+                var offset = $el.offset();
                 component.setInternal('xy', [offset.left, offset.top]);
-                component.setInternal('width', el.width());
-                component.setInternal('height', el.height());
+                component.setInternal('width', $el.width());
+                component.setInternal('height', $el.height());
             });
         },
         pluginDestructor: function () {
@@ -51,3 +58,4 @@ KISSY.add('component/plugin/resize', function (S, Resize) {
 }, {
     requires: ['resizable']
 });
+

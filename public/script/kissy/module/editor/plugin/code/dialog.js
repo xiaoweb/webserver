@@ -1,14 +1,20 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:41
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/code/dialog
+*/
+
 /**
+ * @ignore
  * insert program code dialog
  * @author yiminghe@gmail.com
  */
-KISSY.add('editor/plugin/code/dialog', function (S, Editor, Overlay, MenuButton) {
-
+KISSY.add('editor/plugin/code/dialog', function (S, Editor, Dialog4E, MenuButton) {
     var xhtml_dtd = Editor.XHTML_DTD;
     var NodeType = S.DOM.NodeType;
     var notWhitespaceEval = Editor.Walker.whitespaces(true);
@@ -24,7 +30,7 @@ KISSY.add('editor/plugin/code/dialog', function (S, Editor, Overlay, MenuButton)
             ['Diff', 'diff'],
             ['Erlang', 'erlang'],
             ['Groovy', 'groovy'],
-            ['Html', 'html'],
+            ['HTML', 'html'],
             ['Java', 'java'],
             ['JavaFx', 'jfx'],
             ['Javascript', 'js'],
@@ -93,7 +99,7 @@ KISSY.add('editor/plugin/code/dialog', function (S, Editor, Overlay, MenuButton)
                 prefixCls = self.editor.get('prefixCls') + 'editor-',
                 el,
                 d;
-            d = self.dialog = new Overlay.Dialog({
+            d = self.dialog = new Dialog4E({
                 width: 500,
                 mask: true,
                 headerContent: '插入代码',
@@ -136,7 +142,7 @@ KISSY.add('editor/plugin/code/dialog', function (S, Editor, Overlay, MenuButton)
             }
             var codeEl = S.all(S.substitute(codeTpl, {
                 type: self.type.get('value'),
-                code: S.escapeHTML(val)
+                code: S.escapeHtml(val)
             }), editor.get('document')[0]);
             self.dialog.hide();
             // chrome:
@@ -175,5 +181,6 @@ KISSY.add('editor/plugin/code/dialog', function (S, Editor, Overlay, MenuButton)
 
     return CodeDialog;
 }, {
-    requires: ['editor', '../overlay/', 'menubutton']
+    requires: ['editor', '../dialog', 'menubutton']
 });
+

@@ -1,11 +1,17 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 00:01
+build time: Sep 17 22:59
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ dd/plugin/proxy
+*/
+
 /**
  * @ignore
- *  generate proxy drag object,
+ * generate proxy drag object,
  * @author yiminghe@gmail.com
  */
 KISSY.add('dd/plugin/proxy', function (S, Node, Base, DD) {
@@ -18,76 +24,7 @@ KISSY.add('dd/plugin/proxy', function (S, Node, Base, DD) {
      * Proxy plugin to provide abilities for draggable tp create a proxy drag node,
      * instead of dragging the original node.
      */
-    function Proxy() {
-        var self = this;
-        Proxy.superclass.constructor.apply(self, arguments);
-    }
-
-    Proxy.ATTRS = {
-        /**
-         * how to get the proxy node.
-         * default clone the node itself deeply.
-         * @cfg {Function} node
-         */
-        /**
-         * @ignore
-         */
-        node: {
-            value: function (drag) {
-                return new Node(drag.get('node').clone(true));
-            }
-        },
-
-        /**
-         * whether hide original node when drag proxy.
-         * Defaults to: false
-         * @cfg {Boolean} hideNodeOnDrag
-         */
-        /**
-         * @ignore
-         */
-        hideNodeOnDrag: {
-            value: false
-        },
-
-        /**
-         * destroy the proxy node at the end of this drag.
-         * default false
-         * @cfg {Boolean} destroyOnEnd
-         */
-        /**
-         * @ignore
-         */
-        destroyOnEnd: {
-            value: false
-        },
-
-        /**
-         * move the original node at the end of the drag.
-         * default true
-         * @cfg {Boolean} moveOnEnd
-         */
-        /**
-         * @ignore
-         */
-        moveOnEnd: {
-            value: true
-        },
-
-        /**
-         * Current proxy node.
-         * @type {KISSY.NodeList}
-         * @property proxyNode
-         */
-        /**
-         * @ignore
-         */
-        proxyNode: {
-
-        }
-    };
-
-    S.extend(Proxy, Base, {
+    return Base.extend({
 
         pluginId: 'dd/plugin/proxy',
 
@@ -97,7 +34,6 @@ KISSY.add('dd/plugin/proxy', function (S, Node, Base, DD) {
          * @private
          */
         pluginInitializer: function (drag) {
-
             var self = this, hideNodeOnDrag = self.get('hideNodeOnDrag');
 
             function start() {
@@ -105,10 +41,9 @@ KISSY.add('dd/plugin/proxy', function (S, Node, Base, DD) {
                     dragNode = drag.get('node');
                 // cache proxy node
                 if (!self.get('proxyNode')) {
-                    if (S.isFunction(node)) {
+                    if (typeof node === 'function') {
                         node = node(drag);
                         node.addClass('ks-dd-proxy');
-                        node.css('position', 'absolute');
                         self.set('proxyNode', node);
                     }
                 } else {
@@ -139,12 +74,12 @@ KISSY.add('dd/plugin/proxy', function (S, Node, Base, DD) {
                 }
                 drag['setInternal']('node', dragNode);
                 if (hideNodeOnDrag) {
-                    dragNode.css('visibility', 'visible');
+                    dragNode.css('visibility', '');
                 }
             }
 
             drag['on']('dragstart' + PROXY_EVENT, start)
-                .on('dragend' + PROXY_EVENT, end);
+                ['on']('dragend' + PROXY_EVENT, end);
         },
         /**
          * make this draggable object unproxied
@@ -154,9 +89,72 @@ KISSY.add('dd/plugin/proxy', function (S, Node, Base, DD) {
         pluginDestructor: function (drag) {
             drag['detach'](PROXY_EVENT);
         }
-    });
+    }, {
+        ATTRS: {
+            /**
+             * how to get the proxy node.
+             * default clone the node itself deeply.
+             * @cfg {Function} node
+             */
+            /**
+             * @ignore
+             */
+            node: {
+                value: function (drag) {
+                    return new Node(drag.get('node').clone(true));
+                }
+            },
 
-    return Proxy;
+            /**
+             * whether hide original node when drag proxy.
+             * Defaults to: false
+             * @cfg {Boolean} hideNodeOnDrag
+             */
+            /**
+             * @ignore
+             */
+            hideNodeOnDrag: {
+                value: false
+            },
+
+            /**
+             * destroy the proxy node at the end of this drag.
+             * default false
+             * @cfg {Boolean} destroyOnEnd
+             */
+            /**
+             * @ignore
+             */
+            destroyOnEnd: {
+                value: false
+            },
+
+            /**
+             * move the original node at the end of the drag.
+             * default true
+             * @cfg {Boolean} moveOnEnd
+             */
+            /**
+             * @ignore
+             */
+            moveOnEnd: {
+                value: true
+            },
+
+            /**
+             * Current proxy node.
+             * @type {KISSY.NodeList}
+             * @property proxyNode
+             */
+            /**
+             * @ignore
+             */
+            proxyNode: {
+
+            }
+        }
+    });
 }, {
-    requires: ['node', 'base', 'dd/base']
+    requires: ['node', 'base', 'dd']
 });
+

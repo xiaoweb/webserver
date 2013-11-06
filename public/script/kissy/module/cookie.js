@@ -1,11 +1,17 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:01
+build time: Sep 17 22:58
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ cookie
+*/
+
 /**
  * @ignore
- *  cookie
+ * cookie
  * @author lifesinger@gmail.com
  */
 KISSY.add('cookie', function (S) {
@@ -108,3 +114,4 @@ KISSY.add('cookie', function (S) {
  - api 设计上，原本想借鉴 jQuery 的简明风格：S.cookie(name, ...), 但考虑到可扩展性，目前
  独立成静态工具类的方式更优。
  */
+

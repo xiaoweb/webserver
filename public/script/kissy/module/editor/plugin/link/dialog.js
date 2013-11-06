@@ -1,17 +1,22 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:45
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/link/dialog
+*/
+
 /**
+ * @ignore
  * link dialog
  * @author yiminghe@gmail.com
  */
-KISSY.add("editor/plugin/link/dialog", function (S, Editor, Overlay4E, Utils) {
-
-    var Dialog = Overlay4E.Dialog,
-        _ke_saved_href = Utils._ke_saved_href,
-        bodyHtml = "<div style='padding:20px 20px 0 20px'>" +
+KISSY.add("editor/plugin/link/dialog", function (S, Editor, Dialog4E, Utils) {
+    var _ke_saved_href = Utils._ke_saved_href,
+        bodyHTML = "<div style='padding:20px 20px 0 20px'>" +
             "<p>" +
             "<label>" +
             "链接网址： " +
@@ -40,7 +45,7 @@ KISSY.add("editor/plugin/link/dialog", function (S, Editor, Overlay4E, Utils) {
             "</label>" +
             "</p>" +
             "</div>",
-        footHtml = "<div style='padding:5px 20px 20px;'>" +
+        footHTML = "<div style='padding:5px 20px 20px;'>" +
             "<a " +
             "href='javascript:void(\'确定\')' " +
             "class='{prefixCls}editor-link-ok {prefixCls}editor-button ks-inline-block' " +
@@ -62,13 +67,13 @@ KISSY.add("editor/plugin/link/dialog", function (S, Editor, Overlay4E, Utils) {
             var self = this,
                 editor=self.editor,
                 prefixCls=editor.get('prefixCls'),
-                d = new Dialog({
+                d = new Dialog4E({
                     width:500,
                     headerContent:"链接",
-                    bodyContent: S.substitute(bodyHtml,{
+                    bodyContent: S.substitute(bodyHTML,{
                         prefixCls:prefixCls
                         }),
-                    footerContent:S.substitute(footHtml,{
+                    footerContent:S.substitute(footHTML,{
                         prefixCls:prefixCls
                     }),
                     mask:true
@@ -137,5 +142,6 @@ KISSY.add("editor/plugin/link/dialog", function (S, Editor, Overlay4E, Utils) {
     });
     return LinkDialog;
 }, {
-    requires:['editor', '../overlay/', './utils']
+    requires:['editor', '../dialog', './utils']
 });
+

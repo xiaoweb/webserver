@@ -1,75 +1,35 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 00:01
+build time: Sep 17 22:59
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ dd/plugin/scroll
+*/
+
 /**
  * @ignore
- *  auto scroll for drag object's container
+ * auto scroll for drag object's container
  * @author yiminghe@gmail.com
  */
-KISSY.add('dd/plugin/scroll', function (S, DD, Base, Node, DOM) {
+KISSY.add('dd/plugin/scroll', function (S, DD, Base, Node) {
 
     var DDM = DD.DDM,
         win = S.Env.host,
         SCROLL_EVENT = '.-ks-dd-scroll' + S.now(),
         RATE = [10, 10],
         ADJUST_DELAY = 100,
-        DIFF = [20, 20];
+        DIFF = [20, 20],
+        isWin = S.isWindow;
 
     /**
      * @class KISSY.DD.Plugin.Scroll
+     * @extends KISSY.Base
      * Scroll plugin to make parent node scroll while dragging.
      */
-    function Scroll() {
-        Scroll.superclass.constructor.apply(this, arguments);
-    }
-
-    Scroll.ATTRS = {
-        /**
-         * node to be scrolled while dragging
-         * @cfg {window|String|HTMLElement} node
-         */
-        /**
-         * @ignore
-         */
-        node: {
-            // value:window：不行，默认值一定是简单对象
-            valueFn: function () {
-                return Node.one(win);
-            },
-            setter: function (v) {
-                return Node.one(v);
-            }
-        },
-        /**
-         * adjust velocity, larger faster
-         * default [10,10]
-         * @cfg {Number[]} rate
-         */
-        /**
-         * @ignore
-         */
-        rate: {
-            value: RATE
-        },
-        /**
-         * the margin to make node scroll, easier to scroll for node if larger.
-         * default  [20,20]
-         * @cfg {number[]} diff
-         */
-        /**
-         * @ignore
-         */
-        diff: {
-            value: DIFF
-        }
-    };
-
-
-    var isWin = S.isWindow;
-
-    S.extend(Scroll, Base, {
+    return Base.extend({
 
         pluginId: 'dd/plugin/scroll',
 
@@ -80,8 +40,8 @@ KISSY.add('dd/plugin/scroll', function (S, DD, Base, Node, DOM) {
         getRegion: function (node) {
             if (isWin(node[0])) {
                 return {
-                    width: DOM.viewportWidth(),
-                    height: DOM.viewportHeight()
+                    width: node.width(),
+                    height: node.height()
                 };
             } else {
                 return {
@@ -98,8 +58,8 @@ KISSY.add('dd/plugin/scroll', function (S, DD, Base, Node, DOM) {
         getOffset: function (node) {
             if (isWin(node[0])) {
                 return {
-                    left: DOM.scrollLeft(),
-                    top: DOM.scrollTop()
+                    left: node.scrollLeft(),
+                    top: node.scrollTop()
                 };
             } else {
                 return node.offset();
@@ -269,9 +229,49 @@ KISSY.add('dd/plugin/scroll', function (S, DD, Base, Node, DOM) {
                 }
             }
         }
+    }, {
+        ATTRS: {
+            /**
+             * node to be scrolled while dragging
+             * @cfg {Window|String|HTMLElement} node
+             */
+            /**
+             * @ignore
+             */
+            node: {
+                // value:window：不行，默认值一定是简单对象
+                valueFn: function () {
+                    return Node.one(win);
+                },
+                setter: function (v) {
+                    return Node.one(v);
+                }
+            },
+            /**
+             * adjust velocity, larger faster
+             * default [10,10]
+             * @cfg {Number[]} rate
+             */
+            /**
+             * @ignore
+             */
+            rate: {
+                value: RATE
+            },
+            /**
+             * the margin to make node scroll, easier to scroll for node if larger.
+             * default  [20,20]
+             * @cfg {number[]} diff
+             */
+            /**
+             * @ignore
+             */
+            diff: {
+                value: DIFF
+            }
+        }
     });
-
-    return Scroll;
 }, {
-    requires: ['dd/base', 'base', 'node', 'dom']
+    requires: ['dd', 'base', 'node']
 });
+

@@ -1,18 +1,24 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:43
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/flash/dialog
+*/
+
 /**
+ * @ignore
  * flash dialog
  * @author yiminghe@gmail.com
  */
-KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay4E, MenuButton) {
+KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Dialog4E, MenuButton) {
     var CLS_FLASH = 'ke_flash',
         TYPE_FLASH = 'flash',
-        Dialog = Overlay4E.Dialog,
         TIP = "请输入如 http://www.xxx.com/xxx.swf",
-        bodyHtml = "<div style='padding:20px 20px 0 20px'>" +
+        bodyHTML = "<div style='padding:20px 20px 0 20px'>" +
             "<p>" +
             "<label>网址： " +
             "<input " +
@@ -67,7 +73,7 @@ KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay
             "</td></tr>" +
             "</table>" +
             "</div>",
-        footHtml = "<div style='padding:10px 0 35px 20px;'>" +
+        footHTML = "<div style='padding:10px 0 35px 20px;'>" +
             "<a " +
             "class='{prefixCls}editor-flash-ok {prefixCls}editor-button ks-inline-block' " +
             "style='margin-left:40px;margin-right:20px;'>确定</a> " +
@@ -94,43 +100,39 @@ KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay
             self._cls = CLS_FLASH;
             self._config_dwidth = "400px";
             self._title = "Flash";//属性";
-            self._bodyHtml = S.substitute(bodyHtml, {
+            self._bodyHTML = S.substitute(bodyHTML, {
                 prefixCls: prefixCls
             });
-            self._footHtml = S.substitute(footHtml, {
+            self._footHTML = S.substitute(footHTML, {
                 prefixCls: prefixCls
             });
         },
         //建立弹出窗口
         _prepareShow: function () {
             var self = this;
-            self.dialog = new Dialog({
+            self.dialog = new Dialog4E({
                 headerContent: self._title,
-                bodyContent: self._bodyHtml,
-                footerContent: self._footHtml,
+                bodyContent: self._bodyHTML,
+                footerContent: self._footHTML,
                 width: self._config_dwidth || "500px",
                 mask: true
             }).render();
             self.addRes(self.dialog);
             self._initD();
         },
+
         _realShow: function () {
             //显示前就要内容搞好
             this._updateD();
             this.dialog.show();
         },
-        /**
-         * 子类覆盖，如何从flash url得到合适的应用表示地址
-         *
-         * @param r flash 元素
-         */
+
+        // 子类覆盖，如何从flash url得到合适的应用表示地址
         _getFlashUrl: function (r) {
             return flashUtils.getUrl(r);
         },
-        /**
-         * 触发前初始化窗口 field，子类覆盖
-         *
-         */
+
+        // 触发前初始化窗口 field，子类覆盖
         _updateD: function () {
             var self = this,
                 editor = self.editor,
@@ -165,10 +167,7 @@ KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay
         },
 
 
-        /**
-         * 映射窗口field，子类覆盖
-         *
-         */
+        // 映射窗口field，子类覆盖
         _initD: function () {
             var self = this,
                 d = self.dialog,
@@ -200,10 +199,8 @@ KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay
             self.addRes(self.dAlign);
         },
 
-        /**
-         * 应用子类覆盖，提供 flash 元素的相关信息
-         *
-         */
+
+        // 应用子类覆盖，提供 flash 元素的相关信息
         _getDInfo: function () {
             var self = this;
             return {
@@ -219,9 +216,8 @@ KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay
             };
         },
 
-        /**
-         * 真正产生 flash 元素
-         */
+
+        // 真正产生 flash 元素
         _gen: function (ev) {
             ev && ev.halt();
             var self = this,
@@ -253,5 +249,6 @@ KISSY.add("editor/plugin/flash/dialog", function (S, Editor, flashUtils, Overlay
 
     return FlashDialog;
 }, {
-    requires: ['editor', '../flash-common/utils', '../overlay/', '../menubutton/']
+    requires: ['editor', '../flash-common/utils', '../dialog', '../menubutton']
 });
+

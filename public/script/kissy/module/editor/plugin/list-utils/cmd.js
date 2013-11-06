@@ -1,9 +1,16 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:45
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/list-utils/cmd
+*/
+
 /**
+ * @ignore
  * Add ul and ol command identifier for KISSY Editor.
  * @author yiminghe@gmail.com
  */
@@ -12,12 +19,12 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
     var insertUnorderedList = "insertUnorderedList",
         insertOrderedList = "insertOrderedList",
         listNodeNames = {"ol": insertOrderedList, "ul": insertUnorderedList},
-        KER = Editor.RANGE,
+        KER = Editor.RangeType,
         ElementPath = Editor.ElementPath,
         Walker = Editor.Walker,
         UA = S.UA,
         Node = S.Node,
-        DOM = S.DOM,
+        Dom = S.DOM,
         headerTagRegex = /^h[1-6]$/;
 
     function ListCommand(type) {
@@ -25,6 +32,8 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
     }
 
     ListCommand.prototype = {
+
+        constructor:ListCommand,
 
         changeListType: function (editor, groupObj, database, listsCreated, listStyleType) {
             // This case is easy...
@@ -74,7 +83,7 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
             if (contents.length == 1
                 && contents[0][0] === groupObj.root[0]) {
                 var divBlock = new Node(doc.createElement('div'));
-                contents[0][0].nodeType != DOM.NodeType.TEXT_NODE &&
+                contents[0][0].nodeType != Dom.NodeType.TEXT_NODE &&
                 contents[0]._4e_moveChildren(divBlock, undefined, undefined);
                 contents[0][0].appendChild(divBlock[0]);
                 contents[0] = divBlock;
@@ -105,7 +114,7 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
             if (listContents.length < 1)
                 return;
 
-            // Insert the list to the DOM tree.
+            // Insert the list to the Dom tree.
             var insertAnchor = new Node(listContents[ listContents.length - 1 ][0].nextSibling),
                 listNode = new Node(doc.createElement(this.type));
 
@@ -163,7 +172,7 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
 
             // After cutting parts of the list out with indent=-1, we still have to maintain the array list
             // model's nextItem.indent <= currentItem.indent + 1 invariant. Otherwise the array model of the
-            // list cannot be converted back to a real DOM list.
+            // list cannot be converted back to a real Dom list.
             for (i = lastListIndex + 1; i < listArray.length; i++) {
                 //if (listArray[i].indent > listArray[i - 1].indent + 1) {
                 //modified by yiminghe
@@ -187,11 +196,11 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
 
             function compensateBrs(isStart) {
                 if (( boundaryNode = new Node(docFragment[ isStart ? 'firstChild' : 'lastChild' ]) )
-                    && !( boundaryNode[0].nodeType == DOM.NodeType.ELEMENT_NODE &&
+                    && !( boundaryNode[0].nodeType == Dom.NodeType.ELEMENT_NODE &&
                     boundaryNode._4e_isBlockBoundary(undefined, undefined) )
                     && ( siblingNode = groupObj.root[ isStart ? 'prev' : 'next' ]
                     (Walker.whitespaces(true), 1) )
-                    && !( boundaryNode[0].nodeType == DOM.NodeType.ELEMENT_NODE &&
+                    && !( boundaryNode[0].nodeType == Dom.NodeType.ELEMENT_NODE &&
                     siblingNode._4e_isBlockBoundary({ br: 1 }, undefined) )) {
                     boundaryNode[ isStart ? 'before' : 'after' ](editor.get("document")[0].createElement('br'));
                 }
@@ -230,10 +239,10 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
                     startNode = boundaryNodes.startNode,
                     endNode = boundaryNodes.endNode;
 
-                if (startNode[0].nodeType == DOM.NodeType.ELEMENT_NODE && startNode.nodeName() == 'td')
+                if (startNode[0].nodeType == Dom.NodeType.ELEMENT_NODE && startNode.nodeName() == 'td')
                     range.setStartAt(boundaryNodes.startNode, KER.POSITION_AFTER_START);
 
-                if (endNode[0].nodeType == DOM.NodeType.ELEMENT_NODE && endNode.nodeName() == 'td')
+                if (endNode[0].nodeType == Dom.NodeType.ELEMENT_NODE && endNode.nodeName() == 'td')
                     range.setEndAt(boundaryNodes.endNode, KER.POSITION_BEFORE_END);
 
                 var iterator = range.createIterator(),
@@ -391,5 +400,6 @@ KISSY.add("editor/plugin/list-utils/cmd", function (S, Editor, ListUtils, undefi
     };
 
 }, {
-    requires: ['editor', '../list-utils/']
+    requires: ['editor', '../list-utils']
 });
+

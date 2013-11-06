@@ -1,69 +1,70 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:07
+build time: Sep 17 23:10
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ separator/render
+ separator
+*/
+
 /**
- *  separator def
+ * @ignore
+ * separator render def
  * @author yiminghe@gmail.com
  */
-KISSY.add("separator", function (S, Component, SeparatorRender) {
+KISSY.add("separator/render", function (S, Control) {
 
+    return Control.getDefaultRender().extend({
+        beforeCreateDom: function (renderData) {
+            renderData.elAttrs.role = 'separator';
+        }
+    });
+
+}, {
+    requires: ['component/control']
+});
+/**
+ * @ignore
+ * separator def
+ * @author yiminghe@gmail.com
+ */
+KISSY.add("separator", function (S, Control, SeparatorRender) {
     /**
-     * @extends KISSY.Component.Controller
-     * @class
-     * separator.
-     * xclass: 'separator'.
-     * @name Separator
+     * separator component for KISSY. xclass: 'separator'.
+     * @extends KISSY.Component.Control
+     * @class KISSY.Separator
      */
-    var Separator = Component.Controller.extend({
+    return Control.extend({
     }, {
-        ATTRS:/**
-         * @lends Separator#
-         */
-        {
+        ATTRS: {
 
             /**
              * Un-focusable.
              * readonly.
              * Defaults to: false.
              */
-            focusable:{
-                value:false
+            focusable: {
+                value: false
             },
 
-            disabled:{
-                value:true
+            disabled: {
+                value: true
             },
 
-            handleMouseEvents:{
-                value:false
+            handleMouseEvents: {
+                value: false
             },
 
-            xrender:{
-                value:SeparatorRender
+            xrender: {
+                value: SeparatorRender
             }
-        }
-    }, {
-        xclass:'separator'
+        },
+        xclass: 'separator'
     });
-
-    return Separator;
-
 }, {
-    requires:['component/base', 'separator/separatorRender']
-});/**
- *  separator render def
- * @author yiminghe@gmail.com
- */
-KISSY.add("separator/separatorRender", function (S, Component) {
-
-    return Component.Render.extend({
-        createDom:function () {
-            this.get("el").attr("role", "separator");
-        }
-    });
-
-}, {
-    requires:['component/base']
+    requires: ['component/control', 'separator/render']
 });
+

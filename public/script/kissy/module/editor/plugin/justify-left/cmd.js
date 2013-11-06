@@ -1,9 +1,16 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:45
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/justify-left/cmd
+*/
+
 /**
+ * @ignore
  * Add justifyCenter command identifier for Editor.
  * @author yiminghe@gmail.com
  */
@@ -16,5 +23,6 @@ KISSY.add("editor/plugin/justify-left/cmd", function (S, justifyUtils) {
     };
 
 }, {
-    requires:['../justify-utils/cmd']
+    requires:['../justify-cmd']
 });
+

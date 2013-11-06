@@ -1,19 +1,25 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:46
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/maximize/cmd
+*/
+
 /**
+ * @ignore
  * Add maximizeWindow/restoreWindow to Editor.
  * @author yiminghe@gmail.com
  */
-KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
+KISSY.add("editor/plugin/maximize/cmd", function (S, Event, Editor) {
     var UA = S.UA,
         ie = UA['ie'],
         doc = document,
         Node = S.Node,
-        Event = S.Event,
-        DOM = S.DOM,
+        Dom = S.DOM,
         iframe,
         MAXIMIZE_TOOLBAR_CLASS = "editor-toolbar-padding",
         init = function () {
@@ -62,9 +68,9 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
             }, 30);
         },
 
-        /**
-         * 从内存恢复最大化前的外围状态信息到编辑器实际动作，
-         * 包括编辑器位置以及周围元素，浏览器窗口
+        /*
+         从内存恢复最大化前的外围状态信息到编辑器实际动作，
+         包括编辑器位置以及周围元素，浏览器窗口
          */
         _restoreState: function () {
             var self = this,
@@ -87,7 +93,7 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
             textareaEl.css({
                 height: self.iframeHeight
             });
-            DOM.css(doc.body, {
+            Dom.css(doc.body, {
                 width: "",
                 height: "",
                 overflow: ""
@@ -98,13 +104,6 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
             var editorElStyle = editor.get("el")[0].style;
             editorElStyle.position = "static";
             editorElStyle.width = self.editorElWidth;
-
-            /*
-             iframe 中时假死！
-             editor.editorEl.css({
-             position:"static",
-             width:self.editorElWidth
-             });*/
 
             iframe.css({
                 left: "-99999px",
@@ -118,9 +117,9 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
                     editor.get('prefixCls') + MAXIMIZE_TOOLBAR_CLASS, undefined);
             }
         },
-        /**
-         * 保存最大化前的外围状态信息到内存，
-         * 包括编辑器位置以及周围元素，浏览器窗口
+        /*
+         保存最大化前的外围状态信息到内存，
+         包括编辑器位置以及周围元素，浏览器窗口
          */
         _saveSate: function () {
             var self = this,
@@ -130,8 +129,8 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
             self.iframeHeight = editor.get("textarea").parent().style("height");
             self.editorElWidth = editorEl.style("width");
             //主窗口滚动条也要保存哦
-            self.scrollLeft = DOM.scrollLeft();
-            self.scrollTop = DOM.scrollTop();
+            self.scrollLeft = Dom.scrollLeft();
+            self.scrollTop = Dom.scrollTop();
             window.scrollTo(0, 0);
 
             //将父节点的position都改成static并保存原状态 bugfix:最大化被父元素限制
@@ -157,9 +156,9 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
             }
         },
 
-        /**
-         *  编辑器自身核心状态保存，每次最大化最小化都要save,restore，
-         *  firefox修正，iframe layout变化时，range丢了
+        /*
+         编辑器自身核心状态保存，每次最大化最小化都要save,restore，
+         firefox修正，iframe layout变化时，range丢了
          */
         _saveEditorStatus: function () {
             var self = this,
@@ -173,9 +172,9 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
             self.savedRanges = sel && sel.getRanges();
         },
 
-        /**
-         * 编辑器自身核心状态恢复，每次最大化最小化都要save,restore，
-         * 维持编辑器核心状态不变
+        /*
+         编辑器自身核心状态恢复，每次最大化最小化都要save,restore，
+         维持编辑器核心状态不变
          */
         _restoreEditorStatus: function () {
             var self = this,
@@ -200,31 +199,31 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
                 var element = sel.getStartElement();
                 //使用原生不行的，会使主窗口滚动
                 //element[0] && element[0].scrollIntoView(true);
-                element && element.scrollIntoView(undefined,{
-                    alignWithTop:false,
-                    allowHorizontalScroll:true,
-                    onlyScrollIfNeeded:true
+                element && element.scrollIntoView(undefined, {
+                    alignWithTop: false,
+                    allowHorizontalScroll: true,
+                    onlyScrollIfNeeded: true
                 });
             }
         },
 
-        /**
-         * 将编辑器最大化-实际动作
-         * 必须做两次，何解？？
+        /*
+         将编辑器最大化-实际动作
+         必须做两次，何解？？
          */
         _maximize: function (stop) {
             var self = this,
                 editor = self.editor,
                 editorEl = editor.get("el"),
-                viewportHeight = DOM.viewportHeight(),
-                viewportWidth = DOM.viewportWidth(),
+                viewportHeight = Dom.viewportHeight(),
+                viewportWidth = Dom.viewportWidth(),
                 textareaEl = editor.get("textarea"),
                 statusHeight = editor.get("statusBarEl") ?
                     editor.get("statusBarEl")[0].offsetHeight : 0,
                 toolHeight = editor.get("toolBarEl")[0].offsetHeight;
 
             if (!ie) {
-                DOM.css(doc.body, {
+                Dom.css(doc.body, {
                     width: 0,
                     height: 0,
                     overflow: "hidden"
@@ -236,11 +235,11 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
 
             editorEl.css({
                 position: "absolute",
-                zIndex: Editor.baseZIndex(Editor.zIndexManager.MAXIMIZE),
+                zIndex: Editor.baseZIndex(Editor.ZIndexManager.MAXIMIZE),
                 width: viewportWidth + "px"
             });
             iframe.css({
-                zIndex: Editor.baseZIndex(Editor.zIndexManager.MAXIMIZE - 5),
+                zIndex: Editor.baseZIndex(Editor.ZIndexManager.MAXIMIZE - 5),
                 height: viewportHeight + "px",
                 width: viewportWidth + "px"
             });
@@ -312,9 +311,7 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
 
     return {
         init: function (editor) {
-
             if (!editor.hasCommand("maximizeWindow")) {
-
                 var maximizeCmd = new MaximizeCmd(editor);
 
                 editor.addCommand("maximizeWindow", {
@@ -328,11 +325,10 @@ KISSY.add("editor/plugin/maximize/cmd", function (S, Editor) {
                         maximizeCmd.restoreWindow();
                     }
                 });
-
             }
-
         }
     };
 }, {
-    requires: ['editor']
+    requires: ['event', 'editor']
 });
+

@@ -1,9 +1,16 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:43
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/font/ui
+*/
+
 /**
+ * @ignore
  * font formatting for kissy editor
  * @author yiminghe@gmail.com
  */
@@ -21,7 +28,7 @@ KISSY.add("editor/plugin/font/ui", function (S, Editor, Button, MenuButton) {
             });
 
             editor.on("selectionChange", function () {
-                if (editor.get("mode") == Editor.SOURCE_MODE) {
+                if (editor.get("mode") == Editor.Mode.SOURCE_MODE) {
                     return;
                 }
 
@@ -69,7 +76,7 @@ KISSY.add("editor/plugin/font/ui", function (S, Editor, Button, MenuButton) {
             });
             editor.on("selectionChange", function () {
 
-                if (editor.get("mode") == Editor.SOURCE_MODE) {
+                if (editor.get("mode") == Editor.Mode.SOURCE_MODE) {
                     return;
                 }
                 var cmdType = self.get("cmdType");
@@ -86,7 +93,7 @@ KISSY.add("editor/plugin/font/ui", function (S, Editor, Button, MenuButton) {
                 value:true
             },
             mode:{
-                value:Editor.WYSIWYG_MODE
+                value:Editor.Mode.WYSIWYG_MODE
             }
         }
     });
@@ -96,5 +103,6 @@ KISSY.add("editor/plugin/font/ui", function (S, Editor, Button, MenuButton) {
         Select:FontSelect
     };
 }, {
-    requires:['editor', '../button/', '../menubutton/']
+    requires:['editor', '../button', '../menubutton']
 });
+

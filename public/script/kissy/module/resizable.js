@@ -1,15 +1,20 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:07
+build time: Sep 17 23:09
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ resizable
+*/
+
 /**
  * @ignore
- *  resizable support for kissy
+ * resizable support for kissy
  * @author yiminghe@gmail.com
  */
-KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
-
+KISSY.add("resizable", function (S, Node, Base, DD, undefined) {
     var $ = Node.all,
         i,
         j,
@@ -19,26 +24,41 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
         vertical = ["t", "b"],
         ATTRS_ORDER = ["width", "height", "top", "left"],
         hcNormal = {
-            "t": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT) {
+            "t": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL, preserveRatio) {
                 var h = getBoundValue(minH, maxH, oh - diffT),
-                    t = ot + oh - h;
-                return [0, h, t, 0]
+                    t = ot + oh - h,
+                    w = 0;
+                if (preserveRatio) {
+                    w = h / oh * ow;
+                }
+                return [w, h, t, 0]
             },
-            "b": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT) {
-                var h = getBoundValue(minH, maxH, oh + diffT);
-                return [0, h, 0, 0];
+            "b": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL, preserveRatio) {
+                var h = getBoundValue(minH, maxH, oh + diffT),
+                    w = 0;
+                if (preserveRatio) {
+                    w = h / oh * ow;
+                }
+                return [w, h, 0, 0];
             },
-            "r": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL) {
-                var w = getBoundValue(minW, maxW, ow + diffL);
-                return [w, 0, 0, 0];
+            "r": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL, preserveRatio) {
+                var w = getBoundValue(minW, maxW, ow + diffL),
+                    h = 0;
+                if (preserveRatio) {
+                    h = w / ow * oh;
+                }
+                return [w, h, 0, 0];
             },
-            "l": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL) {
+            "l": function (minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL, preserveRatio) {
                 var w = getBoundValue(minW, maxW, ow - diffL),
+                    h = 0,
                     l = ol + ow - w;
-                return [w, 0, 0, l]
+                if (preserveRatio) {
+                    h = w / ow * oh;
+                }
+                return [w, h, 0, l]
             }
         };
-
 
     for (i = 0; i < horizontal.length; i++) {
         for (j = 0; j < vertical.length; j++) {
@@ -66,6 +86,8 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
         var dds = self['dds'],
             node = self.get('node'),
             handlers = self.get('handlers'),
+            preserveRatio,
+            dragConfig = self.get('dragConfig'),
             prefixCls = self.get('prefixCls'),
             prefix = prefixCls + CLS_PREFIX;
         for (i = 0; i < handlers.length; i++) {
@@ -76,36 +98,42 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
                     "-" + hc +
                     "'></div>")
                     .prependTo(node, undefined),
-                dd = dds[hc] = new Draggable({
+                dd = dds[hc] = new Draggable(S.mix({
                     node: el,
-                    cursor: null
-                });
+                    cursor: null,
+                    groups: false
+                }, dragConfig));
             (function (hc, dd) {
+                var startEdgePos;
                 dd.on("drag", function (ev) {
-                    var node = self.get('node'),
-                        dd = ev.target,
+                    var dd = ev.target,
                         ow = self._width,
                         oh = self._height,
                         minW = self.get("minWidth"),
                         maxW = self.get("maxWidth"),
                         minH = self.get("minHeight"),
                         maxH = self.get("maxHeight"),
-                        diffT = ev.top - dd.get('startNodePos').top,
-                        diffL = ev.left - dd.get('startNodePos').left,
+                        diffT = ev.pageY - startEdgePos.top,
+                        diffL = ev.pageX - startEdgePos.left,
                         ot = self._top,
                         ol = self._left,
-                        pos = hcNormal[hc](minW, maxW, minH, maxH, ot, ol, ow, oh, diffT, diffL);
+                        region = {},
+                        pos = hcNormal[hc](minW, maxW, minH, maxH,
+                            ot, ol, ow, oh, diffT, diffL, preserveRatio);
                     for (i = 0; i < ATTRS_ORDER.length; i++) {
                         if (pos[i]) {
-                            node.css(ATTRS_ORDER[i], pos[i]);
+                            region[ATTRS_ORDER[i]] = pos[i];
                         }
                     }
-                    self.fire('resize', {
+                    self.fire('beforeResize', {
                         handler: hc,
-                        dd: dd
+                        dd: dd,
+                        region: region
                     });
                 });
                 dd.on("dragstart", function () {
+                    startEdgePos = dd.get('startMousePos');
+                    preserveRatio = self.get('preserveRatio');
                     self._width = node.width();
                     self._top = parseInt(node.css("top"));
                     self._left = parseInt(node.css("left"));
@@ -130,10 +158,21 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
      * @class KISSY.Resizable
      * @extends KISSY.Base
      */
-    var Resizable = RichBase.extend({
-
+    var Resizable = Base.extend({
         initializer: function () {
             this['dds'] = {};
+            this.publish('beforeResize', {
+                defaultFn: this._onBeforeResize
+            })
+        },
+
+        _onBeforeResize: function (e) {
+            this.get('node').css(e.region);
+            this.fire('resize', {
+                handler: e.hc,
+                dd: e.dd,
+                region: e.region
+            });
         },
 
         _onSetNode: function () {
@@ -157,8 +196,9 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
                 delete dds[d];
             }
         }
-
     }, {
+        name: 'Resizable',
+
         ATTRS: {
             /**
              * KISSY Node to be resizable.
@@ -173,7 +213,16 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
                     return $(v);
                 }
             },
+            /**
+             * config for internal drag object
+             * @cfg {Object} dragConfig
+             */
+            /**
+             * @ignore
+             */
+            dragConfig: {
 
+            },
             /**
              * css prefix for handler elements.
              * @cfg {String} prefixCls
@@ -262,6 +311,16 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
                 value: Number['MAX_VALUE']
             },
             /**
+             * Whether preserve width/height ratio when resizing
+             * @cfg {Boolean} preserveRatio
+             */
+            /**
+             * @ignore
+             */
+            preserveRatio: {
+                value: false
+            },
+            /**
              * directions can current node resize to.
              * @cfg {KISSY.Resizable.Handler} handlers
              */
@@ -315,5 +374,7 @@ KISSY.add("resizable", function (S, Node, RichBase, DD, undefined) {
     };
 
     return Resizable;
+}, {
+    requires: ["node", 'base', "dd"]
+});
 
-}, { requires: ["node", "rich-base", "dd/base"] });

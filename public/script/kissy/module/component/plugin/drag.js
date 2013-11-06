@@ -1,14 +1,20 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 00:01
+build time: Sep 17 22:58
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ component/plugin/drag
+*/
+
 /**
  * @ignore
  * drag plugin for kissy component
  * @author yiminghe@gmail.com
  */
-KISSY.add('component/plugin/drag', function (S, RichBase, DD) {
+KISSY.add('component/plugin/drag', function (S, Base, DD) {
 
     /**
      * drag plugin for kissy component
@@ -39,12 +45,12 @@ KISSY.add('component/plugin/drag', function (S, RichBase, DD) {
         pluginId: 'component/plugin/drag',
 
         pluginBindUI: function (component) {
-            var el = component.get('el'),
+            var $el = component.$el,
                 self = this;
-            self.set('node', el);
+            self.set('node', $el);
             // sync
             self.on("dragend", function () {
-                var offset = el.offset();
+                var offset = $el.offset();
                 component.setInternal('xy', [offset.left, offset.top]);
             });
         },
@@ -57,10 +63,14 @@ KISSY.add('component/plugin/drag', function (S, RichBase, DD) {
         ATTRS: {
             move: {
                 value: 1
+            },
+            groups: {
+                value: false
             }
         }
     });
 
 }, {
-    requires: ['rich-base', 'dd/base']
+    requires: ['base', 'dd']
 });
+

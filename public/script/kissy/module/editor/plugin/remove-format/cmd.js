@@ -1,32 +1,35 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:47
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/remove-format/cmd
+*/
+
 /**
+ * @ignore
  * Add remove-format command for KISSY Editor.
  * @author yiminghe@gmail.com
  */
 KISSY.add("editor/plugin/remove-format/cmd", function (S, Editor) {
-    var KER = Editor.RANGE,
+    var KER = Editor.RangeType,
         ElementPath = Editor.ElementPath,
-        DOM = S.DOM,
-        /**
-         * A comma separated list of elements to be removed
-         * when executing the "remove format" command.
-         * Note that only inline elements are allowed.
-         * @type {String}
-         * Defaults to: 'b,big,code,del,dfn,em,font,i,ins,kbd,q,samp,small,span,strike,strong,sub,sup,tt,u,var'
-         * @example
+        Dom = S.DOM,
+        /*
+          A comma separated list of elements to be removed
+          when executing the "remove format" command.
+          Note that only inline elements are allowed.
+          Defaults to: 'b,big,code,del,dfn,em,font,i,ins,kbd,q,samp,small,span,strike,strong,sub,sup,tt,u,var'
          */
             removeFormatTags = 'b,big,code,del,dfn,em,font,i,ins,kbd,' +
             'q,samp,small,span,strike,strong,sub,sup,tt,u,var,s',
-        /**
-         * A comma separated list of elements attributes to be removed
-         * when executing the "remove format" command.
-         * @type {String}
-         * Defaults to: 'class,style,lang,width,height,align,hspace,valign'
-         * @example
+        /*
+          A comma separated list of elements attributes to be removed
+          when executing the "remove format" command.
+          Defaults to: 'class,style,lang,width,height,align,hspace,valign'
          */
             removeFormatAttributes = ('class,style,lang,width,height,' +
             'align,hspace,valign').split(/,/),
@@ -93,14 +96,14 @@ KISSY.add("editor/plugin/remove-format/cmd", function (S, Editor) {
                             };
 
                             // does not make bookmark within any format tag
-                            // but keep bookmark node is at original text posititon
+                            // but keep bookmark node is at original text position
                             breakParent(startNode);
                             breakParent(endNode);
 
                             // Navigate through all nodes between the bookmarks.
                             var currentNode = startNode
                                 // start from sibling , because obvious bookmark has no children
-                                ._4e_nextSourceNode(true, DOM.NodeType.ELEMENT_NODE, undefined, undefined);
+                                ._4e_nextSourceNode(true, Dom.NodeType.ELEMENT_NODE, undefined, undefined);
 
                             while (currentNode) {
                                 // If we have reached the end of the selection, stop looping.
@@ -111,7 +114,7 @@ KISSY.add("editor/plugin/remove-format/cmd", function (S, Editor) {
                                 // Cache the next node to be processed. Do it now, because
                                 // currentNode may be removed.
                                 var nextNode = currentNode.
-                                    _4e_nextSourceNode(false, DOM.NodeType.ELEMENT_NODE, undefined, undefined);
+                                    _4e_nextSourceNode(false, Dom.NodeType.ELEMENT_NODE, undefined, undefined);
 
                                 // This node must not be a fake element.
                                 if (!( currentNode.nodeName() == 'img' &&
@@ -142,3 +145,4 @@ KISSY.add("editor/plugin/remove-format/cmd", function (S, Editor) {
 }, {
     requires:['editor']
 });
+

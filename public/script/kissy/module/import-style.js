@@ -1,16 +1,22 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:06
+build time: Sep 17 23:08
 */
 /**
  * use document.write to load external css files in block loading ways.
  * depends on loader.
+ * @ignore
  * @author yiminghe@gmail.com
  */
 (function (S) {
     var isDebug;
 
+    /**
+     * use document.write to load module's css dependency or css module in block loading ways.
+     * @param {String[]} modNames css/js module names
+     * @member KISSY
+     */
     function importStyle(modNames) {
         if (typeof modNames == 'string') {
             modNames = modNames.split(',');

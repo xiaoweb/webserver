@@ -1,50 +1,36 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:08
+build time: Sep 17 23:10
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ split-button
+*/
+
 /**
+ * @ignore
  * SplitButton for KISSY. Combination of button and menubutton.
  * @author yiminghe@gmail.com
  */
-KISSY.add("split-button", function (S, Component, Button, MenuButton) {
-
-    return Component.Controller.extend([], {
-
+KISSY.add("split-button", function (S, Container) {
+    /**
+     * split button container for menubutton and button
+     * @class KISSY.SplitButton
+     * @extend KISSY.Component.Container
+     */
+    return Container.extend({
         renderUI: function () {
             var self = this,
                 alignWithEl = self.get("alignWithEl"),
-                children = self.get("children");
-            self.setInternal("menuButton", children[1]);
-            self.setInternal("button", children[0]);
-            var menuButton = children[1],
+                menuButton = self.get("children")[1],
                 menu = menuButton.get("menu");
             if (alignWithEl) {
-                if (menu.isController) {
-                    menu.get("align").node = self.get("el");
-                } else {
-                    menu.align = menu.align || {};
-                    menu.align.node = self.get("el");
-                }
+                menu.get("align").node = self.$el;
             }
-        },
-
-        decorateInternal: function (el) {
-            var self = this,
-                button = self.get("button"),
-                menuButton = self.get("menuButton");
-            self.set("el", el);
-            var children = el.children();
-            self.setInternal("button", new Button(S.mix({
-                srcNode: children[0]
-            }, button)));
-            self.setInternal("menuButton", new MenuButton(S.mix({
-                srcNode: children[1]
-            }, menuButton)));
         }
-
     }, {
-
         ATTRS: {
             handleMouseEvents: {
                 value: false
@@ -52,6 +38,14 @@ KISSY.add("split-button", function (S, Component, Button, MenuButton) {
             focusable: {
                 value: false
             },
+            /**
+             * whether align menubutton with button.
+             * Defaults to: true
+             * @cfg {Boolean} alignWithEl
+             */
+            /**
+             * @ignore
+             */
             alignWithEl: {
                 value: true
             },
@@ -65,23 +59,55 @@ KISSY.add("split-button", function (S, Component, Button, MenuButton) {
                     }
                 ]
             },
-            button: {
+            /**
+             * menubutton component
+             * @cfg {KISSY.MenuButton} menuButton
+             */
+
+            /**
+             * menubutton component
+             * @property {KISSY.MenuButton} menuButton
+             */
+
+            /**
+             * @ignore
+             */
+            menuButton: {
+                getter: function () {
+                    return this.get('children')[1];
+                },
                 setter: function (v) {
-                    this.get("children")[0] = v;
+                    this.get('children')[1] = v;
                 }
             },
-            menuButton: {
+
+            /**
+             * button component
+             * @cfg {KISSY.Button} button
+             */
+
+            /**
+             * button component
+             * @property {KISSY.Button} button
+             */
+
+            /**
+             * @ignore
+             */
+            button: {
+                getter: function () {
+                    return this.get('children')[0];
+                },
                 setter: function (v) {
-                    this.get("children")[1] = v;
+                    this.get('children')[0] = v;
                 }
             }
-        }
-
-    }, {
+        },
         xclass: 'split-button'
     });
-
-
 }, {
-    requires: ['component/base', 'button', 'menubutton']
+    requires: ['component/container',
+        // implicit requirement
+        'button', 'menubutton']
 });
+

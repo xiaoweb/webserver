@@ -1,325 +1,30 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:07
+build time: Sep 17 23:09
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ mvc/model
+ mvc/collection
+ mvc/view
+ mvc/router
+ mvc/sync
+ mvc
+*/
+
 /**
- *  collection of models
- * @author yiminghe@gmail.com
- */
-KISSY.add("mvc/collection", function (S, Event, Model, Base) {
-
-    function findModelIndex(mods, mod, comparator) {
-        var i = mods.length;
-        if (comparator) {
-            var k = comparator(mod);
-            for (i = 0; i < mods.length; i++) {
-                var k2 = comparator(mods[i]);
-                if (k < k2) {
-                    break;
-                }
-            }
-        }
-        return i;
-    }
-
-    /**
-     * @name Collection
-     * @class
-     * Collection. A list of model.
-     * @memberOf MVC
-     * @extends KISSY.Base
-     */
-    function Collection() {
-        Collection.superclass.constructor.apply(this, arguments);
-    }
-
-    Collection.ATTRS =
-    /**
-     * @lends MVC.Collection#
-     */
-    {
-        /**
-         * Model constructor with in current collection.
-         * @type {MVC.Model}
-         */
-        model:{
-            value:Model
-        },
-        /**
-         * Model list.
-         * @type {MVC.Model[]}
-         */
-        models:{
-            /*
-             normalize model list
-             @param models
-             */
-            setter:function (models) {
-                var prev = this.get("models");
-                this.remove(prev, {silent:1});
-                this.add(models, {silent:1});
-                return this.get("models");
-            },
-            value:[]
-        },
-        /**
-         * Get url for sending data to server.
-         * @type {String|Function}
-         */
-        url:{
-            value:""
-        },
-        /**
-         * Comparator function for index getter when adding model.
-         * default to append to last of current model list.
-         * @type {Function}
-         */
-        comparator:{},
-        /**
-         * Sync function to sync data with server.
-         * Default to call {@link MVC.sync}
-         * @type {Function}
-         */
-        sync:{
-            value:function () {
-                S.require("mvc").sync.apply(this, arguments);
-            }
-        },
-        /**
-         * Get structured data from raw data returned from server.
-         * default to return raw data from server.
-         * @type {Function}
-         */
-        parse:{
-            value:function (resp) {
-                return resp;
-            }
-        }
-    };
-
-    S.extend(Collection, Base,
-        /**
-         * @lends MVC.Collection#
-         */
-        {
-            /**
-             * Sort model list according {@link MVC.Collection#comparator}.
-             */
-            sort:function () {
-                var comparator = this.get("comparator");
-                if (comparator) {
-                    this.get("models").sort(function (a, b) {
-                        return comparator(a) - comparator(b);
-                    });
-                }
-            },
-
-            /**
-             * Get json representation of this collection.
-             * @return Object[]
-             */
-            toJSON:function () {
-                return S.map(this.get("models"), function (m) {
-                    return m.toJSON();
-                });
-            },
-
-            /**
-             * Add a model to current collection.
-             * @param {Object|MVC.Model} model Model or json data to be added.
-             * @param {Object} [opts] Add config
-             * @param {Function} opts.silent Whether to fire add event.
-             */
-            add:function (model, opts) {
-                var self = this,
-                    ret = true;
-                if (S.isArray(model)) {
-                    var orig = [].concat(model);
-                    S.each(orig, function (m) {
-                        var t = self._add(m, opts);
-                        ret = ret && t;
-                    });
-                } else {
-                    ret = self._add(model, opts);
-                }
-                return ret;
-            },
-
-            /**
-             * Remove an existing model from current collection.
-             * @param {MVC.Model} model Model to be removed.
-             * @param {Object} [opts] Remove config.
-             * @param {Function} opts.silent Whether to fire remove event.
-             */
-            remove:function (model, opts) {
-                var self = this;
-                if (S.isArray(model)) {
-                    var orig = [].concat(model);
-                    S.each(orig, function (m) {
-                        self._remove(m, opts);
-                    });
-                } else if (model) {
-                    self._remove(model, opts);
-                }
-            },
-
-            /**
-             * Get model at specified index.
-             * @param {Number} i Specified index.
-             */
-            at:function (i) {
-                return this.get("models")[i];
-            },
-
-            _normModel:function (model) {
-                var ret = true;
-                if (!(model instanceof Model)) {
-                    var data = model,
-                        modelConstructor = this.get("model");
-                    model = new modelConstructor();
-                    ret = model.set(data, {
-                        silent:1
-                    });
-                }
-                return ret && model;
-            },
-
-            /**
-             * Initialize model list by loading data using sync mechanism.
-             * @param {Object} opts Load config.
-             * @param {Function} opts.success Callback when load is successful.
-             * @param {Function} opts.error Callback when error occurs on loading.
-             * @param {Function} opts.complete Callback when load is complete.
-             * @chainable
-             */
-            load:function (opts) {
-                var self = this;
-                opts = opts || {};
-                var success = opts.success;
-                /**
-                 * @ignore
-                 */
-                opts.success = function (resp) {
-                    if (resp) {
-                        var v = self.get("parse").call(self, resp);
-                        if (v) {
-                            self.set("models", v, opts);
-                        }
-                    }
-                    // https://github.com/kissyteam/kissy/issues/138
-                    S.each(self.get("models"), function (m) {
-                        m.__isModified = 0;
-                    });
-                    success && success.apply(this, arguments);
-                };
-                self.get("sync").call(self, self, 'read', opts);
-                return self;
-            },
-
-            /**
-             * Add a model to current collection by provide json data.
-             * @param {Object} model Json data represent model data.
-             * @param {Object} opts Create config.
-             * @param {Function} opts.success Callback when create is successful.
-             * @param {Function} opts.error Callback when error occurs on creating.
-             * @param {Function} opts.complete Callback when create is complete.
-             * @param {Function} opts.silent Whether to fire add event.
-             */
-            create:function (model, opts) {
-                var self = this;
-                opts = opts || {};
-                model = this._normModel(model);
-                if (model) {
-                    model.addToCollection(self);
-                    var success = opts.success;
-                    opts.success = function () {
-                        self.add(model, opts);
-                        success && success();
-                    };
-                    model.save(opts);
-                }
-                return model;
-            },
-
-            _add:function (model, opts) {
-                model = this._normModel(model);
-                if (model) {
-                    opts = opts || {};
-                    var index = findModelIndex(this.get("models"), model, this.get("comparator"));
-                    this.get("models").splice(index, 0, model);
-                    model.addToCollection(this);
-                    if (!opts['silent']) {
-                        this.fire("add", {
-                            model:model
-                        });
-                    }
-                }
-                return model;
-            },
-
-            /**
-             * not call model.destroy ,maybe model belongs to multiple collections
-             * @private
-             */
-            _remove:function (model, opts) {
-                opts = opts || {};
-                var index = S.indexOf(model, this.get("models"));
-                if (index != -1) {
-                    this.get("models").splice(index, 1);
-                    model.removeFromCollection(this);
-                }
-                if (!opts['silent']) {
-                    this.fire("remove", {
-                        model:model
-                    });
-                }
-            },
-
-            /**
-             * Get model instance by id.
-             * @param {String} id
-             */
-            getById:function (id) {
-                var models = this.get("models");
-                for (var i = 0; i < models.length; i++) {
-                    var model = models[i];
-                    if (model.getId() === id) {
-                        return model;
-                    }
-                }
-                return null;
-            },
-
-            /**
-             * Get model instance by client id.
-             * @param {String} cid Client id auto generated by model.
-             */
-            getByCid:function (cid) {
-                var models = this.get("models");
-                for (var i = 0; i < models.length; i++) {
-                    var model = models[i];
-                    if (model.get("clientId") === cid) {
-                        return model;
-                    }
-                }
-                return null;
-            }
-
-        });
-
-    return Collection;
-
-}, {
-    requires:['event', './model', 'base']
-});/**
- *  enhanced base for model with sync
+ * @ignore
+ * enhanced base for model with sync
  * @author yiminghe@gmail.com
  */
 KISSY.add("mvc/model", function (S, Base) {
-
     var blacklist = [
         "idAttribute",
+        "destroyed",
+        "plugins",
+        "listeners",
         "clientId",
         "urlRoot",
         "url",
@@ -328,40 +33,31 @@ KISSY.add("mvc/model", function (S, Base) {
     ];
 
     /**
-     * @name Model
-     * @class
      * Model represent a data record.
-     * @memberOf MVC
+     * @class KISSY.MVC.Model
      * @extends KISSY.Base
      */
-    function Model() {
-        var self = this;
-        Model.superclass.constructor.apply(self, arguments);
-        /*
-         *Change should bubble to its collections
-         */
-        self.collections = {};
-    }
-
-    S.extend(Model, Base,
-        /**
-         * @lends MVC.Model#
-         */
-        {
+   return Base.extend({
+       initializer:function(){
+           /*
+            *Change should bubble to its collections
+            */
+           this.collections = {};
+       },
 
             /**
              * Add current model instance to a specified collection.
-             * @param {MVC.Collection} c
+             * @param {KISSY.MVC.Collection} c
              */
-            addToCollection: function (c) {
+            addToCollection:function (c) {
                 this.collections[S.stamp(c)] = c;
                 this.addTarget(c);
             },
             /**
              * Remove current model instance from a specified collection.
-             * @param {MVC.Collection} c
+             * @param {KISSY.MVC.Collection} c
              */
-            removeFromCollection: function (c) {
+            removeFromCollection:function (c) {
                 delete this.collections[S.stamp(c)];
                 this.removeTarget(c);
             },
@@ -369,7 +65,7 @@ KISSY.add("mvc/model", function (S, Base) {
             /**
              * Get current model 's id.
              */
-            getId: function () {
+            getId:function () {
                 return this.get(this.get("idAttribute"));
             },
 
@@ -377,20 +73,20 @@ KISSY.add("mvc/model", function (S, Base) {
              * Set current model 's id.
              * @param id
              */
-            setId: function (id) {
+            'setId':function (id) {
                 return this.set(this.get("idAttribute"), id);
             },
 
-            setInternal: function () {
+            setInternal:function () {
                 this.__isModified = 1;
-                return Model.superclass.setInternal.apply(this, arguments);
+                return this.callSuper.apply(this,arguments);
             },
 
             /**
              * whether it is newly created.
              * @return {Boolean}
              */
-            isNew: function () {
+            isNew:function () {
                 return !this.getId();
             },
 
@@ -398,7 +94,7 @@ KISSY.add("mvc/model", function (S, Base) {
              * whether has been modified since last save.
              * @return {Boolean}
              */
-            isModified: function () {
+            isModified:function () {
                 return !!(this.isNew() || this.__isModified);
             },
 
@@ -410,7 +106,7 @@ KISSY.add("mvc/model", function (S, Base) {
              * @param {Function} opts.complete callback when action is complete.
              * @chainable
              */
-            destroy: function (opts) {
+            destroy:function (opts) {
                 var self = this;
                 opts = opts || {};
                 var success = opts.success;
@@ -427,9 +123,6 @@ KISSY.add("mvc/model", function (S, Base) {
                     }
                     for (var l in lists) {
                         lists[l].remove(self, opts);
-                        if (lists[l]) {
-                            self.removeFromCollection(lists[l]);
-                        }
                     }
                     self.fire("destroy");
                     success && success.apply(this, arguments);
@@ -454,7 +147,7 @@ KISSY.add("mvc/model", function (S, Base) {
              * @param {Function} opts.complete callback when action is complete.
              * @chainable
              */
-            load: function (opts) {
+            load:function (opts) {
                 var self = this;
                 opts = opts || {};
                 var success = opts.success;
@@ -483,7 +176,7 @@ KISSY.add("mvc/model", function (S, Base) {
              * @param {Function} opts.complete callback when action is complete.
              * @chainable
              */
-            save: function (opts) {
+            save:function (opts) {
                 var self = this;
                 opts = opts || {};
                 var success = opts.success;
@@ -508,7 +201,7 @@ KISSY.add("mvc/model", function (S, Base) {
              * Get json representation for current model.
              * @return {Object}
              */
-            toJSON: function () {
+            toJSON:function () {
                 var ret = this.getAttrVals();
                 S.each(blacklist, function (b) {
                     delete ret[b];
@@ -517,17 +210,14 @@ KISSY.add("mvc/model", function (S, Base) {
             }
 
         }, {
-            ATTRS: /**
-             * @lends MVC.Model#
-             */
-            {
+            ATTRS:{
                 /**
                  * Attribute name used to store id from server.
                  * Defaults to: "id".
                  * @type {String}
                  */
-                idAttribute: {
-                    value: 'id'
+                idAttribute:{
+                    value:'id'
                 },
 
                 /**
@@ -535,8 +225,8 @@ KISSY.add("mvc/model", function (S, Base) {
                  * Default call S.guid()
                  * @type {Function}
                  */
-                clientId: {
-                    valueFn: function () {
+                clientId:{
+                    valueFn:function () {
                         return S.guid("mvc-client");
                     }
                 },
@@ -545,24 +235,24 @@ KISSY.add("mvc/model", function (S, Base) {
                  * Defaults to: collection.url+"/"+mode.id
                  * @type {Function}
                  */
-                url: {
-                    value: url
+                url:{
+                    value:url
                 },
                 /**
                  * If current model does not belong to any collection.
-                 * Use this attribute value as collection.url in {@link MVC.Model#url}
+                 * Use this attribute value as collection.url in {@link KISSY.MVC.Model#url}
                  * @type {String}
                  */
-                urlRoot: {
-                    value: ""
+                urlRoot:{
+                    value:""
                 },
                 /**
                  * Sync model data with server.
-                 * Default to call {@link MVC.sync}
+                 * Default to call {@link KISSY.MVC#sync}
                  * @type {Function}
                  */
-                sync: {
-                    value: function () {
+                sync:{
+                    value:function () {
                         S.require("mvc").sync.apply(this, arguments);
                     }
                 },
@@ -571,8 +261,8 @@ KISSY.add("mvc/model", function (S, Base) {
                  * Default to return raw data from server.
                  * @type {Function}
                  */
-                parse: {
-                    value: function (resp) {
+                parse:{
+                    value:function (resp) {
                         return resp;
                     }
                 }
@@ -609,37 +299,424 @@ KISSY.add("mvc/model", function (S, Base) {
         base = base + (base.charAt(base.length - 1) == '/' ? '' : '/');
         return base + encodeURIComponent(this.getId()) + "/";
     }
-
-    return Model;
-
 }, {
-    requires: ['base']
-});/**
- *  KISSY 's MVC Framework for Page Application (Backbone Style)
+    requires:['base']
+});
+/**
+ * @ignore
+ * collection of models
  * @author yiminghe@gmail.com
  */
-KISSY.add("mvc", function (S, Model, Collection, View, Router, sync) {
+KISSY.add("mvc/collection", function (S, Model, Base) {
+
+    function findModelIndex(mods, mod, comparator) {
+        var i = mods.length;
+        if (comparator) {
+            var k = comparator(mod);
+            for (i = 0; i < mods.length; i++) {
+                var k2 = comparator(mods[i]);
+                if (k < k2) {
+                    break;
+                }
+            }
+        }
+        return i;
+    }
 
     /**
-     * @namespace
-     * KISSY MVC Framework.
-     * @name MVC
+     * Collection. A list of model.
+     * @class KISSY.MVC.Collection
+     * @extends KISSY.Base
      */
+    return Base.extend({
+        /**
+         * Sort model list according {@link KISSY.MVC.Collection#comparator}.
+         */
+        sort: function () {
+            var comparator = this.get("comparator");
+            if (comparator) {
+                this.get("models").sort(function (a, b) {
+                    return comparator(a) - comparator(b);
+                });
+            }
+        },
 
-    return {
-        sync:sync,
-        Model:Model,
-        View:View,
-        Collection:Collection,
-        Router:Router
-    };
+        /**
+         * Get json representation of this collection.
+         * @return Object[]
+         */
+        toJSON: function () {
+            return S.map(this.get("models"), function (m) {
+                return m.toJSON();
+            });
+        },
+
+        /**
+         * Add a model to current collection.
+         * @param {Object|KISSY.MVC.Model} model Model or json data to be added.
+         * @param {Object} [opts] Add config
+         * @param {Function} opts.silent Whether to fire add event.
+         */
+        add: function (model, opts) {
+            var self = this,
+                ret = true;
+            if (S.isArray(model)) {
+                var orig = [].concat(model);
+                S.each(orig, function (m) {
+                    var t = self._add(m, opts);
+                    ret = ret && t;
+                });
+            } else {
+                ret = self._add(model, opts);
+            }
+            return ret;
+        },
+
+        /**
+         * Remove an existing model from current collection.
+         * @param {KISSY.MVC.Model} model Model to be removed.
+         * @param {Object} [opts] Remove config.
+         * @param {Function} opts.silent Whether to fire remove event.
+         */
+        remove: function (model, opts) {
+            var self = this;
+            if (S.isArray(model)) {
+                var orig = [].concat(model);
+                S.each(orig, function (m) {
+                    self._remove(m, opts);
+                });
+            } else if (model) {
+                self._remove(model, opts);
+            }
+        },
+
+        /**
+         * Get model at specified index.
+         * @param {Number} i Specified index.
+         */
+        at: function (i) {
+            return this.get("models")[i];
+        },
+
+        _normModel: function (model) {
+            var ret = true;
+            if (!(model instanceof Model)) {
+                var data = model,
+                    modelConstructor = this.get("model");
+                model = new modelConstructor();
+                ret = model.set(data, {
+                    silent: 1
+                });
+            }
+            return ret && model;
+        },
+
+        /**
+         * Initialize model list by loading data using sync mechanism.
+         * @param {Object} opts Load config.
+         * @param {Function} opts.success Callback when load is successful.
+         * @param {Function} opts.error Callback when error occurs on loading.
+         * @param {Function} opts.complete Callback when load is complete.
+         * @chainable
+         */
+        load: function (opts) {
+            var self = this;
+            opts = opts || {};
+            var success = opts.success;
+            /**
+             * @ignore
+             */
+            opts.success = function (resp) {
+                if (resp) {
+                    var v = self.get("parse").call(self, resp);
+                    if (v) {
+                        self.set("models", v, opts);
+                    }
+                }
+                // https://github.com/kissyteam/kissy/issues/138
+                S.each(self.get("models"), function (m) {
+                    m.__isModified = 0;
+                });
+                success && success.apply(this, arguments);
+            };
+            self.get("sync").call(self, self, 'read', opts);
+            return self;
+        },
+
+        /**
+         * Add a model to current collection by provide json data.
+         * @param {Object} model Json data represent model data.
+         * @param {Object} opts Create config.
+         * @param {Function} opts.success Callback when create is successful.
+         * @param {Function} opts.error Callback when error occurs on creating.
+         * @param {Function} opts.complete Callback when create is complete.
+         * @param {Function} opts.silent Whether to fire add event.
+         */
+        create: function (model, opts) {
+            var self = this;
+            opts = opts || {};
+            model = this._normModel(model);
+            if (model) {
+                model.addToCollection(self);
+                var success = opts.success;
+                opts.success = function () {
+                    self.add(model, opts);
+                    success && success();
+                };
+                model.save(opts);
+            }
+            return model;
+        },
+
+        _add: function (model, opts) {
+            model = this._normModel(model);
+            if (model) {
+                opts = opts || {};
+                var index = findModelIndex(this.get("models"), model, this.get("comparator"));
+                this.get("models").splice(index, 0, model);
+                model.addToCollection(this);
+                if (!opts['silent']) {
+                    this.fire("add", {
+                        model: model
+                    });
+                }
+            }
+            return model;
+        },
+
+        /**
+         * not call model.destroy ,maybe model belongs to multiple collections
+         * @private
+         */
+        _remove: function (model, opts) {
+            opts = opts || {};
+            var index = S.indexOf(model, this.get("models"));
+            if (index != -1) {
+                this.get("models").splice(index, 1);
+                model.removeFromCollection(this);
+            }
+            if (!opts['silent']) {
+                this.fire("remove", {
+                    model: model
+                });
+            }
+        },
+
+        /**
+         * Get model instance by id.
+         * @param {String} id
+         */
+        getById: function (id) {
+            var models = this.get("models");
+            for (var i = 0; i < models.length; i++) {
+                var model = models[i];
+                if (model.getId() === id) {
+                    return model;
+                }
+            }
+            return null;
+        },
+
+        /**
+         * Get model instance by client id.
+         * @param {String} cid Client id auto generated by model.
+         */
+        getByCid: function (cid) {
+            var models = this.get("models");
+            for (var i = 0; i < models.length; i++) {
+                var model = models[i];
+                if (model.get("clientId") === cid) {
+                    return model;
+                }
+            }
+            return null;
+        }
+
+    }, {
+        ATTRS: {
+            /**
+             * Model constructor with in current collection.
+             * @type {KISSY.MVC.Model}
+             */
+            model: {
+                value: Model
+            },
+            /**
+             * Model list.
+             * @type {KISSY.MVC.Model[]}
+             */
+            models: {
+                /*
+                 normalize model list
+                 @param models
+                 */
+                setter: function (models) {
+                    var prev = this.get("models");
+                    this.remove(prev, {silent: 1});
+                    this.add(models, {silent: 1});
+                    return this.get("models");
+                },
+                value: []
+            },
+            /**
+             * Get url for sending data to server.
+             * @type {String|Function}
+             */
+            url: {
+                value: ""
+            },
+            /**
+             * Comparator function for index getter when adding model.
+             * default to append to last of current model list.
+             * @type {Function}
+             */
+            comparator: {},
+            /**
+             * Sync function to sync data with server.
+             * Default to call {@link KISSY.MVC#sync}
+             * @type {Function}
+             */
+            sync: {
+                value: function () {
+                    S.require("mvc").sync.apply(this, arguments);
+                }
+            },
+            /**
+             * Get structured data from raw data returned from server.
+             * default to return raw data from server.
+             * @type {Function}
+             */
+            parse: {
+                value: function (resp) {
+                    return resp;
+                }
+            }
+        }
+    });
 }, {
-    requires:["mvc/model", "mvc/collection", "mvc/view", "mvc/router", "mvc/sync"]
-});/**
- *  simple router to get path parameter and query parameter from hash(old ie) or url(html5)
+    requires: ['./model', 'base']
+});
+/**
+ * @ignore
+ * view for kissy mvc : event delegation,el generator
  * @author yiminghe@gmail.com
  */
-KISSY.add('mvc/router', function (S, Event, Base) {
+KISSY.add("mvc/view", function (S, Node, Base) {
+
+    var $ = Node.all;
+
+    function normFn(self, f) {
+        if (typeof f == 'string') {
+            return self[f];
+        }
+        return f;
+    }
+
+    /**
+     * View for delegating event on root element.
+     * @class KISSY.MVC.View
+     * @extends KISSY.Base
+     */
+    return Base.extend({
+        initializer: function () {
+            var events;
+            if (events = this.get("events")) {
+                this._afterEventsChange({
+                    newVal: events
+                });
+            }
+        },
+
+        _afterEventsChange: function (e) {
+            var prevVal = e.prevVal;
+            if (prevVal) {
+                this._removeEvents(prevVal);
+            }
+            this._addEvents(e.newVal);
+        },
+
+        _removeEvents: function (events) {
+            var el = this.get("el");
+            for (var selector in events) {
+                var event = events[selector];
+                for (var type in event) {
+                    var callback = normFn(this, event[type]);
+                    el.undelegate(type, selector, callback, this);
+                }
+            }
+        },
+
+        _addEvents: function (events) {
+            var el = this.get("el");
+            for (var selector in events) {
+                var event = events[selector];
+                for (var type in event) {
+                    var callback = normFn(this, event[type]);
+                    el.delegate(type, selector, callback, this);
+                }
+            }
+        },
+
+        /**
+         * @chainable
+         */
+        render: function () {
+            return this;
+        },
+
+        /**
+         * Remove root element.
+         */
+        destroy: function () {
+            this.get("el").remove();
+        }
+
+    }, {
+        ATTRS: {
+            /**
+             * Get root element for current view instance.
+             * @type {String}
+             *
+             *
+             *      //  selector :
+             *      .xx
+             *      // or html string
+             *      <div>my</div>
+             */
+            el: {
+                value: "<div />",
+                getter: function (s) {
+                    if (typeof s == 'string') {
+                        s = $(s);
+                        this.setInternal("el", s);
+                    }
+                    return s;
+                }
+            },
+
+            /**
+             * Delegate event on root element.
+             * @type {Object}
+             *
+             *
+             *      selector:{
+             *          eventType:callback
+             *      }
+             */
+            events: {
+
+            }
+        }
+    });
+}, {
+    requires: ['node', 'base']
+});
+/**
+ * @ignore
+ * simple router to get path parameter and query parameter from hash(old ie) or url(html5)
+ * @author yiminghe@gmail.com
+ */
+KISSY.add('mvc/router', function (S, Node, Base, undefined) {
     var each = S.each,
     // take a breath to avoid duplicate hashchange
         BREATH_INTERVAL = 100,
@@ -647,6 +724,8 @@ KISSY.add('mvc/router', function (S, Event, Base) {
     // all registered route instance
         allRoutes = [],
         win = S.Env.host,
+        $ = Node.all,
+        $win = $(win),
         ie = win.document.documentMode || S.UA.ie,
         history = win.history ,
         supportNativeHistory = !!(history && history['pushState']),
@@ -679,9 +758,8 @@ KISSY.add('mvc/router', function (S, Event, Base) {
         return new S.Uri(url).getFragment().replace(/^!/, "");
     }
 
-    /**
-     * get url fragment and dispatch
-     */
+
+   // get url fragment and dispatch
     function getFragment(url) {
         url = url || location.href;
         if (Router.nativeHistory && supportNativeHistory) {
@@ -693,14 +771,6 @@ KISSY.add('mvc/router', function (S, Event, Base) {
         }
     }
 
-    /**
-     * slash ------------- start
-     */
-
-    /**
-     * whether string end with slash
-     * @param str
-     */
     function endWithSlash(str) {
         return S.endsWith(str, "/");
     }
@@ -741,22 +811,15 @@ KISSY.add('mvc/router', function (S, Event, Base) {
         return str1 == str2;
     }
 
-    /**
-     * slash ------------------  end
-     */
 
-    /**
-     * get full path from fragment for html history
-     * @param fragment
-     */
+   // get full path from fragment for html history
     function getFullPath(fragment) {
         return location.protocol + "//" + location.host +
             removeEndSlash(Router.urlRoot) + addStartSlash(fragment)
     }
 
-    /**
-     * match url with route intelligently (always get optimal result)
-     */
+
+   // match url with route intelligently (always get optimal result)
     function dispatch() {
         var query,
             path,
@@ -858,12 +921,14 @@ KISSY.add('mvc/router', function (S, Event, Base) {
                             return false;
                         }
                     }
+                    return undefined;
                 }
             );
 
             if (exactlyMatch) {
                 return false;
             }
+            return undefined;
         });
 
 
@@ -885,17 +950,17 @@ KISSY.add('mvc/router', function (S, Event, Base) {
         }
     }
 
-    /**
-     * transform route declaration to router reg
-     * @param str
-     *         /search/:q
-     *         /user/*path
+    /*
+     transform route declaration to router reg
+     @param str
+     /search/:q
+     /user/*path
      */
     function transformRouterReg(self, str, callback) {
         var name = str,
             paramNames = [];
 
-        if (S.isFunction(callback)) {
+        if (typeof callback === 'function') {
             // escape keyword from regexp
             str = S.escapeRegExp(str);
 
@@ -909,6 +974,7 @@ KISSY.add('mvc/router', function (S, Event, Base) {
                 else if (g4) {
                     return "(.*)";
                 }
+                return undefined;
             });
 
             return {
@@ -927,13 +993,10 @@ KISSY.add('mvc/router', function (S, Event, Base) {
         }
     }
 
-    /**
-     * normalize function by self
-     * @param self
-     * @param callback
-     */
+
+   // normalize function by self
     function normFn(self, callback) {
-        if (S.isFunction(callback)) {
+        if (typeof callback === 'function') {
             return callback;
         } else if (typeof callback == 'string') {
             return self[callback];
@@ -947,245 +1010,253 @@ KISSY.add('mvc/router', function (S, Event, Base) {
         self.addRoutes(e.newVal);
     }
 
+    var Router;
+
     /**
-     * @name Router
-     * @class
      * Router used to route url to responding action callbacks.
-     * @memberOf MVC
+     * @class KISSY.MVC.Router
      * @extends KISSY.Base
      */
-    function Router() {
-        var self = this;
-        Router.superclass.constructor.apply(self, arguments);
-        self.on("afterRoutesChange", _afterRoutesChange, self);
-        _afterRoutesChange.call(self, {newVal: self.get("routes")});
-        allRoutes.push(self);
-    }
-
-    Router.ATTRS =
-    /**
-     * @lends MVC.Router#
-     */
-    {
+    return Router = Base.extend({
+        initializer: function () {
+            var self = this;
+            self.on("afterRoutesChange", _afterRoutesChange, self);
+            _afterRoutesChange.call(self, {newVal: self.get("routes")});
+            allRoutes.push(self);
+        },
         /**
-         * Route and action config.
-         * @type {Object}
-         * @example
-         * <code>
-         *   {
-         *     "/search/:param":"callback"
-         *     // or
-         *     "search":{
-         *       reg:/xx/,
-         *       callback:fn
-         *     }
-         *   }
-         * </code>
+         * Add config to current router.
+         * @param {Object} routes Route config.
+         *
+         *
+         *      {
+         *          "/search/:param":"callback"
+         *          // or
+         *          "search":{
+         *              reg:/xx/,
+         *              callback:fn
+         *          }
+         *      }
          */
-        routes: {}
-    };
+        addRoutes: function (routes) {
+            var self = this;
+            each(routes, function (callback, name) {
+                self[ROUTER_MAP][name] = transformRouterReg(self, name, normFn(self, callback));
+            });
+        }
+    }, {
+        ATTRS: {
 
-    S.extend(Router, Base,
-        /**
-         * @lends MVC.Router#
-         */
-        {
             /**
-             * Add config to current router.
-             * @param {Object} routes Route config.
-             * @example
-             * <code>
-             *   {
-             *     "/search/:param":"callback"
-             *     // or
-             *     "search":{
-             *       reg:/xx/,
-             *       callback:fn
+             * Route and action config.
+             * @cfg {Object} routes
+             *
+             *
+             *     {
+             *       "/search/:param":"callback"
+             *       // or
+             *       "search":{
+             *         reg:/xx/,
+             *         callback:fn
+             *       }
              *     }
-             *   }
-             * </code>
              */
-            addRoutes: function (routes) {
-                var self = this;
-                each(routes, function (callback, name) {
-                    self[ROUTER_MAP][name] = transformRouterReg(self, name, normFn(self, callback));
+            /**
+             * @ignore
+             */
+            routes: {}
+        },
+
+        /**
+         * whether Router can process path
+         * @param {String} path path for route
+         * @return {Boolean}
+         * @static
+         * @member KISSY.MVC.Router
+         */
+        hasRoute: function (path) {
+            var match = 0;
+            // user input : /xx/yy/zz
+            each(allRoutes, function (route) {
+                var routeRegs = route[ROUTER_MAP];
+                each(routeRegs, function (desc) {
+                    var reg = desc.reg;
+                    if (path.match(reg)) {
+                        match = 1;
+                        return false;
+                    }
+                    return undefined;
                 });
+                if (match) {
+                    return false;
+                }
+                return undefined;
+            });
+            return !!match;
+        },
+
+        /**
+         * get the route path
+         * @param {String} url full location href
+         * @return {String} route path
+         * @static
+         * @member KISSY.MVC.Router
+         */
+        removeRoot: function (url) {
+            var u = new S.Uri(url);
+            return u.getPath().substr(Router.urlRoot.length);
+        },
+
+        /**
+         * Navigate to specified path.
+         * @static
+         * @member KISSY.MVC.Router
+         * @param {String} path Destination path.
+         * @param {Object} [opts] Config for current navigation.
+         * @param {Boolean} opts.triggerRoute Whether to trigger responding action
+         *                  even current path is same as parameter
+         */
+        navigate: function (path, opts) {
+            opts = opts || {};
+            var replaceHistory = opts.replaceHistory, normalizedPath;
+            if (getFragment() !== path) {
+                if (Router.nativeHistory && supportNativeHistory) {
+                    history[replaceHistory ? 'replaceState' : 'pushState']({},
+                        "", getFullPath(path));
+                    // pushState does not fire popstate event (unlike hashchange)
+                    // so popstate is not statechange
+                    // fire manually
+                    dispatch();
+                } else {
+                    normalizedPath = '#!' + path;
+                    if (replaceHistory) {
+                        // add history hack
+                        location.replace(normalizedPath +
+                            (ie && ie < 8 ? Node.REPLACE_HISTORY : ''));
+                    } else {
+                        location.hash = normalizedPath;
+                    }
+                }
+            } else if (opts && opts.triggerRoute) {
+                dispatch();
             }
         },
         /**
-         * @lends MVC.Router
+         * Start all routers (url monitor).
+         * @static
+         * @member KISSY.MVC.Router
+         * @param {Object} opts
+         * @param {Function} opts.success Callback function to be called after router is started.
+         * @param {String} opts.urlRoot Specify url root for html5 history management.
+         * @param {Boolean} opts.nativeHistory Whether enable html5 history management.
          */
-        {
+        start: function (opts) {
+            opts = opts || {};
 
-            /**
-             * whether Router can process path
-             * @param {String} path path for route
-             * @return {Boolean}
-             */
-            hasRoute: function (path) {
-                var match = 0;
-                // user input : /xx/yy/zz
-                each(allRoutes, function (route) {
-                    var routeRegs = route[ROUTER_MAP];
-                    each(routeRegs, function (desc) {
-                        var reg = desc.reg;
-                        if (path.match(reg)) {
-                            match = 1;
-                            return false;
-                        }
-                    });
-                    if (match) {
-                        return false;
-                    }
-                });
-                return !!match;
-            },
+            if (Router.__started) {
+                return opts.success && opts.success();
+            }
 
-            /**
-             * get the route path
-             * @param {String} url full location href
-             * @return {String} route path
-             */
-            removeRoot: function (url) {
-                var u = new S.Uri(url);
-                return u.getPath().substr(Router.urlRoot.length);
-            },
+            // remove backslash
+            opts.urlRoot = (opts.urlRoot || "").replace(/\/$/, '');
 
-            /**
-             * Navigate to specified path.
-             * Similar to runRoute in sammy.js.
-             * @param {String} path Destination path.
-             * @param {Object} [opts] Config for current navigation.
-             * @param {Boolean} opts.triggerRoute Whether to trigger responding action
-             *                  even current path is same as parameter
-             */
-            navigate: function (path, opts) {
-                opts = opts || {};
-                var replaceHistory = opts.replaceHistory, normalizedPath;
-                if (getFragment() !== path) {
-                    if (Router.nativeHistory && supportNativeHistory) {
-                        history[replaceHistory ? 'replaceState' : 'pushState']({},
-                            "", getFullPath(path));
-                        // pushState does not fire popstate event (unlike hashchange)
-                        // so popstate is not statechange
-                        // fire manually
-                        dispatch();
-                    } else {
-                        normalizedPath = '#!' + path;
-                        if (replaceHistory) {
-                            // add history hack
-                            location.replace(normalizedPath +
-                                (ie && ie < 8 ? Event.REPLACE_HISTORY : ''));
-                        } else {
-                            location.hash = normalizedPath;
-                        }
-                    }
-                } else if (opts && opts.triggerRoute) {
-                    dispatch();
-                }
-            },
-            /**
-             * Start router (url monitor).
-             * @param {Object} opts
-             * @param {Function} opts.success Callback function to be called after router is started.
-             * @param {String} opts.urlRoot Specify url root for html5 history management.
-             * @param {Boolean} opts.nativeHistory Whether enable html5 history management.
-             */
-            start: function (opts) {
+            var urlRoot,
+                nativeHistory = opts.nativeHistory,
+                locPath = location.pathname,
+                hash = getFragment(),
+                hashIsValid = location.hash.match(/#!.+/);
 
-                opts = opts || {};
+            urlRoot = Router.urlRoot = opts.urlRoot;
+            Router.nativeHistory = nativeHistory;
 
-                if (Router.__started) {
-                    return opts.success && opts.success();
-                }
+            if (nativeHistory) {
 
-                // remove backslash
-                opts.urlRoot = (opts.urlRoot || "").replace(/\/$/, '');
-
-                var urlRoot,
-                    nativeHistory = opts.nativeHistory,
-                    locPath = location.pathname,
-                    hash = getFragment(),
-                    hashIsValid = location.hash.match(/#!.+/);
-
-                urlRoot = Router.urlRoot = opts.urlRoot;
-                Router.nativeHistory = nativeHistory;
-
-                if (nativeHistory) {
-
-                    if (supportNativeHistory) {
-                        // http://x.com/#!/x/y
-                        // =>
-                        // http://x.com/x/y
-                        // =>
-                        // process without refresh page and add history entry
-                        if (hashIsValid) {
-                            if (equalsIgnoreSlash(locPath, urlRoot)) {
-                                // put hash to path
-                                history['replaceState']({}, "", getFullPath(hash));
-                                opts.triggerRoute = 1;
-                            } else {
-                                S.error("location path must be same with urlRoot!");
-                            }
-                        }
-                    }
-                    // http://x.com/x/y
-                    // =>
+                if (supportNativeHistory) {
                     // http://x.com/#!/x/y
                     // =>
-                    // refresh page without add history entry
-                    else if (!equalsIgnoreSlash(locPath, urlRoot)) {
-                        location.replace(addEndSlash(urlRoot) + "#!" + hash);
-                        return;
+                    // http://x.com/x/y
+                    // =>
+                    // process without refresh page and add history entry
+                    if (hashIsValid) {
+                        if (equalsIgnoreSlash(locPath, urlRoot)) {
+                            // put hash to path
+                            history['replaceState']({}, "", getFullPath(hash));
+                            opts.triggerRoute = 1;
+                        } else {
+                            S.error("location path must be same with urlRoot!");
+                        }
                     }
-
+                }
+                // http://x.com/x/y
+                // =>
+                // http://x.com/#!/x/y
+                // =>
+                // refresh page without add history entry
+                else if (!equalsIgnoreSlash(locPath, urlRoot)) {
+                    location.replace(addEndSlash(urlRoot) + "#!" + hash);
+                    return undefined;
                 }
 
-                // prevent hashChange trigger on start
-                setTimeout(function () {
-
-                    if (nativeHistory && supportNativeHistory) {
-                        Event.on(win, 'popstate', dispatch);
-                        // html5 triggerRoute is leaved to user decision
-                        // if provide no #! hash
-                    } else {
-                        Event.on(win, "hashchange", dispatch);
-                        // hash-based browser is forced to trigger route
-                        opts.triggerRoute = 1;
-                    }
-
-                    // check initial hash on start
-                    // in case server does not render initial state correctly
-                    // when monitor hashchange ,client must be responsible for dispatching and rendering.
-                    if (opts.triggerRoute) {
-                        dispatch();
-                    }
-                    opts.success && opts.success();
-
-                }, BREATH_INTERVAL);
-
-                Router.__started = 1;
             }
-        });
 
-    return Router;
+            // prevent hashChange trigger on start
+            setTimeout(function () {
 
+                if (nativeHistory && supportNativeHistory) {
+                    $win.on('popstate', dispatch);
+                    // html5 triggerRoute is leaved to user decision
+                    // if provide no #! hash
+                } else {
+                    $win.on("hashchange", dispatch);
+                    // hash-based browser is forced to trigger route
+                    opts.triggerRoute = 1;
+                }
+
+                // check initial hash on start
+                // in case server does not render initial state correctly
+                // when monitor hashchange ,client must be responsible for dispatching and rendering.
+                if (opts.triggerRoute) {
+                    dispatch();
+                }
+                opts.success && opts.success();
+
+            }, BREATH_INTERVAL);
+
+            Router.__started = 1;
+            return undefined;
+        },
+
+        /**
+         * stop all routers
+         * @static
+         * @member KISSY.MVC.Router
+         */
+        stop: function () {
+            Router.__started = 0;
+            $win.detach('popstate', dispatch);
+            $win.detach("hashchange", dispatch);
+            allRoutes = [];
+        }
+    });
 }, {
-    requires: ['event', 'base']
+    requires: ['node', 'base']
 });
 
 /**
+ * @ignore
  * 2011-11-30
  *  - support user-given native regexp for router rule
  *
  * refer :
  * http://www.w3.org/TR/html5/history.html
  * http://documentcloud.github.com/backbone/
- **//**
- *  default sync for model
+ **/
+/**
+ * @ignore
+ * default sync for model
  * @author yiminghe@gmail.com
  */
-KISSY.add("mvc/sync", function (S, io, JSON) {
+KISSY.add("mvc/sync", function (S, io, Json) {
     var methodMap = {
         'create': 'POST',
         'update': 'POST', //'PUT'
@@ -1195,9 +1266,9 @@ KISSY.add("mvc/sync", function (S, io, JSON) {
 
     /**
      * Default sync mechanism.
-     * Sync data with server using {@link IO} .
-     * @memberOf MVC
-     * @param {MVC.Model|MVC.Collection} self Model or Collection instance to sync with server.
+     * Sync data with server using {@link KISSY.IO} .
+     * @member KISSY.MVC
+     * @param {KISSY.MVC.Model|KISSY.MVC.Collection} self Model or Collection instance to sync with server.
      * @param {String} method Create or update or delete or read.
      * @param {Object} options IO options
      */
@@ -1221,7 +1292,7 @@ KISSY.add("mvc/sync", function (S, io, JSON) {
         }
 
         if (method == 'create' || method == 'update') {
-            data.model = JSON.stringify(self.toJSON());
+            data.model = Json.stringify(self.toJSON());
         }
 
         return io(ioParam);
@@ -1229,138 +1300,22 @@ KISSY.add("mvc/sync", function (S, io, JSON) {
 
     return sync;
 }, {
-    requires: ['ajax', 'json']
-});/**
- *  view for kissy mvc : event delegation,el generator
+    requires: ['io', 'json']
+});
+/**
+ * @ignore
+ * KISSY 's MVC Framework for Page Application (Backbone Style)
  * @author yiminghe@gmail.com
  */
-KISSY.add("mvc/view", function (S, Node, Base) {
-
-    var $ = Node.all;
-
-    function normFn(self, f) {
-        if (typeof f == 'string') {
-            return self[f];
-        }
-        return f;
-    }
-
-    /**
-     * @name View
-     * @class
-     * View for delegating event on root element.
-     * @memberOf MVC
-     * @extends KISSY.Base
-     */
-    function View() {
-        View.superclass.constructor.apply(this, arguments);
-        var events;
-        if (events = this.get("events")) {
-            this._afterEventsChange({
-                newVal: events
-            });
-        }
-    }
-
-    View.ATTRS =
-    /**
-     * @lends MVC.View#
-     */
-    {
-        /**
-         * Get root element for current view instance.
-         * @type {String}
-         * @example
-         * <code>
-         * //  selector :
-         * .xx
-         * // or html string
-         * <div>my</div>
-         * </code>
-         */
-        el: {
-            value: "<div />",
-            getter: function (s) {
-                if (typeof s == 'string') {
-                    s = $(s);
-                    this.setInternal("el", s);
-                }
-                return s;
-            }
-        },
-
-        /**
-         * Delegate event on root element.
-         * @type {Object}
-         * @example
-         * <code>
-         * events:{
-         *   selector:{
-         *     eventType:callback
-         *   }
-         * }
-         * </code>
-         */
-        events: {
-
-        }
+KISSY.add("mvc", function (S, Model, Collection, View, Router, sync) {
+    return {
+        sync:sync,
+        Model:Model,
+        View:View,
+        Collection:Collection,
+        Router:Router
     };
-
-
-    S.extend(View, Base,
-        /**
-         * @lends MVC.View#
-         */
-        {
-
-            _afterEventsChange: function (e) {
-                var prevVal = e.prevVal;
-                if (prevVal) {
-                    this._removeEvents(prevVal);
-                }
-                this._addEvents(e.newVal);
-            },
-
-            _removeEvents: function (events) {
-                var el = this.get("el");
-                for (var selector in events) {
-                    var event = events[selector];
-                    for (var type in event) {
-                        var callback = normFn(this, event[type]);
-                        el.undelegate(type, selector, callback, this);
-                    }
-                }
-            },
-
-            _addEvents: function (events) {
-                var el = this.get("el");
-                for (var selector in events) {
-                    var event = events[selector];
-                    for (var type in event) {
-                        var callback = normFn(this, event[type]);
-                        el.delegate(type, selector, callback, this);
-                    }
-                }
-            },
-
-            /**
-             * @chainable
-             */
-            render: function () {
-                return this;
-            },
-
-            /**
-             * Remove root element.
-             */
-            destroy: function () {
-                this.get("el").remove();
-            }
-
-        });
-
-    return View;
-
 }, {
-    requires: ['node', 'base']
+    requires:["mvc/model", "mvc/collection", "mvc/view", "mvc/router", "mvc/sync"]
 });
+

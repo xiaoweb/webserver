@@ -1,122 +1,35 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:00
+build time: Sep 17 22:57
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ color
+*/
+
 /**
  * Color For KISSY.
  * @ignore
  * @author yiminghe@gmail.com
  */
 KISSY.add("color", function (S, Base) {
-
-    var rgbaRe = /\s*rgba?\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*(?:,\s*(\d+))?\)\s*/,
+    var rgbaRe = /\s*rgba?\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*(?:,\s*([\d\.]+))?\)\s*/,
         hexRe = /\s*#([0-9a-fA-F][0-9a-fA-F]?)([0-9a-fA-F][0-9a-fA-F]?)([0-9a-fA-F][0-9a-fA-F]?)\s*/;
 
     /**
      * Color for KISSY to normalize HSL, HSV, RGB and HEX.
      * @class KISSY.Color
      */
-    function Color() {
-        Color.superclass.constructor.apply(this, arguments);
-    }
-
-    Color.ATTRS = {
-        /**
-         * Red.
-         * @type {Number}
-         * @property r
-         */
-        /**
-         * Red.
-         * @cfg {Number} r
-         */
-        /**
-         * @ignore
-         */
-        r: {
-            getter: function (v) {
-                return Math.round(v);
-            },
-            setter: function (v) {
-                return constrain255(v);
-            }
-        },
-        /**
-         * Green.
-         * @type {Number}
-         * @property g
-         */
-        /**
-         * Green.
-         * @cfg {Number} g
-         */
-        /**
-         * @ignore
-         */
-        g: {
-            getter: function (v) {
-                return Math.round(v);
-            },
-            setter: function (v) {
-                return constrain255(v);
-            }
-        },
-        /**
-         * Blue.
-         * @type {Number}
-         * @property b
-         */
-        /**
-         * Blue.
-         * @cfg {Number} b
-         */
-        /**
-         * @ignore
-         */
-        b: {
-            getter: function (v) {
-                return Math.round(v);
-            },
-            setter: function (v) {
-                return constrain255(v);
-            }
-        },
-        /**
-         * Alpha.
-         * @type {Number}
-         * @property a
-         */
-        /**
-         * Alpha.
-         * Defaults to: 1
-         * @cfg {Number} a
-         */
-        /**
-         * @ignore
-         */
-        a: {
-            getter: function (v) {
-                if (v == undefined) {
-                    return 1;
-                }
-                return Math.round(v);
-            },
-            setter: function (v) {
-                return constrain255(v);
-            }
-        }
-    };
-
-    S.extend(Color, Base, {
-
+    var Color = Base.extend({
         /**
          * To hsl string format
          * @return {String}
          */
         toHSL: function () {
             var hsl = this.getHSL();
-            return "hsl(" + (Math.round(hsl.h || 0)) + "," + percentage(hsl.s) + "," + percentage(hsl.l) + ")";
+            return "hsl(" + (Math.round(hsl.h || 0)) + ", " + percentage(hsl.s) + ", " + percentage(hsl.l) + ")";
         },
         /**
          * To hsla string format
@@ -124,7 +37,8 @@ KISSY.add("color", function (S, Base) {
          */
         'toHSLA': function () {
             var hsl = this.getHSL();
-            return "hsla(" + (Math.round(hsl.h || 0)) + "," + percentage(hsl.s) + "," + percentage(hsl.l) + "," + this.a + ")";
+            return "hsla(" + (Math.round(hsl.h || 0)) + ", " + percentage(hsl.s) + ", " +
+                percentage(hsl.l) + ", " + this.get('a') + ")";
         },
 
         /**
@@ -133,7 +47,7 @@ KISSY.add("color", function (S, Base) {
          */
         toRGB: function () {
             var self = this;
-            return "rgb(" + self.get("r") + "," + self.get("g") + "," + self.get("b") + ")";
+            return "rgb(" + self.get("r") + ", " + self.get("g") + ", " + self.get("b") + ")";
         },
         /**
          * To rgba string format
@@ -141,7 +55,8 @@ KISSY.add("color", function (S, Base) {
          */
         toRGBA: function () {
             var self = this;
-            return "rgba(" + self.get("r") + "," + self.get("g") + "," + self.get("b") + "," + self.get("a") + ")";
+            return "rgba(" + self.get("r") + ", " + self.get("g") +
+                ", " + self.get("b") + ", " + self.get("a") + ")";
         },
         /**
          * To hex string format
@@ -255,9 +170,89 @@ KISSY.add("color", function (S, Base) {
 
             self.set(hsl2rgb(cfg));
         }
-    });
+    }, {
+        ATTRS: {
+            /**
+             * Red.
+             * @type {Number}
+             * @property r
+             */
+            /**
+             * Red.
+             * @cfg {Number} r
+             */
+            /**
+             * @ignore
+             */
+            r: {
+                getter: function (v) {
+                    return Math.round(v);
+                },
+                setter: function (v) {
+                    return constrain255(v);
+                }
+            },
+            /**
+             * Green.
+             * @type {Number}
+             * @property g
+             */
+            /**
+             * Green.
+             * @cfg {Number} g
+             */
+            /**
+             * @ignore
+             */
+            g: {
+                getter: function (v) {
+                    return Math.round(v);
+                },
+                setter: function (v) {
+                    return constrain255(v);
+                }
+            },
+            /**
+             * Blue.
+             * @type {Number}
+             * @property b
+             */
+            /**
+             * Blue.
+             * @cfg {Number} b
+             */
+            /**
+             * @ignore
+             */
+            b: {
+                getter: function (v) {
+                    return Math.round(v);
+                },
+                setter: function (v) {
+                    return constrain255(v);
+                }
+            },
+            /**
+             * Alpha.
+             * @type {Number}
+             * @property a
+             */
+            /**
+             * Alpha.
+             * Defaults to: 1
+             * @cfg {Number} a
+             */
+            /**
+             * @ignore
+             */
+            a: {
+                value: 1,
+                setter: function (v) {
+                    return constrain1(v);
+                }
+            }
+        },
 
-    S.mix(Color, {
 
         /**
          * Construct color object from String.
@@ -268,7 +263,7 @@ KISSY.add("color", function (S, Base) {
             var values, r,
                 g,
                 b,
-                a;
+                a = 1;
 
             if ((str.length == 4 || str.length == 7) && str.substr(0, 1) === '#') {
                 values = str.match(hexRe);
@@ -286,10 +281,10 @@ KISSY.add("color", function (S, Base) {
             else {
                 values = str.match(rgbaRe);
                 if (values) {
-                    r = values[1];
-                    g = values[2];
-                    b = values[3];
-                    a = values[4];
+                    r = parseInt(values[1]);
+                    g = parseInt(values[2]);
+                    b = parseInt(values[3]);
+                    a = parseFloat(values[4]) || 1;
                 }
             }
 
@@ -329,7 +324,6 @@ KISSY.add("color", function (S, Base) {
             rgb.a = cfg.a;
             return new Color(rgb);
         }
-
     });
 
     // #---------------------------- private start
@@ -340,7 +334,6 @@ KISSY.add("color", function (S, Base) {
 
 
     function hsv2rgb(cfg) {
-
         var h = Math.min(Math.round(cfg.h), 359),
             s = Math.max(0, Math.min(1, cfg.s)),
             v = Math.max(0, Math.min(1, cfg.v)),
@@ -388,8 +381,6 @@ KISSY.add("color", function (S, Base) {
     }
 
     function rgb2hsv(cfg) {
-
-
         var r = cfg.r / 255,
             g = cfg.g / 255,
             b = cfg.b / 255;
@@ -504,11 +495,13 @@ KISSY.add("color", function (S, Base) {
         return Math.max(0, Math.min(v, 255));
     }
 
+    function constrain1(v) {
+        return Math.max(0, Math.min(v, 1));
+    }
+
     // #---------------------------- private end
 
-
     return Color;
-
 }, {
     requires: ['base']
 });
@@ -516,5 +509,6 @@ KISSY.add("color", function (S, Base) {
 /**
  * @ignore
  * Refer:
- *  - http://en.wikipedia.org/wiki/HSL_and_HSV
+ *  - 支持 http://en.wikipedia.org/wiki/HSL_and_HSV
  */
+

@@ -1,9 +1,16 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:48
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/video/dialog
+*/
+
 /**
+ * @ignore
  * video dialog
  * @author yiminghe@gmail.com
  */
@@ -12,7 +19,7 @@ KISSY.add("editor/plugin/video/dialog", function (S, Editor, FlashDialog, MenuBu
         TYPE_VIDEO = "video",
         DTIP = "自动",
         MARGIN_DEFAULT = 0,
-        bodyHtml = "<div style='padding:20px 20px 0 20px'>" +
+        bodyHTML = "<div style='padding:20px 20px 0 20px'>" +
             "<p>" +
             "<label>" +
             "链接： " +
@@ -68,7 +75,7 @@ KISSY.add("editor/plugin/video/dialog", function (S, Editor, FlashDialog, MenuBu
             "</td></tr>" +
             "</table>" +
             "</div>",
-        footHtml = "<div style='padding:10px 0 35px 20px;'><a " +
+        footHTML = "<div style='padding:10px 0 35px 20px;'><a " +
             "class='{prefixCls}editor-video-ok {prefixCls}editor-button ks-inline-block' " +
             "style='margin-left:40px;margin-right:20px;'>确定</button> " +
             "<a class='{prefixCls}editor-video-cancel {prefixCls}editor-button ks-inline-block'>取消</a></div>";
@@ -86,10 +93,10 @@ KISSY.add("editor/plugin/video/dialog", function (S, Editor, FlashDialog, MenuBu
             self._cls = CLS_VIDEO;
             self._type = TYPE_VIDEO;
             self._title = "视频";//属性";
-            self._bodyHtml = S.substitute(bodyHtml, {
+            self._bodyHTML = S.substitute(bodyHTML, {
                 prefixCls: prefixCls
             });
-            self._footHtml = S.substitute(footHtml, {
+            self._footHTML = S.substitute(footHTML, {
                 prefixCls: prefixCls
             });
             self.urlCfg = cfg.urlCfg;
@@ -213,5 +220,6 @@ KISSY.add("editor/plugin/video/dialog", function (S, Editor, FlashDialog, MenuBu
 
     return VideoDialog;
 }, {
-    requires: ['editor', '../flash/dialog', '../menubutton/']
+    requires: ['editor', '../flash/dialog', '../menubutton']
 });
+

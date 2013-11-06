@@ -1,20 +1,25 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40dev
 MIT Licensed
-build time: Aug 15 16:16
+build time: Oct 25 16:47
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ editor/plugin/table/dialog
+*/
+
 /**
+ * @ignore
  * table dialog
  * @author yiminghe@gmail.com
  */
-KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButton) {
+KISSY.add("editor/plugin/table/dialog", function (S, Editor, Dialog4E, MenuButton) {
     var Node = S.Node,
-        DOM = S.DOM,
-        UA = S.UA,
+        Dom = S.DOM,
         trim = S.trim,
         showBorderClassName = "ke_show_border",
         collapseTableClass = "k-e-collapse-table",
-        Dialog = Overlay4E.Dialog,
         IN_SIZE = 6,
         alignStyle = 'margin:0 5px 0 0;',
         TABLE_HTML = "<div style='padding:20px 20px 10px 20px;'>" +
@@ -146,7 +151,7 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
             "</tr>" +
             "</table>" +
             "</div>",
-        footHtml = "<div style='padding:5px 20px 20px;'>" +
+        footHTML = "<div style='padding:5px 20px 20px;'>" +
             "<a " +
             "class='{prefixCls}editor-table-ok {prefixCls}editor-button ks-inline-block' " +
             "style='margin-right:20px;'>确定</a> " +
@@ -176,12 +181,12 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
         _tableInit: function () {
             var self = this,
                 prefixCls = self.editor.get('prefixCls'),
-                d = new Dialog({
+                d = new Dialog4E({
                     width: "500px",
                     mask: true,
                     headerContent: "表格", //属性",
                     bodyContent: replacePrefix(TABLE_HTML, prefixCls),
-                    footerContent: replacePrefix(footHtml, prefixCls)
+                    footerContent: replacePrefix(footHTML, prefixCls)
                 }).render(),
                 dbody = d.get("body"),
                 foot = d.get("footer");
@@ -302,14 +307,14 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
             d.cellpadding.val(parseInt(d.cellpadding.val()) || 0);
             if (self.selectedTd)self.selectedTd.css("padding", d.cellpadding.val());
             if (valid(d.tcaption.val())) {
-                var tcv = Editor.Utils.htmlEncode(trim(d.tcaption.val()));
+                var tcv = S.escapeHtml(trim(d.tcaption.val()));
                 if (caption && caption[0])
                     caption.html(tcv);
                 else {
                     //不能使用dom操作了, ie6 table 报错
                     //http://msdn.microsoft.com/en-us/library/ms532998(VS.85).aspx
                     var c = selectedTable[0].createCaption();
-                    DOM.html(c, "<span>"
+                    Dom.html(c, "<span>"
                         + tcv
                         + "</span>");
                     // new Node("<caption><span>" + tcv + "</span></caption>");
@@ -328,7 +333,8 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
                 cols = parseInt(d.tcols.val()) || 1,
                 rows = parseInt(d.trows.val()) || 1,
             //firefox 需要 br 才能得以放置焦点
-                cellpad = UA['ie'] ? "&nbsp;" : "&nbsp;<br/>",
+            //cellPad = UA['ie'] ? "&nbsp;" : "&nbsp;<br/>",
+                cellPad = S.UA.ie ? '' : '<br/>',
                 editor = self.editor;
 
             if (valid(d.talign.get("value")))
@@ -369,14 +375,14 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
 
             html += ">";
             if (valid(d.tcaption.val())) {
-                html += "<caption><span>" + Editor.Utils.htmlEncode(trim(d.tcaption.val()))
+                html += "<caption><span>" + S.escapeHtml(trim(d.tcaption.val()))
                     + "</span></caption>";
             }
             if (d.thead.get("value")) {
                 html += "<thead>";
                 html += "<tr>";
                 for (i = 0; i < cols; i++) {
-                    html += "<th>" + cellpad + "</th>";
+                    html += "<th>" + cellPad + "</th>";
                 }
                 html += "</tr>";
                 html += "</thead>";
@@ -387,7 +393,7 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
             for (var r = 0; r < rows; r++) {
                 html += "<tr>";
                 for (i = 0; i < cols; i++) {
-                    html += "<td>" + cellpad + "</td>";
+                    html += "<td>" + cellPad + "</td>";
                 }
                 html += "</tr>";
             }
@@ -482,5 +488,6 @@ KISSY.add("editor/plugin/table/dialog", function (S, Editor, Overlay4E, MenuButt
 
     return TableDialog;
 }, {
-    requires: ['editor', '../overlay/', '../menubutton/']
+    requires: ['editor', '../dialog', '../menubutton']
 });
+

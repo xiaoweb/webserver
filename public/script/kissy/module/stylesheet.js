@@ -1,14 +1,20 @@
 /*
-Copyright 2013, KISSY UI Library v1.31
+Copyright 2013, KISSY v1.40
 MIT Licensed
-build time: Aug 15 00:08
+build time: Sep 17 23:10
 */
+/*
+ Combined processedModules by KISSY Module Compiler: 
+
+ stylesheet
+*/
+
 /**
  * @ignore
  * Normalize operation about stylesheet
  * @author yiminghe@gmail.com
  */
-KISSY.add("stylesheet", function (S, DOM) {
+KISSY.add("stylesheet", function (S, Dom) {
 
     /**
      * Normalize operation about stylesheet
@@ -27,13 +33,13 @@ KISSY.add("stylesheet", function (S, DOM) {
          * @type {HTMLElement}
          * @property el
          */
-        
+
 
         if (el.el) {
             el = el.el;
         }
 
-        this['el'] = DOM.get(el);
+        el = this['el'] = Dom.get(el);
         // http://msdn.microsoft.com/en-us/library/ie/ms535871(v=vs.85).aspx
         // firefox 跨域时抛出异常
         var sheet = el.sheet || el.styleSheet;
@@ -101,12 +107,10 @@ KISSY.add("stylesheet", function (S, DOM) {
          * @param {Object} css style declaration object. set value to "" to unset
          *
          * for example:
-         * <code>
          *      // set
          *      set("p",{color:'red'})
          *      // unset
          *      set("p",{color:''})
-         * </code>
          * @chainable
          */
         set: function (selectorText, css) {
@@ -183,7 +187,7 @@ KISSY.add("stylesheet", function (S, DOM) {
 
     function toCssText(css, base) {
         workerElement.style.cssText = base || "";
-        DOM.css(workerElement, css);
+        Dom.css(workerElement, css);
         return workerElement.style.cssText;
     }
 
@@ -213,6 +217,7 @@ KISSY.add("stylesheet", function (S, DOM) {
 /**
  * @ignore
  * Refer
- *  - http://www.w3.org/TR/DOM-Level-2-Style/css.html
+ *  - http://www.w3.org/TR/Dom-Level-2-Style/css.html
  *  - rule.style 和 el.style 效果一样，同属于 CSSStyleDeclare
  **/
+
