@@ -5,7 +5,7 @@
  * Time: 上午11:57
  * To change this template use File | Settings | File Templates.
  */
-KISSY.use("base",function(S,b){
+/*KISSY.use("base",function(S,b){
     function test(){
         this.x=10;
     }
@@ -36,5 +36,10 @@ KISSY.use("base",function(S,b){
     });
     obj.set("name",8);
     console.log(obj.get("name"));
+});*/
+KISSY.use("node,event,dom",function(S,N,E,D){
+    var $= S.all;
+    var p=document.createElement("p");
+    D.insertAfter(p,"#node");
 });
 
