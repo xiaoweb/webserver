@@ -440,7 +440,7 @@
                 
                 <tr>
                   <td colspan="3" class="search-export"><span class="skin-gray">
-                    <button id="J_SearchOrders" class="small-btn J_MakePoint" type="button" onclick="changePage(0)"
+                    <button id="J_SearchOrders" class="small-btn J_MakePoint" type="button" ondbclick="changePage(0)"
          data-point-url=" http://gm.mmstat.com/listsold.1.1">搜索</button>
                     <button id="J_BatchExportBtn" class="small-long-btn" type="button">批量导出</button>
                     </span></td>
@@ -453,7 +453,7 @@
                 <li>为了保证您的查询性能，两次导出的时间间隔请保持在5分钟以上。</li>
                 <li>我们将为您保留30天内导出的数据，便于您随时导出。</li>
               </ul>
-              <div class="actions"> <a class="long-btn generate-sheets" onclick="applyExport()">生成报表</a> <a class="long-btn view-sheets"
+              <div class="actions"> <a class="long-btn generate-sheets" ondbclick="applyExport()">生成报表</a> <a class="long-btn view-sheets"
                        href='http://trade.taobao.com/trade/itemlist/list_export_order.htm' target="_blank">查看已生成报表</a> </div>
               <a id="J_BatchExportPanelCloseBtn" class="close-btn" href="#" title="关闭">关闭</a> </div>
           </div>
@@ -477,7 +477,7 @@
     }
     -->
 </script>
-      <div class="msg" style="float:right; position:relative; margin-top:10px;width:450px"> <span class="naked notice">好消息：凭“已发货”订单申请淘宝贷款，3秒现金到账。</span> <a class="small-long-btn" title="" href="#" onclick="javascript:addClickStat('tbloan_ym_sq');aliLoanRedirect();">马上申请</a> </div>
+      <div class="msg" style="float:right; position:relative; margin-top:10px;width:450px"> <span class="naked notice">好消息：凭“已发货”订单申请淘宝贷款，3秒现金到账。</span> <a class="small-long-btn" title="" href="#" ondbclick="javascript:addClickStat('tbloan_ym_sq');aliLoanRedirect();">马上申请</a> </div>
       <div class="item-list">
         <div class="item-list-hd"> 
           <script type="text/javascript">
@@ -625,14 +625,14 @@
         }
     </script>
           <ul class="item-list-tabs item-list-tabs-flexible clearfix" data-spm="9">
-            <li  class="current" ><a href="#" onclick="changeDBOnline(this,'ALL')" hidefocus="true">近三个月订单</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'NOT_PAID')" hidefocus="true">等待买家付款</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'PAID')" hidefocus="true">等待发货</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'SEND')" hidefocus="true">已发货</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'REFUNDING')" hidefocus="true">退款中</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'I_HAS_NOT_COMMENT')" hidefocus="true">需要评价</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'SUCCESS')" hidefocus="true">成功的订单</a></li>
-            <li ><a href="#" onclick="changeDBOnline(this,'DROP')" hidefocus="true">关闭的订单</a></li>
+            <li  class="current" ><a href="#" ondbclick="changeDBOnline(this,'ALL')" hidefocus="true">近三个月订单</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'NOT_PAID')" hidefocus="true">等待买家付款</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'PAID')" hidefocus="true">等待发货</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'SEND')" hidefocus="true">已发货</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'REFUNDING')" hidefocus="true">退款中</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'I_HAS_NOT_COMMENT')" hidefocus="true">需要评价</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'SUCCESS')" hidefocus="true">成功的订单</a></li>
+            <li ><a href="#" ondbclick="changeDBOnline(this,'DROP')" hidefocus="true">关闭的订单</a></li>
             <li><a  href="http://tradearchive.taobao.com/trade/itemlist/list_sold_items.htm?hid_choose=1"  hidefocus="true">三个月前订单</a></li>
           </ul>
         </div>
@@ -677,13 +677,13 @@
                       <label>全选</label>
                       <a id="plfh1" href="javascript:void(0)" class="J_MakePoint" data-point-url="http://gm.mmstat.com/listsold.1.3">批量发货</a> <a id="plbz1" href="javascript:void(0)" class="J_MakePoint" data-point-url="http://gm.mmstat.com/listsold.1.5">批量备忘</a> <a href="http://trade.taobao.com/trade/free_post_fee.htm" class="operation-btn J_BatchFreeShipping J_MakePoint" data-point-url="http://gm.mmstat.com/listsold.1.4">批量免运费</a> <span style="display:inline">
                       <label class="show-hidden-orders" for="J_ShowHiddenOrder">
-                        <input type="checkbox" id="J_ShowHiddenOrder" onclick="switch_closeorder(this)"
+                        <input type="checkbox" id="J_ShowHiddenOrder" ondbclick="switch_closeorder(this)"
              />
                         不显示已关闭的订单 </label>
                       </span>
                       <ul class="page-nav inline-block page-nav-simply">
-                        <li class="prev-page"> <a href="#" class="disabled" onclick="javascript:void(0)">上一页</a> </li>
-                        <li class="next-page"> <a href="#" onclick="return changePage('2')">下一页</a> </li>
+                        <li class="prev-page"> <a href="#" class="disabled" ondbclick="javascript:void(0)">上一页</a> </li>
+                        <li class="next-page"> <a href="#" ondbclick="return changePage('2')">下一页</a> </li>
                       </ul>
                     </div></td>
                 </tr>
@@ -719,10 +719,10 @@
                     <div class="txt-info">
                       <div class="desc"> <a hidefocus="true" href="http://trade.taobao.com/trade/detail/trade_snap.htm?tradeID=451174306450703" title="查看宝贝详情" target="_blank">牛尔 森玫瑰保湿滋养套装（美肤露+乳液+精华露+冻膜）</a> <br />
                         <span class="good-icons"> <span class="good-icons">  </span> </span> <span> </span> </div>
-                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
-                      <div class="props"> <span>化妆品容量: 150ml/120ml/30ml/60ml</span> </div>
+                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002336</div>
+                      <div class="props"> <span></span> </div>
                     </div></td>
-                  <td class="price" title="260.00">260.00</td>
+                  <td class="price" title="254.80">254.80</td>
                   <td class="num" title="2"> 2 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=张丽8025" target="_blank">zhangjialu_1008</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="张丽8025" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -752,7 +752,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">520.00</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">509.6</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451174306450703&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -776,7 +776,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="274662130"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451270924543021" class="order-item
   last
@@ -788,10 +788,10 @@
                     <div class="txt-info">
                       <div class="desc"> <a hidefocus="true" href="http://trade.taobao.com/trade/detail/trade_snap.htm?tradeID=451270924543021" title="查看宝贝详情" target="_blank">牛尔京城之霜简装版美白补水保湿护肤品面霜面部润肤面霜28g</a> <br />
                         <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=3930972692" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
-                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-000638</div>
+                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002341</div>
                       <div class="props"> <span>化妆品容量: 28g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="42.50">42.50</td>
+                  <td class="price" title="84.50">84.50</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=smile090715" target="_blank">smile090715</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="smile090715" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -821,7 +821,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">42.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">84.50</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451270924543021&bizType=200" target="_blank">修改价格</a> <a title="该订单来自您的手机淘宝店铺" href="http://www.taobao.com/go/act/integrated/maijia-index.php?sprefer=symj27" target="_blank"> <img src="http://img01.taobaocdn.com/tps/i1/T1xRBqXdNAXXXXXXXX-46-16.png"/> </a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -845,7 +845,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="109875490"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451268725959054" class="order-item
   last
@@ -856,11 +856,11 @@
                     </div>
                     <div class="txt-info">
                       <div class="desc"> <a hidefocus="true" href="http://trade.taobao.com/trade/detail/trade_snap.htm?tradeID=451268725959054" title="查看宝贝详情" target="_blank">牛尔 奢华美容套装 京城之霜WANG PEIYI慈善限量版+京城导入液</a> <br />
-                        <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=3930972692" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
-                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-000638</div>
-                      <div class="props"> <span>化妆品容量: 48g/200ml</span> </div>
+                        <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=3930972692" target="_blank"> </a> </span> </span> <span> </span> </div>
+                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002341</div>
+                      <div class="props"> <span></span> </div>
                     </div></td>
-                  <td class="price" title="340.00">340.00</td>
+                  <td class="price" title="333.20">333.20</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=莉璐姆??" target="_blank">Wei7590</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="Wei7590" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -890,7 +890,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">340.00</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">333.20</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451268725959054&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -914,7 +914,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="85224563"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451138814336345" class="order-item
   last
@@ -925,11 +925,11 @@
                     </div>
                     <div class="txt-info">
                       <div class="desc"> <a hidefocus="true" href="http://trade.taobao.com/trade/detail/trade_snap.htm?tradeID=451138814336345" title="查看宝贝详情" target="_blank">牛尔 奢华美容套装 京城之霜WANG PEIYI慈善限量版+京城导入液</a> <br />
-                        <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=16851834960" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
+                        <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=16851834960" target="_blank">  </a> </span> </span> <span> </span> </div>
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002292</div>
-                      <div class="props"> <span>化妆品容量: 48g/200ml</span> </div>
+                      <div class="props"> <span></span> </div>
                     </div></td>
-                  <td class="price" title="340.00">340.00</td>
+                  <td class="price" title="333.20">333.20</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=jinli05321" target="_blank">chatcat</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="chatcat" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -959,7 +959,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">340.00</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">333.20</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451138814336345&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -983,7 +983,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="70737698"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451179462829876" class="order-item
   last
@@ -995,10 +995,10 @@
                     <div class="txt-info">
                       <div class="desc"> <a hidefocus="true" href="http://trade.taobao.com/trade/detail/trade_snap.htm?tradeID=451179462829876" title="查看宝贝详情" target="_blank">牛尔京城之霜简装版美白补水保湿护肤品面霜面部润肤面霜28g</a> <br />
                         <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=3930972692" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
-                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-000638</div>
+                      <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002341</div>
                       <div class="props"> <span>化妆品容量: 28g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="42.50">42.50</td>
+                  <td class="price" title="84.50">84.50</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=hetalanlan" target="_blank">hetalanlan</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="hetalanlan" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1028,7 +1028,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">42.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">84.50</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451179462829876&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1052,7 +1052,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="873875956"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451171187045659" class="order-item
   last
@@ -1066,7 +1066,7 @@
                         <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=17564951488" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002338</div>
                     </div></td>
-                  <td class="price" title="90.00">90.00</td>
+                  <td class="price" title="180.00">180.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=袁梦洁0221" target="_blank">袁梦洁0221</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="袁梦洁0221" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1096,7 +1096,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">90.00</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">180.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451171187045659&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1120,7 +1120,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="409926907"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451139853590769" class="order-item
   last
@@ -1135,7 +1135,7 @@
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
                       <div class="props"> <span>化妆品容量: 60g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="22.50">22.50</td>
+                  <td class="price" title="45.00">45.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=congyanru9" target="_blank">congyanru9</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="congyanru9" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1165,7 +1165,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">22.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">45.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451139853590769&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1189,7 +1189,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="906610112"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451029792301201" class="order-item
   last
@@ -1204,7 +1204,7 @@
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
                       <div class="props"> <span>化妆品容量: 60g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="22.50">22.50</td>
+                  <td class="price" title="45.00">45.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=tb4490696_2012" target="_blank">tb4490696_2012</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="tb4490696_2012" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1234,7 +1234,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">22.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">45.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451029792301201&bizType=200" target="_blank">修改价格</a> <a title="该订单来自您的手机淘宝店铺" href="http://www.taobao.com/go/act/integrated/maijia-index.php?sprefer=symj27" target="_blank"> <img src="http://img01.taobaocdn.com/tps/i1/T1xRBqXdNAXXXXXXXX-46-16.png"/> </a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1258,7 +1258,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="341405301"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451027594060153" class="order-item
   last
@@ -1272,7 +1272,7 @@
                         <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=35529906379" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002361</div>
                     </div></td>
-                  <td class="price" title="88.20">88.20</td>
+                  <td class="price" title="176.40">176.40</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=米米和果冻" target="_blank">米米和果冻</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="米米和果冻" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1302,7 +1302,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">88.20</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">176.40</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451027594060153&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1326,7 +1326,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="1697141259"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451024755065912" class="order-item
   last
@@ -1341,7 +1341,7 @@
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
                       <div class="props"> <span>化妆品容量: 60g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="22.50">22.50</td>
+                  <td class="price" title="45.00">45.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=庄冰琼" target="_blank">庄冰琼</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="庄冰琼" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1349,7 +1349,7 @@
                   <td class="trade-status" rowspan="1" sumRows="1"><a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451024755065912" target="_blank"> <strong class="J_TradeStatus status todo h">买家已付款</strong> </a> <a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451024755065912" class="detail-link" target="_blank" style="display:inline">详情</a>
                     <div class="trade-actions"> <span class="skin-blue"> <a class="small-btn" href="http://trade.taobao.com/trade/logistics_status.htm?logis_type=1&biz_order_id=451024755065912&biz_type=200"
         target="_blank"> 发货 </a> </span> </div></td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">22.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">45.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <img alt="买家已使用信用卡付款" title="买家已使用信用卡付款" src="http://assets.taobaocdn.com/sys/common/icon/trade/xcard.png"/> <a title="该订单来自您的手机淘宝店铺" href="http://www.taobao.com/go/act/integrated/maijia-index.php?sprefer=symj27" target="_blank"> <img src="http://img01.taobaocdn.com/tps/i1/T1xRBqXdNAXXXXXXXX-46-16.png"/> </a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1373,7 +1373,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="633444260"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451023715506042" class="order-item
   last
@@ -1388,7 +1388,7 @@
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
                       <div class="props"> <span>化妆品容量: 60g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="22.50">22.50</td>
+                  <td class="price" title="45.00">45.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=hera_小静" target="_blank">hera_小静</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="hera_小静" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1396,7 +1396,7 @@
                   <td class="trade-status" rowspan="1" sumRows="1"><a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451023715506042" target="_blank"> <strong class="J_TradeStatus status todo h">买家已付款</strong> </a> <a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451023715506042" class="detail-link" target="_blank" style="display:inline">详情</a>
                     <div class="trade-actions"> <span class="skin-blue"> <a class="small-btn" href="http://trade.taobao.com/trade/logistics_status.htm?logis_type=1&biz_order_id=451023715506042&biz_type=200"
         target="_blank"> 发货 </a> </span> </div></td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">22.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">45.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a title="该订单来自您的手机淘宝店铺" href="http://www.taobao.com/go/act/integrated/maijia-index.php?sprefer=symj27" target="_blank"> <img src="http://img01.taobaocdn.com/tps/i1/T1xRBqXdNAXXXXXXXX-46-16.png"/> </a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1420,7 +1420,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="655334672"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451170947547246" class="order-item
   last
@@ -1434,7 +1434,7 @@
                         <span class="good-icons"> <span class="good-icons"> <a href="http://ju.taobao.com/tg/home.htm?item_id=35529906379" target="_blank"> <img src='http://img01.taobaocdn.com/tps/i1/T1rJ5TXaNiXXXXXXXX-16-16.png'/> </a> </span> </span> <span> </span> </div>
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002361</div>
                     </div></td>
-                  <td class="price" title="88.20">88.20</td>
+                  <td class="price" title="176.40">176.40</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=颖8867" target="_blank">颖8867</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="颖8867" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1464,7 +1464,7 @@
 
     </div>
 </td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">88.20</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">176.40</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <a class="J_DialogTrigger modify-price" data="width=787px&amp;height=400" href="http://trade.taobao.com/trade/modify_price.htm?bizOrderId=451170947547246&bizType=200" target="_blank">修改价格</a></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1488,7 +1488,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="853953584"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451174384998435" class="order-item
   last
@@ -1503,7 +1503,7 @@
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
                       <div class="props"> <span>化妆品容量: 60g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="22.50">22.50</td>
+                  <td class="price" title="45.00">45.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=vipmimi174" target="_blank">vipmimi174</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="vipmimi174" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1511,7 +1511,7 @@
                   <td class="trade-status" rowspan="1" sumRows="1"><a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451174384998435" target="_blank"> <strong class="J_TradeStatus status todo h">买家已付款</strong> </a> <a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451174384998435" class="detail-link" target="_blank" style="display:inline">详情</a>
                     <div class="trade-actions"> <span class="skin-blue"> <a class="small-btn" href="http://trade.taobao.com/trade/logistics_status.htm?logis_type=1&biz_order_id=451174384998435&biz_type=200"
         target="_blank"> 发货 </a> </span> </div></td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">22.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">45.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <img alt="买家已使用信用卡付款" title="买家已使用信用卡付款" src="http://assets.taobaocdn.com/sys/common/icon/trade/xcard.png"/></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1535,7 +1535,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="651567100"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451270683700071" class="order-item
   last
@@ -1603,7 +1603,7 @@
                     <input type="hidden" name="sellerId" value="288885616"/>
                     <input type="hidden" name="buyerId" value="651658780"/></td>
                 </tr>
-                
+
                 <!--start 子订单list start-->
                 <tr id="item451173305548087" class="order-item
   last
@@ -1618,7 +1618,7 @@
                       <div style="word-wrap:break-word;word-break:break-all;">商家编码: NACS2-002284</div>
                       <div class="props"> <span>化妆品容量: 60g/ml</span> </div>
                     </div></td>
-                  <td class="price" title="22.50">22.50</td>
+                  <td class="price" title="45.00">45.00</td>
                   <td class="num" title="1"> 1 </td>
                   <td class="trouble"></td>
                   <td class="contact" rowspan="1" sumRows="1"><a class="nickname" href="http://member1.taobao.com/member/user_profile.jhtml?userID=maruchi0414" target="_blank">maruchi0414</a>&nbsp; <a title="查询该买家订单" class="J_filterTrigger" data-nick="maruchi0414" target="_blank" href="javascript:void(0);" > <img src="http://img08.taobaocdn.com/tps/i8/T1KNtuXc4rXXXXXXXX-12-12.png" alt="查询该买家订单"
@@ -1626,7 +1626,7 @@
                   <td class="trade-status" rowspan="1" sumRows="1"><a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451173305548087" target="_blank"> <strong class="J_TradeStatus status todo h">买家已付款</strong> </a> <a href="http://trade.tmall.com/detail/orderDetail.htm?bizOrderId=451173305548087" class="detail-link" target="_blank" style="display:inline">详情</a>
                     <div class="trade-actions"> <span class="skin-blue"> <a class="small-btn" href="http://trade.taobao.com/trade/logistics_status.htm?logis_type=1&biz_order_id=451173305548087&biz_type=200"
         target="_blank"> 发货 </a> </span> </div></td>
-                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">22.50</strong>
+                  <td class="order-price" rowspan="1" sumRows="1"><strong class="J_OrderPrice">45.00</strong>
                     <div class="post-info"> (含<span class="post-type">快递</span>:<span class="J_PostFee">0.00</span>) </div>
                     <img alt="买家已使用信用卡付款" title="买家已使用信用卡付款" src="http://assets.taobaocdn.com/sys/common/icon/trade/xcard.png"/></td>
                   <td class="remark"  rowspan="1"  sumRows="1"></td>
@@ -1743,12 +1743,12 @@
             </script>
                       <ul class="page-nav inline-block">
                         <li class="prev-page"> </li>
-                        <li class="curr-page"><a href="#" class="selected" onclick="return changePage('1')">1</a></li>
-                        <li><a href="#" onclick="return changePage('2')">2</a></li>
-                        <li><a href="#" onclick="return changePage('3')">3</a></li>
+                        <li class="curr-page"><a href="#" class="selected" ondbclick="return changePage('1')">1</a></li>
+                        <li><a href="#" ondbclick="return changePage('2')">2</a></li>
+                        <li><a href="#" ondbclick="return changePage('3')">3</a></li>
                         <li>...</li>
-                        <li class="next-page"><a href="#" onclick="return changePage('2')">下一页</a></li>
-                        <li><a href="#" onclick="return changePage('11')">显示更多页码</a></li>
+                        <li class="next-page"><a href="#" ondbclick="return changePage('2')">下一页</a></li>
+                        <li><a href="#" ondbclick="return changePage('11')">显示更多页码</a></li>
                       </ul>
                     </div></td>
                 </tr>
