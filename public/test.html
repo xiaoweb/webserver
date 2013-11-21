@@ -1,10 +1,59 @@
 <!doctype html>
-<html lang="ZH-CN" style="height: 100%:">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title></title>
+    <meta charset="gbk">
+    <title>Document</title>
+    <script type="text/javascript" src="script/kissy/module/seed.js"></script>
 </head>
-<body style="height:100%;position: relative;top:0;left:0;bottom:0;">
-
+<body>
+<div id="J_tab" class="slide-style">
+    <ul class="tab-nav clearfix"><!--选项卡导航，内容可以是空-->
+        <!--若内容为空，则Slide会创建<li></li>-->
+        <li class="selected"><a href="#">1</a></li>
+        <li><a href="">2</a></li>
+        <li><a href="">3</a></li>
+        <li><a href="">4</a></li>
+    </ul>
+    <div class="tab-content"><!--选项卡内容的父容器-->
+        <div class="tab-pannel"><!--选项卡的每项的容器-->
+            <!--第1个选项卡中的内容-->
+        </div>
+        <!--一般情况下，需要指定默认情况非首帧是否显示-->
+        <div class="tab-pannel hidden">
+            <!--第2个选项卡中的内容-->
+        </div>
+        <div class="tab-pannel hidden">
+            <!--第3个选项卡中的内容-->
+        </div>
+        <div class="tab-pannel hidden">
+            <!--第4个选项卡中的内容-->
+            <textarea class="data-lazyload">
+                延时加载的内容
+            </textarea>
+        </div>
+    </div>
+</div>
 </body>
+<script type="text/javascript">
+    KISSY.config({
+        packages:[
+            {
+                name: "gallery",
+                path: './',
+                charset: "utf-8"
+            }
+        ]
+    });
+    KISSY.use('slide/index', function(S, Slide) {
+        new Slide('Jtab',{
+            eventType:'mouseenter'
+        }).on('beforeSwitch',function(e){
+                    S.log(e);
+                }).on('afterSwitch',function(e){
+                    //console.info(e);
+                });
+    });
+
+
+</script>
 </html>
