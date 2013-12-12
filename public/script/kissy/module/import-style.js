@@ -1,7 +1,7 @@
 /*
-Copyright 2013, KISSY v1.40
+Copyright 2013, KISSY v1.41
 MIT Licensed
-build time: Sep 17 23:08
+build time: Dec 4 22:16
 */
 /**
  * use document.write to load external css files in block loading ways.
@@ -18,9 +18,11 @@ build time: Sep 17 23:08
      * @member KISSY
      */
     function importStyle(modNames) {
-        if (typeof modNames == 'string') {
-            modNames = modNames.split(',');
-        }
+        var Utils = S.Loader.Utils;
+
+        modNames = Utils.getModNamesAsArray(modNames);
+        modNames = Utils.normalizeModNames(S, modNames);
+
         var cssList = [],
             doc = S.Env.host.document,
             Config = S.Config,
@@ -50,7 +52,7 @@ build time: Sep 17 23:08
                     // map individual module
                     var fullpath = currentCss.getFullPath();
                     if (!currentPackage.isCombine() || !S.startsWith(fullpath, packagePath)) {
-                        document.writeln('<link href="' + fullpath + '"  rel="stylesheet"/>');
+                        doc.writeln('<link href="' + fullpath + '"  rel="stylesheet"/>');
                         continue;
                     }
                     var path = fullpath.slice(packagePath.length).replace(/\?.*$/, '');
@@ -63,10 +65,10 @@ build time: Sep 17 23:08
                         if ((combinedUrl.length > maxFileNum) ||
                             (prefix.length + combinedUrl.join(comboSep).length +
                                 suffix.length > maxUrlLength) ||
-                            combined[0].getPackage() != currentPackage) {
+                            combined[0].getPackage() !== currentPackage) {
                             combined.pop();
                             combinedUrl.pop();
-                            document.writeln('<link href="' +
+                            doc.writeln('<link href="' +
                                 (prefix + combinedUrl.join(comboSep) + suffix) +
                                 '"  rel="stylesheet"/>');
                             combined = [];
@@ -82,7 +84,7 @@ build time: Sep 17 23:08
                 }
             } else {
                 S.each(cssList, function (css) {
-                    doc.writeln('<link href="' + css.getFullPath() + '"  rel="stylesheet"/>')
+                    doc.writeln('<link href="' + css.getFullPath() + '"  rel="stylesheet"/>');
                 });
             }
         }
@@ -98,7 +100,7 @@ build time: Sep 17 23:08
             return;
         }
         processed[name] = 1;
-        if (mod.getType() == 'css') {
+        if (mod.getType() === 'css') {
             if (!cssCache[name]) {
                 mod.status = 4;
                 cssList.push(mod);

@@ -1,7 +1,7 @@
 /*
-Copyright 2013, KISSY v1.40dev
+Copyright 2013, KISSY v1.41
 MIT Licensed
-build time: Oct 25 16:43
+build time: Dec 4 22:09
 */
 /*
  Combined processedModules by KISSY Module Compiler: 
@@ -9,34 +9,11 @@ build time: Oct 25 16:43
  editor/plugin/font-size/cmd
 */
 
-/**
- * @ignore
- * fontSize command.
- * @author yiminghe@gmail.com
- */
-KISSY.add("editor/plugin/font-size/cmd", function (S, Editor, Cmd) {
-    var fontSizeStyle = {
-        element:'span',
-        styles:{
-            'font-size':'#(value)'
-        },
-        overrides:[
-            {
-                element:'font',
-                attributes:{
-                    'size':null
-                }
-            }
-        ]
-    };
-
-    return {
-        init:function (editor) {
-            Cmd.addSelectCmd(editor, "fontSize", fontSizeStyle);
-        }
-    };
-
-}, {
-    requires:['editor', '../font/cmd']
+KISSY.add("editor/plugin/font-size/cmd", ["../font/cmd"], function(S, require) {
+  var Cmd = require("../font/cmd");
+  var fontSizeStyle = {element:"span", styles:{"font-size":"#(value)"}, overrides:[{element:"font", attributes:{size:null}}]};
+  return{init:function(editor) {
+    Cmd.addSelectCmd(editor, "fontSize", fontSizeStyle)
+  }}
 });
 

@@ -1,7 +1,7 @@
 /*
-Copyright 2013, KISSY v1.40
+Copyright 2013, KISSY v1.41
 MIT Licensed
-build time: Sep 18 00:20
+build time: Dec 4 22:16
 */
 /*
  Combined processedModules by KISSY Module Compiler: 
@@ -9,46 +9,12 @@ build time: Sep 18 00:20
  event
 */
 
-/**
- * @ignore
- * event facade for event module.contains custom dom and touch event
- * @author yiminghe@gmail.com
- */
-KISSY.add('event', function (S, DomEvent, CustomEvent, undefined) {
-    /**
-     * KISSY event utils. Provides event management.
-     * @class KISSY.Event
-     * @singleton
-     * @mixins KISSY.Event.DomEvent
-     */
-    var Event = S.Event = S.merge(DomEvent, {
-        DomEvent: DomEvent,
-        CustomEvent: CustomEvent
-    });
-
-
-    /**
-     * @member KISSY.Event
-     * @property {KISSY.Event.CustomEvent.Target} Target
-     */
-
-    /**
-     * @property {KISSY.Event.CustomEvent.Target} EventTarget
-     * @member KISSY
-     */
-
-    /**
-     * global event target
-     * @property {KISSY.Event.CustomEvent.Target} global
-     * @member KISSY.Event
-     */
-    Event.global = CustomEvent.global;
-
-    // compatibility
-    S.EventTarget = Event.Target = CustomEvent.targetObject;
-
-    return Event;
-}, {
-    requires: ['event/dom', 'event/custom']
+KISSY.add("event", ["event/dom", "event/custom"], function(S, require) {
+  var DomEvent = require("event/dom");
+  var CustomEvent = require("event/custom");
+  var Event = S.Event = S.merge(DomEvent, {DomEvent:DomEvent, CustomEvent:CustomEvent});
+  Event.global = CustomEvent.global;
+  S.EventTarget = Event.Target = CustomEvent.Target;
+  return Event
 });
 

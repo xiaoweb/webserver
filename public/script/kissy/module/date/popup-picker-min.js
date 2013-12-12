@@ -1,7 +1,7 @@
 /*
-Copyright 2013, KISSY v1.40dev
+Copyright 2013, KISSY v1.41
 MIT Licensed
-build time: Sep 17 22:58
+build time: Dec 4 22:06
 */
-KISSY.add("date/popup-picker/render-xtpl",function(){return function(b,c,d){var f=this.config.utils.getPropertyOrRunCommand,c='<div class="',a={},e=[];e.push("content");a.params=e;a=f(this,b,a,"getBaseCssClasses",0,1,!0,d);c=c+a+'">\r\n    ';a={};e=[];e.push("date/picker/picker-xtpl");a.params=e;b=f(this,b,a,"include",0,2,!1,d);return c+b+"\r\n</div>"}});
-KISSY.add("date/popup-picker",function(b,c,d,f,a){b=d.getDefaultRender().extend({},{ATTRS:{contentTpl:{value:c}}});return d.extend([a,f],{},{xclass:"popup-date-picker",ATTRS:{xrender:{value:b}}})},{requires:["./popup-picker/render-xtpl","date/picker","component/extension/align","component/extension/shim"]});
+KISSY.add("date/popup-picker/render-xtpl",["date/picker/picker-xtpl"],function(j,d,c,e){return function(f){var a,c;a=this.config.utils;"undefined"!==typeof e&&e.kissy&&(c=e);var h=a.renderOutput,i=a.runInlineCommand;a='<div class="';var b={},g=[];g.push("content");b.params=g;b=i(this,f,b,"getBaseCssClasses",1);a+=h(b,!0);a+='">\n    ';b={};g=[];g.push("date/picker/picker-xtpl");b.params=g;c&&(d("date/picker/picker-xtpl"),b.params[0]=c.resolveByName(b.params[0]));f=i(this,f,b,"include",2);a+=h(f,!1);
+return a+"\n</div>"}});KISSY.add("date/popup-picker",["./popup-picker/render-xtpl","date/picker","component/extension/shim","component/extension/align"],function(j,d){var c=d("./popup-picker/render-xtpl"),e=d("date/picker"),f=d("component/extension/shim"),a=d("component/extension/align"),c=e.getDefaultRender().extend({},{ATTRS:{contentTpl:{value:c}}});return e.extend([f,a],{},{xclass:"popup-date-picker",ATTRS:{xrender:{value:c}}})});

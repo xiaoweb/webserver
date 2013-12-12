@@ -25,10 +25,3 @@ test.ATTRS = {
         }
     }
 };
-KISSY.use("base", function (S, b) {
-
-    S.extend(test, b);
-
-    var obj = new test();
-
-});

@@ -1,7 +1,7 @@
 /*
-Copyright 2013, KISSY v1.40
+Copyright 2013, KISSY v1.41
 MIT Licensed
-build time: Nov 5 15:06
+build time: Dec 9 23:53
 */
 /**
  * @ignore
@@ -26,11 +26,56 @@ build time: Nov 5 15:06
  * @singleton
  * @class KISSY
  */
+/* exported KISSY */
+/*jshint -W079 */
 var KISSY = (function (undefined) {
     var host = this,
         S,
         guid = 0,
         EMPTY = '';
+
+    /**
+     * Log class for specified logger
+     * @class KISSY.Logger
+     * @private
+     */
+
+    /**
+     * print debug log
+     * @method
+     * @param {String} str log str
+     */
+
+    /**
+     * print info log
+     * @method
+     * @param {String} str log str
+     */
+
+    /**
+     * print warn log
+     * @method
+     * @param {String} str log str
+     */
+
+    /**
+     * print error log
+     * @method
+     * @param {String} str log str
+     */
+
+    function getLogger(logger) {
+        var obj = {};
+        for (var cat in loggerLevel) {
+            /*jshint loopfunc: true*/
+            (function (obj, cat) {
+                obj[cat] = function (msg) {
+                    return S.log(msg, cat, logger);
+                };
+            })(obj, cat);
+        }
+        return obj;
+    }
 
     var loggerLevel = {
         'debug': 10,
@@ -42,11 +87,11 @@ var KISSY = (function (undefined) {
     S = {
         /**
          * The build time of the library.
-         * NOTICE: '20131105150616' will replace with current timestamp when compressing.
+         * NOTICE: '20131209235315' will replace with current timestamp when compressing.
          * @private
          * @type {String}
          */
-        __BUILD_TIME: '20131105150616',
+        __BUILD_TIME: '20131209235315',
 
         /**
          * KISSY Environment.
@@ -73,10 +118,10 @@ var KISSY = (function (undefined) {
 
         /**
          * The version of the library.
-         * NOTICE: '1.40' will replace with current version when compressing.
+         * NOTICE: '1.50' will replace with current version when compressing.
          * @type {String}
          */
-        version: '1.40',
+        version:'1.41',
 
         /**
          * set KISSY configuration
@@ -103,10 +148,6 @@ var KISSY = (function (undefined) {
          * @param {String} configName.packages.combine Whether allow combine for current package modules.
          * @param {String} [configName.packages.ignorePackageNameInUri=false] whether remove packageName from module request uri,
          * can only be used in production mode.
-         * @param {Array[]} configName.map file map      File url map configs.
-         * @param {Array[]} configName.map.0     A single map rule.
-         * @param {RegExp} configName.map.0.0    A regular expression to match url.
-         * @param {String|Function} configName.map.0.1   Replacement for String.replace.
          * @param [configValue] config value.
          *
          * for example:
@@ -175,26 +216,26 @@ var KISSY = (function (undefined) {
                     var loggerCfg = S.Config.logger || {},
                         list, i, l, level, minLevel, maxLevel, reg;
                     cat = cat || 'debug';
-                    level = loggerLevel[cat] || loggerLevel['debug'];
-                    if (list = loggerCfg.includes) {
+                    level = loggerLevel[cat] || loggerLevel.debug;
+                    if ((list = loggerCfg.includes)) {
                         matched = 0;
                         for (i = 0; i < list.length; i++) {
                             l = list[i];
                             reg = l.logger;
-                            maxLevel = loggerLevel[l.maxLevel] || loggerLevel['error'];
-                            minLevel = loggerLevel[l.minLevel] || loggerLevel['debug'];
+                            maxLevel = loggerLevel[l.maxLevel] || loggerLevel.error;
+                            minLevel = loggerLevel[l.minLevel] || loggerLevel.debug;
                             if (minLevel <= level && maxLevel >= level && logger.match(reg)) {
                                 matched = 1;
                                 break;
                             }
                         }
-                    } else if (list = loggerCfg.excludes) {
+                    } else if ((list = loggerCfg.excludes)) {
                         matched = 1;
                         for (i = 0; i < list.length; i++) {
                             l = list[i];
                             reg = l.logger;
-                            maxLevel = loggerLevel[l.maxLevel] || loggerLevel['error'];
-                            minLevel = loggerLevel[l.minLevel] || loggerLevel['debug'];
+                            maxLevel = loggerLevel[l.maxLevel] || loggerLevel.error;
+                            minLevel = loggerLevel[l.minLevel] || loggerLevel.debug;
                             if (minLevel <= level && maxLevel >= level && logger.match(reg)) {
                                 matched = 0;
                                 break;
@@ -205,7 +246,8 @@ var KISSY = (function (undefined) {
                         msg = logger + ': ' + msg;
                     }
                 }
-                if (host['console'] !== undefined && console.log && matched) {
+               /*global console*/
+                if (typeof console !== 'undefined' && console.log && matched) {
                     console[cat && console[cat] ? cat : 'log'](msg);
                     return msg;
                 }
@@ -252,56 +294,7 @@ var KISSY = (function (undefined) {
                 }
             ]
         };
-
-        /**
-         * Log class for specified logger
-         * @class KISSY.Logger
-         * @private
-         */
-        function Logger() {
-
-        }
-
-        /**
-         * print debug log
-         * @method
-         * @param {String} str log str
-         */
-        Logger.prototype.debug = function (str) {
-        };
-        /**
-         * print info log
-         * @method
-         * @param {String} str log str
-         */
-        Logger.prototype.info = function (str) {
-        };
-        /**
-         * print warn log
-         * @method
-         * @param {String} str log str
-         */
-        Logger.prototype.warn = function (str) {
-        };
-        /**
-         * print error log
-         * @method
-         * @param {String} str log str
-         */
-        Logger.prototype.error = function (str) {
-        };
     }
-
-    function getLogger(logger) {
-        var obj = {};
-        S.each(loggerLevel, function (_, cat) {
-            obj[cat] = function (msg) {
-                return S.log(msg, cat, logger);
-            };
-        });
-        return obj;
-    }
-
 
     /**
      * Logger level enum
@@ -336,16 +329,17 @@ var KISSY = (function (undefined) {
  *
  */
 (function (S, undefined) {
-
+    var logger = S.getLogger('s/lang');
     var MIX_CIRCULAR_DETECTION = '__MIX_CIRCULAR',
         STAMP_MARKER = '__~ks_stamped',
         host = this,
         TRUE = true,
         EMPTY = '',
         Obj = Object,
-        ObjectCreate = Obj.create,
+
+        objectCreate = Obj.create,
     // error in native ie678, not in simulated ie9
-        hasEnumBug = !({toString: 1}['propertyIsEnumerable']('toString')),
+        hasEnumBug = !({toString: 1}.propertyIsEnumerable('toString')),
         enumProperties = [
             'constructor',
             'hasOwnProperty',
@@ -437,9 +431,9 @@ var KISSY = (function (undefined) {
                 wl = /**
                  @ignore
                  @type {String[]|Function}
-                 */ov['whitelist'];
-                deep = ov['deep'];
-                ov = ov['overwrite'];
+                 */ov.whitelist;
+                deep = ov.deep;
+                ov = ov.overwrite;
             }
 
             if (wl && (typeof wl !== 'function')) {
@@ -457,7 +451,7 @@ var KISSY = (function (undefined) {
                 c,
                 i = 0;
             mixInternal(r, s, ov, wl, deep, cache);
-            while (c = cache[i++]) {
+            while ((c = cache[i++])) {
                 delete c[MIX_CIRCULAR_DETECTION];
             }
             return r;
@@ -468,17 +462,17 @@ var KISSY = (function (undefined) {
          * all the supplied objects. The properties from later objects
          * will overwrite those in earlier objects. Passing in a
          * single object will create a shallow copy of it.
-         * @param {...Object} var_args objects need to be merged
+         * @param {...Object} varArgs objects need to be merged
          * @return {Object} the new merged object
          * @member KISSY
          */
-        merge: function (var_args) {
-            var_args = S.makeArray(arguments);
+        merge: function (varArgs) {
+            varArgs = S.makeArray(arguments);
             var o = {},
                 i,
-                l = var_args.length;
+                l = varArgs.length;
             for (i = 0; i < l; i++) {
-                S.mix(o, var_args[i]);
+                S.mix(o, varArgs[i]);
             }
             return o;
         },
@@ -486,13 +480,13 @@ var KISSY = (function (undefined) {
         /**
          * Applies prototype properties from the supplier to the receiver.
          * @param   {Object} r received object
-         * @param   {...Object} var_args object need to  augment
+         * @param   {...Object} varArgs object need to  augment
          *          {Boolean} [ov=TRUE] whether overwrite existing property
          *          {String[]} [wl] array of white-list properties
          * @return  {Object} the augmented object
          * @member KISSY
          */
-        augment: function (r, var_args) {
+        augment: function (r, varArgs) {
             var args = S.makeArray(arguments),
                 len = args.length - 2,
                 i = 1,
@@ -500,6 +494,8 @@ var KISSY = (function (undefined) {
                 arg,
                 ov = args[len],
                 wl = args[len + 1];
+
+            args[1] = varArgs;
 
             if (!S.isArray(wl)) {
                 ov = wl;
@@ -513,7 +509,7 @@ var KISSY = (function (undefined) {
 
             for (; i < len; i++) {
                 arg = args[i];
-                if (proto = arg.prototype) {
+                if ((proto = arg.prototype)) {
                     arg = S.mix({}, proto, true, removeConstructor);
                 }
                 S.mix(r.prototype, arg, ov, wl);
@@ -534,8 +530,16 @@ var KISSY = (function (undefined) {
          * @member KISSY
          */
         extend: function (r, s, px, sx) {
-            if (!s || !r) {
-                return r;
+            if ('@DEBUG@') {
+                if (!r) {
+                    logger.error('extend r is null');
+                }
+                if (!s) {
+                    logger.error('extend s is null');
+                }
+                if (!s || !r) {
+                    return r;
+                }
             }
 
             var sp = s.prototype,
@@ -600,8 +604,8 @@ var KISSY = (function (undefined) {
 
     function createObject(proto, constructor) {
         var newProto;
-        if (ObjectCreate) {
-            newProto = ObjectCreate(proto);
+        if (objectCreate) {
+            newProto = objectCreate(proto);
         } else {
             Empty.prototype = proto;
             newProto = new Empty();
@@ -633,7 +637,7 @@ var KISSY = (function (undefined) {
         len = keys.length;
         for (i = 0; i < len; i++) {
             p = keys[i];
-            if (p != MIX_CIRCULAR_DETECTION) {
+            if (p !== MIX_CIRCULAR_DETECTION) {
                 // no hasOwnProperty judge!
                 _mix(p, r, s, ov, wl, deep, cache);
             }
@@ -643,7 +647,7 @@ var KISSY = (function (undefined) {
     }
 
     function removeConstructor(k, v) {
-        return k == 'constructor' ? undefined : v;
+        return k === 'constructor' ? undefined : v;
     }
 
     function _mix(p, r, s, ov, wl, deep, cache) {
@@ -717,7 +721,7 @@ var KISSY = (function (undefined) {
                     i = 0,
                     length = object && object.length,
                 // do not use typeof obj == 'function': bug in phantomjs
-                    isObj = length === undefined || S.type(object) == 'function';
+                    isObj = length === undefined || S.type(object) === 'function';
 
                 context = context || null;
 
@@ -875,9 +879,8 @@ var KISSY = (function (undefined) {
                 var len = arr.length,
                     res = new Array(len);
                 for (var i = 0; i < len; i++) {
-                    var el = typeof arr == 'string' ? arr.charAt(i) : arr[i];
-                    if (el
-                        ||
+                    var el = typeof arr === 'string' ? arr.charAt(i) : arr[i];
+                    if (el ||
                         //ie<9 in invalid when typeof arr == string
                         i in arr) {
                         res[i] = fn.call(context || this, el, i, arr);
@@ -899,25 +902,21 @@ var KISSY = (function (undefined) {
          * @return {Array} The items on which the supplied function returned
          * @member KISSY
          */
-        reduce: /*
-         NaN ?
-         reduce ? function(arr, callback, initialValue) {
-         return arr.reduce(callback, initialValue);
-         } : */function (arr, callback, initialValue) {
+        reduce: function (arr, callback, initialValue) {
             var len = arr.length;
             if (typeof callback !== 'function') {
                 throw new TypeError('callback is not function!');
             }
 
             // no value to return if no initial value and an empty array
-            if (len === 0 && arguments.length == 2) {
+            if (len === 0 && arguments.length === 2) {
                 throw new TypeError('arguments invalid');
             }
 
             var k = 0;
             var accumulator;
             if (arguments.length >= 3) {
-                accumulator = arguments[2];
+                accumulator = initialValue;
             }
             else {
                 do {
@@ -1006,15 +1005,15 @@ var KISSY = (function (undefined) {
             var lengthType = typeof o.length,
                 oType = typeof o;
             // The strings and functions also have 'length'
-            if (lengthType != 'number' ||
+            if (lengthType !== 'number' ||
                 // form.elements in ie78 has nodeName 'form'
                 // then caution select
                 // o.nodeName
                 // window
                 o.alert ||
-                oType == 'string' ||
+                oType === 'string' ||
                 // https://github.com/ariya/phantomjs/issues/11478
-                (oType == 'function' && !( 'item' in o && lengthType == 'number'))) {
+                (oType === 'function' && !( 'item' in o && lengthType === 'number'))) {
                 return [o];
             }
             var ret = [];
@@ -1035,10 +1034,11 @@ var KISSY = (function (undefined) {
     // IE doesn't include non-breaking-space (0xa0) in their \s character
     // class (as required by section 7.2 of the ECMAScript spec), we explicitly
     // include it in the regexp to enforce consistent cross-browser behavior.
+    var logger = S.getLogger('s/lang');
     var SEP = '&',
         EMPTY = '',
         EQ = '=',
-        logger= S.getLogger('s/lang'),
+
         TRUE = true,
     // FALSE = false,
         HEX_BASE = 16,
@@ -1051,6 +1051,7 @@ var KISSY = (function (undefined) {
             '&#x60;': '`',
             '&#x2F;': '/',
             '&quot;': '"',
+            /*jshint quotmark:false*/
             '&#x27;': "'"
         },
         reverseEntities = {},
@@ -1072,26 +1073,28 @@ var KISSY = (function (undefined) {
 
     function getEscapeReg() {
         if (escapeReg) {
-            return escapeReg
+            return escapeReg;
         }
         var str = EMPTY;
         S.each(htmlEntities, function (entity) {
             str += entity + '|';
         });
         str = str.slice(0, -1);
-        return escapeReg = new RegExp(str, 'g');
+        escapeReg = new RegExp(str, 'g');
+        return escapeReg;
     }
 
     function getUnEscapeReg() {
         if (unEscapeReg) {
-            return unEscapeReg
+            return unEscapeReg;
         }
         var str = EMPTY;
         S.each(reverseEntities, function (entity) {
             str += entity + '|';
         });
         str += '&#(\\d{1,5});';
-        return unEscapeReg = new RegExp(str, 'g');
+        unEscapeReg = new RegExp(str, 'g');
+        return unEscapeReg;
     }
 
     S.mix(S, {
@@ -1244,7 +1247,7 @@ var KISSY = (function (undefined) {
          * @member KISSY
          */
         unparam: function (str, sep, eq) {
-            if (typeof str != 'string' || !(str = S.trim(str))) {
+            if (typeof str !== 'string' || !(str = S.trim(str))) {
                 return {};
             }
             sep = sep || SEP;
@@ -1258,7 +1261,7 @@ var KISSY = (function (undefined) {
 
             for (; i < len; ++i) {
                 eqIndex = pairs[i].indexOf(eq);
-                if (eqIndex == -1) {
+                if (eqIndex === -1) {
                     key = decode(pairs[i]);
                     val = undefined;
                 } else {
@@ -1300,19 +1303,22 @@ var KISSY = (function (undefined) {
 (function (S, undefined) {
     // ios Function.prototype.bind === undefined
     function bindFn(r, fn, obj) {
+        function FNOP() {
+        }
+
         var slice = [].slice,
             args = slice.call(arguments, 3),
-            fNOP = function () {
-            },
             bound = function () {
                 var inArgs = slice.call(arguments);
                 return fn.apply(
-                    this instanceof fNOP ? this : obj,
+                    this instanceof FNOP ? this :
+                        // fix: y.x=S.bind(fn);
+                        obj || this,
                     (r ? inArgs.concat(args) : args.concat(inArgs))
                 );
             };
-        fNOP.prototype = fn.prototype;
-        bound.prototype = new fNOP();
+        FNOP.prototype = fn.prototype;
+        bound.prototype = new FNOP();
         return bound;
     }
 
@@ -1379,7 +1385,7 @@ var KISSY = (function (undefined) {
                 f,
                 r;
 
-            if (typeof fn == 'string') {
+            if (typeof fn === 'string') {
                 m = context[fn];
             }
 
@@ -1420,20 +1426,20 @@ var KISSY = (function (undefined) {
             ms = ms || 150;
 
             if (ms === -1) {
-                return (function () {
+                return function () {
                     fn.apply(context || this, arguments);
-                });
+                };
             }
 
             var last = S.now();
 
-            return (function () {
+            return function () {
                 var now = S.now();
                 if (now - last > ms) {
                     last = now;
                     fn.apply(context || this, arguments);
                 }
-            });
+            };
         },
 
         /**
@@ -1483,87 +1489,87 @@ var KISSY = (function (undefined) {
         COMPARE_MARKER = '__~ks_compared';
 
     S.mix(S, {
-            /**
-             * Checks to see whether two object are equals.
-             * @param a 比较目标1
-             * @param b 比较目标2
-             * @param [mismatchKeys] internal usage
-             * @param [mismatchValues] internal usage
-             * @return {Boolean} a.equals(b)
-             * @member KISSY
-             */
-            equals: function (a, b, /*internal use*/mismatchKeys, /*internal use*/mismatchValues) {
-                // inspired by jasmine
-                mismatchKeys = mismatchKeys || [];
-                mismatchValues = mismatchValues || [];
+        /**
+         * Checks to see whether two object are equals.
+         * @param a 比较目标1
+         * @param b 比较目标2
+         * @param [mismatchKeys] internal usage
+         * @param [mismatchValues] internal usage
+         * @return {Boolean} a.equals(b)
+         * @member KISSY
+         */
+        equals: function (a, b, /*internal use*/mismatchKeys, /*internal use*/mismatchValues) {
+            // inspired by jasmine
+            mismatchKeys = mismatchKeys || [];
+            mismatchValues = mismatchValues || [];
 
-                if (a === b) {
-                    return TRUE;
-                }
-                if (a === undefined || a === null || b === undefined || b === null) {
-                    // need type coercion
-                    return a == null && b == null;
-                }
-                if (a instanceof Date && b instanceof Date) {
-                    return a.getTime() == b.getTime();
-                }
-                if (typeof a == 'string' && typeof b == 'string') {
-                    return (a == b);
-                }
-                if (typeof a==='number' && typeof b==='number') {
-                    return (a == b);
-                }
-                if (typeof a === 'object' && typeof b === 'object') {
-                    return compareObjects(a, b, mismatchKeys, mismatchValues);
-                }
-                // Straight check
-                return (a === b);
-            },
-
-            /**
-             * Creates a deep copy of a plain object or array. Others are returned untouched.
-             * @param input
-             * @member KISSY
-             * @param {Function} [filter] filter function
-             * @return {Object} the new cloned object
-             * refer: http://www.w3.org/TR/html5/common-dom-interfaces.html#safe-passing-of-structured-data
-             */
-            clone: function (input, filter) {
-                // 稍微改改就和规范一样了 :)
-                // Let memory be an association list of pairs of objects,
-                // initially empty. This is used to handle duplicate references.
-                // In each pair of objects, one is called the source object
-                // and the other the destination object.
-                var memory = {},
-                    ret = cloneInternal(input, filter, memory);
-                S.each(memory, function (v) {
-                    // 清理在源对象上做的标记
-                    v = v.input;
-                    if (v[CLONE_MARKER]) {
-                        try {
-                            delete v[CLONE_MARKER];
-                        } catch (e) {
-                            v[CLONE_MARKER] = undefined;
-                        }
-                    }
-                });
-                memory = null;
-                return ret;
-            },
-
-            /**
-             * Gets current date in milliseconds.
-             * @method
-             * refer:  https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/now
-             * http://j-query.blogspot.com/2011/02/timing-ecmascript-5-datenow-function.html
-             * http://kangax.github.com/es5-compat-table/
-             * @member KISSY
-             * @return {Number} current time
-             */
-            now: Date.now || function () {
-                return +new Date();
+            if (a === b) {
+                return TRUE;
             }
-        });
+            if (a === undefined || a === null || b === undefined || b === null) {
+                // need type coercion
+                return a == null && b == null;
+            }
+            if (a instanceof Date && b instanceof Date) {
+                return a.getTime() === b.getTime();
+            }
+            if (typeof a === 'string' && typeof b === 'string') {
+                return (a === b);
+            }
+            if (typeof a === 'number' && typeof b === 'number') {
+                return (a === b);
+            }
+            if (typeof a === 'object' && typeof b === 'object') {
+                return compareObjects(a, b, mismatchKeys, mismatchValues);
+            }
+            // Straight check
+            return (a === b);
+        },
+
+        /**
+         * Creates a deep copy of a plain object or array. Others are returned untouched.
+         * @param input
+         * @member KISSY
+         * @param {Function} [filter] filter function
+         * @return {Object} the new cloned object
+         * refer: http://www.w3.org/TR/html5/common-dom-interfaces.html#safe-passing-of-structured-data
+         */
+        clone: function (input, filter) {
+            // 稍微改改就和规范一样了 :)
+            // Let memory be an association list of pairs of objects,
+            // initially empty. This is used to handle duplicate references.
+            // In each pair of objects, one is called the source object
+            // and the other the destination object.
+            var memory = {},
+                ret = cloneInternal(input, filter, memory);
+            S.each(memory, function (v) {
+                // 清理在源对象上做的标记
+                v = v.input;
+                if (v[CLONE_MARKER]) {
+                    try {
+                        delete v[CLONE_MARKER];
+                    } catch (e) {
+                        v[CLONE_MARKER] = undefined;
+                    }
+                }
+            });
+            memory = null;
+            return ret;
+        },
+
+        /**
+         * Gets current date in milliseconds.
+         * @method
+         * refer:  https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/now
+         * http://j-query.blogspot.com/2011/02/timing-ecmascript-5-datenow-function.html
+         * http://kangax.github.com/es5-compat-table/
+         * @member KISSY
+         * @return {Number} current time
+         */
+        now: Date.now || function () {
+            return +new Date();
+        }
+    });
 
     function cloneInternal(input, f, memory) {
         var destination = input,
@@ -1583,20 +1589,21 @@ var KISSY = (function (undefined) {
             return memory[input[CLONE_MARKER]].destination;
         } else if (typeof input === 'object') {
             // 引用类型要先记录
-            var constructor = input.constructor;
-            if (S.inArray(constructor, [Boolean, String, Number, Date, RegExp])) {
-                destination = new constructor(input.valueOf());
+            var Constructor = input.constructor;
+            if (S.inArray(Constructor, [Boolean, String, Number, Date, RegExp])) {
+                destination = new Constructor(input.valueOf());
             }
             // ImageData , File, Blob , FileList .. etc
-            else if (isArray = S.isArray(input)) {
+            else if ((isArray = S.isArray(input))) {
                 destination = f ? S.filter(input, f) : input.concat();
-            } else if (isPlainObject = S.isPlainObject(input)) {
+            } else if ((isPlainObject = S.isPlainObject(input))) {
                 destination = {};
             }
             // Add a mapping from input (the source object)
             // to output (the destination object) to memory.
             // 做标记
-            input[CLONE_MARKER] = (stamp = S.guid());
+            // stamp can not be
+            input[CLONE_MARKER] = (stamp = S.guid('c'));
             // 存储源对象以及克隆后的对象
             memory[stamp] = {destination: destination, input: input};
         }
@@ -1639,30 +1646,31 @@ var KISSY = (function (undefined) {
         for (var property in b) {
 
             if (!hasKey(a, property) && hasKey(b, property)) {
-                mismatchKeys.push("expected has key '" + property + "', but missing from actual.");
+                mismatchKeys.push('expected has key ' + property + '", but missing from actual.');
             }
 
         }
         for (property in a) {
 
             if (!hasKey(b, property) && hasKey(a, property)) {
-                mismatchKeys.push("expected missing key '" + property + "', but present in actual.");
+                mismatchKeys.push('expected missing key "' + property + '", but present in actual.');
             }
 
         }
         for (property in b) {
 
-            if (property == COMPARE_MARKER) {
+            if (property === COMPARE_MARKER) {
                 continue;
             }
             if (!S.equals(a[property], b[property], mismatchKeys, mismatchValues)) {
-                mismatchValues.push("'" + property + "' was '" + (b[property] ? (b[property].toString()) : b[property])
-                    + "' in expected, but was '" +
-                    (a[property] ? (a[property].toString()) : a[property]) + "' in actual.");
+                mismatchValues.push('"' + property + '" was "' +
+                    (b[property] ? (b[property].toString()) : b[property]) +
+                    '" in expected, but was "' +
+                    (a[property] ? (a[property].toString()) : a[property]) + '" in actual.');
             }
 
         }
-        if (S.isArray(a) && S.isArray(b) && a.length != b.length) {
+        if (S.isArray(a) && S.isArray(b) && a.length !== b.length) {
             mismatchValues.push('arrays were not the same length');
         }
         delete a[COMPARE_MARKER];
@@ -1710,7 +1718,7 @@ var KISSY = (function (undefined) {
          * @param {RegExp} [regexp] to match a piece of template string
          */
         substitute: function (str, o, regexp) {
-            if (typeof str != 'string' || !o) {
+            if (typeof str !== 'string' || !o) {
                 return str;
             }
 
@@ -1751,7 +1759,7 @@ var KISSY = (function (undefined) {
          */
         endsWith: function (str, suffix) {
             var ind = str.length - suffix.length;
-            return ind >= 0 && str.indexOf(suffix, ind) == ind;
+            return ind >= 0 && str.indexOf(suffix, ind) === ind;
         }
 
     });
@@ -1824,7 +1832,10 @@ var KISSY = (function (undefined) {
             // Must be an Object.
             // Because of IE, we also have to check the presence of the constructor property.
             // Make sure that Dom nodes and window objects don't pass through, as well
-            if (!obj || S.type(obj) !== "object" || obj.nodeType || obj.window == obj) {
+            if (!obj || S.type(obj) !== 'object' || obj.nodeType ||
+                /*jshint eqeqeq:false*/
+                // must == for ie8
+                obj.window == obj) {
                 return FALSE;
             }
 
@@ -1832,7 +1843,7 @@ var KISSY = (function (undefined) {
 
             try {
                 // Not own constructor property must be Object
-                if ((objConstructor = obj.constructor) && !hasOwnProperty(obj, "constructor") && !hasOwnProperty(objConstructor.prototype, "isPrototypeOf")) {
+                if ((objConstructor = obj.constructor) && !hasOwnProperty(obj, 'constructor') && !hasOwnProperty(objConstructor.prototype, 'isPrototypeOf')) {
                     return FALSE;
                 }
             } catch (e) {
@@ -1842,12 +1853,11 @@ var KISSY = (function (undefined) {
 
             // Own properties are enumerated firstly, so to speed up,
             // if last one is own, then all properties are own.
-
-
+            /*jshint noempty:false*/
             for (key in obj) {
             }
 
-            return key === undefined || hasOwnProperty(obj, key);
+            return ((key === undefined) || hasOwnProperty(obj, key));
         }
     });
 
@@ -1926,8 +1936,8 @@ var KISSY = (function (undefined) {
 
         // add isBoolean/isNumber/...
         S['is' + name] = function (o) {
-            return S.type(o) == lc;
-        }
+            return S.type(o) === lc;
+        };
     });
     S.isArray = Array.isArray || S.isArray;
 })(KISSY);/*
@@ -1935,16 +1945,22 @@ var KISSY = (function (undefined) {
  @author yiminghe@gmail.com
  */
 (function (S) {
+    /*global setImmediate*/
+    /*global process */
+    /*global MessageChannel */
+
     var queue = [];
 
     var flushing = 0;
 
     function flush() {
         var i = 0, item;
-        while (item = queue[i++]) {
+        while ((item = queue[i++])) {
             try {
                 item();
             } catch (e) {
+                S.log(e.stack || e, 'error');
+                /*jshint loopfunc:true*/
                 setTimeout(function () {
                     throw e;
                 }, 0);
@@ -1957,9 +1973,9 @@ var KISSY = (function (undefined) {
     }
 
     /*
-      setImmediate for loader and promise
-      @param {Function} fn async function to call
-      @private
+     setImmediate for loader and promise
+     @param {Function} fn async function to call
+     @private
      */
     S.setImmediate = function (fn) {
         queue.push(fn);
@@ -1970,15 +1986,16 @@ var KISSY = (function (undefined) {
     };
 
     var requestFlush;
-    if (typeof setImmediate === "function") {
+    if (typeof setImmediate === 'function') {
         requestFlush = function () {
+
             setImmediate(flush);
         };
-    } else if (typeof process !== 'undefined' && typeof  process.nextTick == 'function') {
+    } else if (typeof process !== 'undefined' && typeof  process.nextTick === 'function') {
         requestFlush = function () {
             process.nextTick(flush);
         };
-    } else if (typeof MessageChannel !== "undefined") {
+    } else if (typeof MessageChannel !== 'undefined') {
         // modern browsers
         // http://msdn.microsoft.com/en-us/library/windows/apps/hh441303.aspx
         var channel = new MessageChannel();
@@ -2028,13 +2045,14 @@ var KISSY = (function (undefined) {
 
         for (; i >= 0; i--) {
             last = parts[i];
-            if (last == '.') {
-            } else if (last === '..') {
-                up++;
-            } else if (up) {
-                up--;
-            } else {
-                newParts[newParts.length] = last;
+            if (last !== '.') {
+                if (last === '..') {
+                    up++;
+                } else if (up) {
+                    up--;
+                } else {
+                    newParts[newParts.length] = last;
+                }
             }
         }
 
@@ -2056,7 +2074,6 @@ var KISSY = (function (undefined) {
      * @singleton
      */
     var Path = S.Path = {
-
         /**
          * resolve([from ...], to)
          * @return {String} Resolved path.
@@ -2071,11 +2088,11 @@ var KISSY = (function (undefined) {
 
             for (i = args.length - 1; i >= 0 && !absolute; i--) {
                 path = args[i];
-                if (typeof path != 'string' || !path) {
+                if (typeof path !== 'string' || !path) {
                     continue;
                 }
                 resolvedPath = path + '/' + resolvedPath;
-                absolute = path.charAt(0) == '/';
+                absolute = path.charAt(0) === '/';
             }
 
             resolvedPathStr = normalizeArray(S.filter(resolvedPath.split('/'), function (p) {
@@ -2096,8 +2113,8 @@ var KISSY = (function (undefined) {
          * @return {String}
          */
         normalize: function (path) {
-            var absolute = path.charAt(0) == '/',
-                trailingSlash = path.slice(-1) == '/';
+            var absolute = path.charAt(0) === '/',
+                trailingSlash = path.slice(-1) === '/';
 
             path = normalizeArray(S.filter(path.split('/'), function (p) {
                 return !!p;
@@ -2122,7 +2139,7 @@ var KISSY = (function (undefined) {
         join: function () {
             var args = S.makeArray(arguments);
             return Path.normalize(S.filter(args,function (p) {
-                return p && (typeof p == 'string');
+                return p && (typeof p === 'string');
             }).join('/'));
         },
 
@@ -2152,7 +2169,7 @@ var KISSY = (function (undefined) {
                 }), commonLength = Math.min(fromParts.length, toParts.length);
 
             for (sameIndex = 0; sameIndex < commonLength; sameIndex++) {
-                if (fromParts[sameIndex] != toParts[sameIndex]) {
+                if (fromParts[sameIndex] !== toParts[sameIndex]) {
                     break;
                 }
             }
@@ -2181,7 +2198,7 @@ var KISSY = (function (undefined) {
             var result = path.match(splitPathRe) || [],
                 basename;
             basename = result[3] || '';
-            if (ext && basename && basename.slice(-1 * ext.length) == ext) {
+            if (ext && basename && basename.slice(-1 * ext.length) === ext) {
                 basename = basename.slice(0, -1 * ext.length);
             }
             return basename;
@@ -2229,9 +2246,10 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S, undefined) {
+    var  logger= S.getLogger('s/uri');
     var reDisallowedInSchemeOrUserInfo = /[#\/\?@]/g,
         reDisallowedInPathName = /[#\?]/g,
-        logger= S.getLogger('s/uri'),
+
     // ?? combo of taobao
         reDisallowedInQuery = /[#@]/g,
         reDisallowedInFragment = /#/g,
@@ -2411,7 +2429,7 @@ var KISSY = (function (undefined) {
             var self = this, _queryMap;
             parseQuery(self);
             _queryMap = self._queryMap;
-            if (typeof key == 'string') {
+            if (typeof key === 'string') {
                 self._queryMap[key] = value;
             } else {
                 if (key instanceof Query) {
@@ -2451,7 +2469,7 @@ var KISSY = (function (undefined) {
             var self = this,
                 _queryMap,
                 currentValue;
-            if (typeof key == 'string') {
+            if (typeof key === 'string') {
                 parseQuery(self);
                 _queryMap = self._queryMap;
                 currentValue = _queryMap[key];
@@ -2485,11 +2503,11 @@ var KISSY = (function (undefined) {
     };
 
     function padding2(str) {
-        return str.length == 1 ? '0' + str : str;
+        return str.length === 1 ? '0' + str : str;
     }
 
     function equalsIgnoreCase(str1, str2) {
-        return str1.toLowerCase() == str2.toLowerCase();
+        return str1.toLowerCase() === str2.toLowerCase();
     }
 
     // www.ta#bao.com // => www.ta.com/#bao.com
@@ -2514,7 +2532,7 @@ var KISSY = (function (undefined) {
     function Uri(uriStr) {
 
         if (uriStr instanceof  Uri) {
-            return uriStr['clone']();
+            return uriStr.clone();
         }
 
         var components, self = this;
@@ -2561,7 +2579,7 @@ var KISSY = (function (undefined) {
 
         S.each(components, function (v, key) {
             v = v || '';
-            if (key == 'query') {
+            if (key === 'query') {
                 // need encoded content
                 self.query = new Query(v);
             } else {
@@ -2615,7 +2633,7 @@ var KISSY = (function (undefined) {
          */
         resolve: function (relativeUri) {
 
-            if (typeof relativeUri == 'string') {
+            if (typeof relativeUri === 'string') {
                 relativeUri = new Uri(relativeUri);
             }
 
@@ -2626,12 +2644,12 @@ var KISSY = (function (undefined) {
                 target = self.clone();
 
             S.each(order, function (o) {
-                if (o == 'path') {
+                if (o === 'path') {
                     // relativeUri does not set for scheme/userInfo/hostname/port
                     if (override) {
                         target[o] = relativeUri[o];
                     } else {
-                        var path = relativeUri['path'];
+                        var path = relativeUri.path;
                         if (path) {
                             // force to override target 's query with relative
                             override = 1;
@@ -2642,7 +2660,7 @@ var KISSY = (function (undefined) {
                                 } else if (target.path) {
                                     // RFC 3986, section 5.2.3, case 2
                                     lastSlashIndex = target.path.lastIndexOf('/');
-                                    if (lastSlashIndex != -1) {
+                                    if (lastSlashIndex !== -1) {
                                         path = target.path.slice(0, lastSlashIndex + 1) + path;
                                     }
                                 }
@@ -2651,9 +2669,9 @@ var KISSY = (function (undefined) {
                             target.path = Path.normalize(path);
                         }
                     }
-                } else if (o == 'query') {
-                    if (override || relativeUri['query'].toString()) {
-                        target.query = relativeUri['query'].clone();
+                } else if (o === 'query') {
+                    if (override || relativeUri.query.toString()) {
+                        target.query = relativeUri.query.clone();
                         override = 1;
                     }
                 } else if (override || relativeUri[o]) {
@@ -2761,7 +2779,7 @@ var KISSY = (function (undefined) {
          * @chainable
          */
         'setQuery': function (query) {
-            if (typeof query == 'string') {
+            if (typeof query === 'string') {
                 if (S.startsWith(query, '?')) {
                     query = query.slice(1);
                 }
@@ -2809,9 +2827,9 @@ var KISSY = (function (undefined) {
         isSameOriginAs: function (other) {
             var self = this;
             // port and hostname has to be same
-            return equalsIgnoreCase(self.hostname, other['hostname']) &&
-                equalsIgnoreCase(self.scheme, other['scheme']) &&
-                equalsIgnoreCase(self.port, other['port']);
+            return equalsIgnoreCase(self.hostname, other.hostname) &&
+                equalsIgnoreCase(self.scheme, other.scheme) &&
+                equalsIgnoreCase(self.port, other.port);
         },
 
         /**
@@ -2834,27 +2852,27 @@ var KISSY = (function (undefined) {
                 query,
                 userInfo;
 
-            if (scheme = self.scheme) {
+            if ((scheme = self.scheme)) {
                 out.push(encodeSpecialChars(scheme, reDisallowedInSchemeOrUserInfo));
                 out.push(':');
             }
 
-            if (hostname = self.hostname) {
+            if ((hostname = self.hostname)) {
                 out.push('//');
-                if (userInfo = self.userInfo) {
+                if ((userInfo = self.userInfo)) {
                     out.push(encodeSpecialChars(userInfo, reDisallowedInSchemeOrUserInfo));
                     out.push('@');
                 }
 
                 out.push(encodeURIComponent(hostname));
 
-                if (port = self.port) {
+                if ((port = self.port)) {
                     out.push(':');
                     out.push(port);
                 }
             }
 
-            if (path = self.path) {
+            if ((path = self.path)) {
                 if (hostname && !S.startsWith(path, '/')) {
                     path = '/' + path;
                 }
@@ -2862,14 +2880,14 @@ var KISSY = (function (undefined) {
                 out.push(encodeSpecialChars(path, reDisallowedInPathName));
             }
 
-            if (query = ( self.query.toString.call(self.query, serializeArray))) {
+            if ((query = ( self.query.toString.call(self.query, serializeArray)))) {
                 out.push('?');
                 out.push(query);
             }
 
-            if (fragment = self.fragment) {
+            if ((fragment = self.fragment)) {
                 out.push('#');
-                out.push(encodeSpecialChars(fragment, reDisallowedInFragment))
+                out.push(encodeSpecialChars(fragment, reDisallowedInFragment));
             }
 
             return out.join('');
@@ -2879,7 +2897,7 @@ var KISSY = (function (undefined) {
     Uri.Query = Query;
 
     Uri.getComponents = function (url) {
-        url = url || "";
+        url = url || '';
         var m = url.match(URI_SPLIT_REG) || [],
             ret = {};
         S.each(REG_INFO, function (index, key) {
@@ -2903,10 +2921,12 @@ var KISSY = (function (undefined) {
  * ua
  */
 (function (S, undefined) {
+    /*global process*/
+
     var win = S.Env.host,
         doc = win.document,
         navigator = win.navigator,
-        ua = navigator && navigator.userAgent || "";
+        ua = navigator && navigator.userAgent || '';
 
     function numberify(s) {
         var c = 0;
@@ -3004,6 +3024,12 @@ var KISSY = (function (undefined) {
              * @member KISSY.UA
              */
             ie: undefined,
+            /**
+             * ie document mode
+             * @type undefined|Number
+             * @member KISSY.UA
+             */
+            ieMode: undefined,
             /**
              * opera version
              * @type undefined|Number
@@ -3195,7 +3221,7 @@ var KISSY = (function (undefined) {
                     // MSIE
                     // 由于最开始已经使用了 IE 条件注释判断，因此落到这里的唯一可能性只有 IE10+
                     // and analysis tools in nodejs
-                    if (ieVersion = getIEVersion(ua)) {
+                    if ((ieVersion = getIEVersion(ua))) {
                         UA[shell = 'ie'] = ieVersion;
                         setTridentVersion(ua, UA);
                         // NOT WebKit, Presto or IE
@@ -3206,7 +3232,7 @@ var KISSY = (function (undefined) {
                             if ((m = ua.match(/rv:([\d.]*)/)) && m[1]) {
                                 UA[core] = numberify(m[1]);
                                 if (/Mobile|Tablet/.test(ua)) {
-                                    o.mobile = "firefox";
+                                    UA.mobile = 'firefox';
                                 }
                             }
                             // Firefox
@@ -3234,6 +3260,7 @@ var KISSY = (function (undefined) {
         UA.os = os;
         UA.core = UA.core || core;
         UA.shell = shell;
+        UA.ieMode = UA.ie && doc.documentMode || UA.ie;
 
         return UA;
     }
@@ -3243,6 +3270,7 @@ var KISSY = (function (undefined) {
     // nodejs
     if (typeof process === 'object') {
         var versions, nodeVersion;
+
         if ((versions = process.versions) && (nodeVersion = versions.node)) {
             UA.os = process.platform;
             UA.nodejs = numberify(nodeVersion);
@@ -3252,7 +3280,7 @@ var KISSY = (function (undefined) {
     // use by analysis tools in nodejs
     UA.getDescriptorFromUserAgent = getDescriptorFromUserAgent;
 
-    var o = [
+    var browsers = [
             // browser core type
             'webkit',
             'trident',
@@ -3268,7 +3296,7 @@ var KISSY = (function (undefined) {
         documentElement = doc && doc.documentElement,
         className = '';
     if (documentElement) {
-        S.each(o, function (key) {
+        S.each(browsers, function (key) {
             var v = UA[key];
             if (v) {
                 className += ' ks-' + key + (parseInt(v) + '');
@@ -3325,24 +3353,26 @@ var KISSY = (function (undefined) {
         ],
     // nodejs
         doc = win.document || {},
-        documentMode = doc.documentMode,
         isMsPointerSupported,
+    // ie11
+        isPointerSupported,
         transitionProperty,
         transformProperty,
         transitionPrefix,
         transformPrefix,
+        isTransform3dSupported,
         documentElement = doc.documentElement,
         documentElementStyle,
         isClassListSupportedState = true,
         isQuerySelectorSupportedState = false,
     // phantomjs issue: http://code.google.com/p/phantomjs/issues/detail?id=375
         isTouchEventSupportedState = ('ontouchstart' in doc) && !(UA.phantomjs),
-        ie = documentMode || UA.ie;
+        ie = UA.ieMode;
 
     if (documentElement) {
         if (documentElement.querySelector &&
             // broken ie8
-            ie != 8) {
+            ie !== 8) {
             isQuerySelectorSupportedState = true;
         }
         documentElementStyle = documentElement.style;
@@ -3363,7 +3393,22 @@ var KISSY = (function (undefined) {
         });
 
         isClassListSupportedState = 'classList' in documentElement;
-        isMsPointerSupported = "msPointerEnabled" in (win.navigator || {});
+        var navigator = (win.navigator || {});
+        isMsPointerSupported = 'msPointerEnabled' in navigator;
+        isPointerSupported = 'pointerEnabled' in navigator;
+
+        if (transformProperty) {
+            // https://gist.github.com/lorenzopolidori/3794226
+            // ie9 does not support 3d transform
+            // http://msdn.microsoft.com/en-us/ie/ff468705
+            var el = doc.createElement('p');
+            documentElement.insertBefore(el, documentElement.firstChild);
+            el.style[transformProperty] = 'translate3d(1px,1px,1px)';
+            var computedStyle = win.getComputedStyle(el);
+            var has3d = computedStyle.getPropertyValue(transformProperty) || computedStyle[transformProperty];
+            documentElement.removeChild(el);
+            isTransform3dSupported = (has3d !== undefined && has3d.length > 0 && has3d !== 'none');
+        }
     }
 
     /**
@@ -3379,7 +3424,17 @@ var KISSY = (function (undefined) {
          * @type {Boolean}
          */
         isMsPointerSupported: function () {
+            // ie11 onMSPointerDown but e.type==pointerdown
             return isMsPointerSupported;
+        },
+
+        /**
+         * whether support microsoft pointer event (ie11).
+         * @type {Boolean}
+         */
+        isPointerSupported: function () {
+            // ie11
+            return isPointerSupported;
         },
 
         /**
@@ -3390,12 +3445,16 @@ var KISSY = (function (undefined) {
             return isTouchEventSupportedState;
         },
 
+        isTouchGestureSupported: function () {
+            return isTouchEventSupportedState || isPointerSupported || isMsPointerSupported;
+        },
+
         /**
          * whether support device motion event
          * @returns {boolean}
          */
         isDeviceMotionSupported: function () {
-            return !!win['DeviceMotionEvent'];
+            return !!win.DeviceMotionEvent;
         },
 
         /**
@@ -3426,11 +3485,19 @@ var KISSY = (function (undefined) {
         },
 
         /**
+         * whether support css transform 3d
+         * @returns {boolean}
+         */
+        'isTransform3dSupported': function () {
+            return isTransform3dSupported;
+        },
+
+        /**
          * whether support class list api
          * @returns {boolean}
          */
         'isClassListSupported': function () {
-            return isClassListSupportedState
+            return isClassListSupportedState;
         },
 
         /**
@@ -3497,16 +3564,20 @@ var KISSY = (function (undefined) {
      * @enum {Number} KISSY.Loader.Status
      */
     Loader.Status = {
+        /** error */
+        'ERROR': -1,
         /** init */
         'INIT': 0,
         /** loading */
         'LOADING': 1,
         /** loaded */
         'LOADED': 2,
-        /** error */
-        'ERROR': 3,
+        /**dependencies are loaded or attached*/
+        'READY_TO_ATTACH': 3,
+        /** attaching */
+        'ATTACHING': 4,
         /** attached */
-        'ATTACHED': 4
+        'ATTACHED': 5
     };
 })(KISSY);/**
  * @ignore
@@ -3516,12 +3587,15 @@ var KISSY = (function (undefined) {
 (function (S) {
     var Loader = S.Loader,
         Path = S.Path,
-        logger = S.getLogger('s/loader'),
         host = S.Env.host,
+        TRUE = !0,
+        FALSE = !1,
         startsWith = S.startsWith,
         data = Loader.Status,
         ATTACHED = data.ATTACHED,
+        READY_TO_ATTACH = data.READY_TO_ATTACH,
         LOADED = data.LOADED,
+        ATTACHING = data.ATTACHING,
         ERROR = data.ERROR,
         /**
          * @class KISSY.Loader.Utils
@@ -3534,31 +3608,34 @@ var KISSY = (function (undefined) {
 
     // http://wiki.commonjs.org/wiki/Packages/Mappings/A
     // 如果模块名以 / 结尾，自动加 index
-    function indexMap(s) {
-        if (typeof s == 'string') {
-            return indexMapStr(s);
+    function addIndexAndRemoveJsExt(s) {
+        if (typeof s === 'string') {
+            return addIndexAndRemoveJsExtFromName(s);
         } else {
             var ret = [],
                 i = 0,
                 l = s.length;
             for (; i < l; i++) {
-                ret[i] = indexMapStr(s[i]);
+                ret[i] = addIndexAndRemoveJsExtFromName(s[i]);
             }
             return ret;
         }
     }
 
-    function indexMapStr(s) {
+    function addIndexAndRemoveJsExtFromName(name) {
         // 'x/' 'x/y/z/'
-        if (s.charAt(s.length - 1) == '/') {
-            s += 'index';
+        if (name.charAt(name.length - 1) === '/') {
+            name += 'index';
         }
-        return s;
+        if (S.endsWith(name, '.js')) {
+            name = name.slice(0, -3);
+        }
+        return name;
     }
 
     function pluginAlias(runtime, name) {
         var index = name.indexOf('!');
-        if (index != -1) {
+        if (index !== -1) {
             var pluginName = name.substring(0, index);
             name = name.substring(index + 1);
             S.use(pluginName, {
@@ -3596,7 +3673,7 @@ var KISSY = (function (undefined) {
                 return depName;
             }
 
-            if (typeof depName == 'string') {
+            if (typeof depName === 'string') {
                 if (startsWith(depName, '../') || startsWith(depName, './')) {
                     // x/y/z -> x/y/
                     return Path.resolve(Path.dirname(moduleName), depName);
@@ -3630,60 +3707,53 @@ var KISSY = (function (undefined) {
          * @return {KISSY.Loader.Module}
          */
         createModuleInfo: function (runtime, modName, cfg) {
-            modName = indexMapStr(modName);
+            modName = addIndexAndRemoveJsExtFromName(modName);
 
             var mods = runtime.Env.mods,
-                mod = mods[modName];
+                module = mods[modName];
 
-            if (mod) {
-                return mod;
+            if (module) {
+                return module;
             }
 
             // 防止 cfg 里有 tag，构建 fullpath 需要
-            mods[modName] = mod = new Loader.Module(S.mix({
+            mods[modName] = module = new Loader.Module(S.mix({
                 name: modName,
                 runtime: runtime
             }, cfg));
 
-            return mod;
+            return module;
         },
 
         /**
-         * Whether modNames is attached.
-         * @param runtime Module container, such as KISSY
-         * @param modNames
-         * @return {Boolean}
-         */
-        'isAttached': function (runtime, modNames) {
-            return isStatus(runtime, modNames, ATTACHED);
-        },
-
-        /**
-         * Get module values
+         * Get modules exports
          * @param runtime Module container, such as KISSY
          * @param {String[]} modNames module names
-         * @return {Array} module values
+         * @return {Array} modules exports
          */
         getModules: function (runtime, modNames) {
-            var mods = [runtime], mod,
+            var mods = [runtime], module,
                 unalias,
                 allOk,
                 m,
                 runtimeMods = runtime.Env.mods;
 
             S.each(modNames, function (modName) {
-                mod = runtimeMods[modName];
-                if (!mod || mod.getType() != 'css') {
+                module = runtimeMods[modName];
+                if (!module || module.getType() !== 'css') {
                     unalias = Utils.unalias(runtime, modName);
                     allOk = S.reduce(unalias, function (a, n) {
                         m = runtimeMods[n];
-                        return a && m && m.status == ATTACHED;
+                        // allow partial module (circular dependency)
+                        return a && m && m.status >= ATTACHING;
                     }, true);
                     if (allOk) {
-                        mods.push(runtimeMods[unalias[0]].value);
+                        mods.push(runtimeMods[unalias[0]].exports);
                     } else {
                         mods.push(null);
                     }
+                } else {
+                    mods.push(undefined);
                 }
             });
 
@@ -3694,12 +3764,16 @@ var KISSY = (function (undefined) {
          * attach modules and their dependency modules recursively
          * @param {String[]} modNames module names
          * @param runtime Module container, such as KISSY
-         * @param {String[]} [stack] stack for detecting circular dependency
-         * @param {Array} [errorList] errors when attach mods
-         * @param {Object} [cache] cached modules to avoid duplicate check
-         * @returns whether success attach all modules
          */
-        attachModsRecursively: function (modNames, runtime, stack, errorList, cache) {
+        attachModsRecursively: function (modNames, runtime) {
+            var i,
+                l = modNames.length;
+            for (i = 0; i < l; i++) {
+                Utils.attachModRecursively(modNames[i], runtime);
+            }
+        },
+
+        checkModsLoadRecursively: function (modNames, runtime, stack, errorList, cache) {
             // for debug. prevent circular dependency
             stack = stack || [];
             // for efficiency. avoid duplicate non-attach check
@@ -3709,22 +3783,13 @@ var KISSY = (function (undefined) {
                 l = modNames.length,
                 stackDepth = stack.length;
             for (i = 0; i < l; i++) {
-                s = s && Utils.attachModRecursively(modNames[i], runtime, stack, errorList, cache);
+                s = s && Utils.checkModLoadRecursively(modNames[i], runtime, stack, errorList, cache);
                 stack.length = stackDepth;
             }
-            return s;
+            return !!s;
         },
 
-        /**
-         * attach module and its dependency modules recursively
-         * @param {String} modName module name
-         * @param runtime Module container, such as KISSY
-         * @param {String[]} [stack] stack for detecting circular dependency
-         * @param {Array} [errorList] errors when attach mods
-         * @param {Object} [cache] cached modules to avoid duplicate check
-         * @returns whether success attach all modules
-         */
-        attachModRecursively: function (modName, runtime, stack, errorList, cache) {
+        checkModLoadRecursively: function (modName, runtime, stack, errorList, cache) {
             var mods = runtime.Env.mods,
                 status,
                 m = mods[modName];
@@ -3732,64 +3797,108 @@ var KISSY = (function (undefined) {
                 return cache[modName];
             }
             if (!m) {
-                return cache[modName] = 0;
+                cache[modName] = FALSE;
+                return FALSE;
             }
             status = m.status;
-            if (status == ATTACHED) {
-                return cache[modName] = 1;
-            }
-            if (status == ERROR) {
+            if (status === ERROR) {
                 errorList.push(m);
+                cache[modName] = FALSE;
+                return FALSE;
             }
-            if (status != LOADED) {
-                return cache[modName] = 0;
+            if (status >= READY_TO_ATTACH) {
+                cache[modName] = TRUE;
+                return TRUE;
+            }
+            if (status !== LOADED) {
+                cache[modName] = FALSE;
+                return FALSE;
             }
             if ('@DEBUG@') {
                 if (S.inArray(modName, stack)) {
-                    stack.push(modName);
-                    S.error('find cyclic dependency between mods: ' + stack);
-                    return cache[modName] = 0;
+                    S.log('find cyclic dependency between mods: ' + stack, 'warn');
+                    cache[modName] = TRUE;
+                    return TRUE;
                 }
                 stack.push(modName);
             }
-            if (Utils.attachModsRecursively(m.getNormalizedRequires(),
+
+            if (Utils.checkModsLoadRecursively(m.getNormalizedRequires(),
                 runtime, stack, errorList, cache)) {
-                Utils.attachMod(runtime, m);
-                return cache[modName] = 1;
+                m.status = READY_TO_ATTACH;
+                cache[modName] = TRUE;
+                return TRUE;
             }
-            return cache[modName] = 0;
+
+            cache[modName] = FALSE;
+            return FALSE;
         },
 
         /**
-         * Attach specified mod.
+         * attach module and its dependency modules recursively
+         * @param {String} modName module name
          * @param runtime Module container, such as KISSY
-         * @param {KISSY.Loader.Module} mod module instance
          */
-        attachMod: function (runtime, mod) {
-            if (mod.status != LOADED) {
+        attachModRecursively: function (modName, runtime) {
+            var mods = runtime.Env.mods,
+                status,
+                m = mods[modName];
+            status = m.status;
+            // attached or circular dependency
+            if (status >= ATTACHING) {
                 return;
             }
-
-            var fn = mod.fn;
-
-            if (typeof fn === 'function') {
-                // 需要解开 index，相对路径
-                // 但是需要保留 alias，防止值不对应
-                mod.value = fn.apply(mod, Utils.getModules(runtime, mod.getRequiresWithAlias()));
+            m.status = ATTACHING;
+            if (m.cjs) {
+                // commonjs format will call require in module code again
+                Utils.attachMod(runtime, m);
             } else {
-                mod.value = fn;
+                Utils.attachModsRecursively(m.getNormalizedRequires(), runtime);
+                Utils.attachMod(runtime, m);
             }
-
-            mod.status = ATTACHED;
         },
 
         /**
-         * Get mod names as array.
+         * Attach specified module.
+         * @param runtime Module container, such as KISSY
+         * @param {KISSY.Loader.Module} module module instance
+         */
+        attachMod: function (runtime, module) {
+            var factory = module.factory,
+                exports;
+
+            if (typeof factory === 'function') {
+                // compatible and efficiency
+                // KISSY.add(function(S,undefined){})
+                var require;
+                if (module.requires && module.requires.length) {
+                    require = S.bind(module.require, module);
+                }
+                // 需要解开 index，相对路径
+                // 但是需要保留 alias，防止值不对应
+                //noinspection JSUnresolvedFunction
+                exports = factory.apply(module,
+                    // KISSY.add(function(S){module.require}) lazy initialize
+                    (module.cjs ? [runtime, require, module.exports, module] : Utils.getModules(runtime, module.getRequiresWithAlias())));
+                if (exports !== undefined) {
+                    //noinspection JSUndefinedPropertyAssignment
+                    module.exports = exports;
+                }
+            } else {
+                //noinspection JSUndefinedPropertyAssignment
+                module.exports = factory;
+            }
+
+            module.status = ATTACHED;
+        },
+
+        /**
+         * Get module names as array.
          * @param {String|String[]} modNames module names array or  module names string separated by ','
          * @return {String[]}
          */
         getModNamesAsArray: function (modNames) {
-            if (typeof modNames == 'string') {
+            if (typeof modNames === 'string') {
                 modNames = modNames.replace(/\s+/g, '').split(',');
             }
             return modNames;
@@ -3814,8 +3923,8 @@ var KISSY = (function (undefined) {
         /**
          * unalias module name.
          * @param runtime Module container, such as KISSY
-         * @param {String} names moduleNames
-         * @return {String[]} unaliased module names
+         * @param {String|String[]} names moduleNames
+         * @return {String[]} unalias module names
          */
         unalias: function (runtime, names) {
             var ret = [].concat(names),
@@ -3824,18 +3933,22 @@ var KISSY = (function (undefined) {
                 alias,
                 ok = 0,
                 j,
-                mods = runtime['Env'].mods;
+                mods = runtime.Env.mods;
             while (!ok) {
                 ok = 1;
                 for (i = ret.length - 1; i >= 0; i--) {
-                    if ((m = mods[ret[i]]) && (alias = m.alias)) {
+                    if ((m = mods[ret[i]]) && ('alias' in m)) {
                         ok = 0;
+                        alias = m.alias;
+                        if (typeof alias === 'string') {
+                            alias = [alias];
+                        }
                         for (j = alias.length - 1; j >= 0; j--) {
                             if (!alias[j]) {
                                 alias.splice(j, 1);
                             }
                         }
-                        ret.splice.apply(ret, [i, 1].concat(indexMap(alias)));
+                        ret.splice.apply(ret, [i, 1].concat(addIndexAndRemoveJsExt(alias)));
                     }
                 }
             }
@@ -3857,7 +3970,7 @@ var KISSY = (function (undefined) {
                     // conditional loader
                     // requires:[window.localStorage?"local-storage":""]
                     if (modNames[i]) {
-                        ret.push(pluginAlias(runtime, indexMap(modNames[i])));
+                        ret.push(pluginAlias(runtime, addIndexAndRemoveJsExt(modNames[i])));
                     }
                 }
             }
@@ -3872,16 +3985,16 @@ var KISSY = (function (undefined) {
          * register module with factory
          * @param runtime Module container, such as KISSY
          * @param {String} name module name
-         * @param {Function|*} fn module's factory or value
+         * @param {Function|*} factory module's factory or exports
          * @param [config] module config, such as dependency
          */
-        registerModule: function (runtime, name, fn, config) {
-            name = indexMapStr(name);
+        registerModule: function (runtime, name, factory, config) {
+            name = addIndexAndRemoveJsExtFromName(name);
 
             var mods = runtime.Env.mods,
-                mod = mods[name];
+                module = mods[name];
 
-            if (mod && mod.fn) {
+            if (module && module.factory !== undefined) {
                 S.log(name + ' is defined more than once', 'warn');
                 return;
             }
@@ -3889,55 +4002,58 @@ var KISSY = (function (undefined) {
             // 没有 use，静态载入的 add 可能执行
             Utils.createModuleInfo(runtime, name);
 
-            mod = mods[name];
+            module = mods[name];
 
-            // 注意：通过 S.add(name[, fn[, config]]) 注册的代码，无论是页面中的代码，
+            // 注意：通过 S.add(name[, factory[, config]]) 注册的代码，无论是页面中的代码，
             // 还是 js 文件里的代码，add 执行时，都意味着该模块已经 LOADED
-            S.mix(mod, {
+            S.mix(module, {
                 name: name,
                 status: LOADED,
-                fn: fn
+                factory: factory
             });
 
-            S.mix(mod, config);
+            S.mix(module, config);
         },
 
         /**
-         * Get mapped path.
-         * @param runtime Module container, such as KISSY
-         * @param {String} path module path
-         * @param [rules] map rules
-         * @return {String} mapped path
+         * Returns hash code of a string djb2 algorithm
+         * @param {String} str
+         * @returns {String} hash code
          */
-        getMappedPath: function (runtime, path, rules) {
-            var mappedRules = rules ||
-                    runtime.Config.mappedRules ||
-                    [],
-                i,
-                m,
-                rule;
-            for (i = 0; i < mappedRules.length; i++) {
-                rule = mappedRules[i];
-                if (m = path.match(rule[0])) {
-                    return path.replace(rule[0], rule[1]);
-                }
+        getHash: function (str) {
+            var hash = 5381,
+                i;
+            for (i = str.length; --i > -1;) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                /* hash * 33 + char */
             }
-            return path;
+            return hash + '';
+        },
+
+        getRequiresFromFn: function (fn) {
+            var requires = [];
+            // Remove comments from the callback string,
+            // look for require calls, and pull them into the dependencies,
+            // but only if there are function args.
+            fn.toString()
+                .replace(commentRegExp, '')
+                .replace(requireRegExp, function (match, dep) {
+                    requires.push(getRequireVal(dep));
+                });
+            return requires;
         }
     });
 
-    function isStatus(runtime, modNames, status) {
-        var mods = runtime.Env.mods,
-            mod,
-            i;
-        modNames = S.makeArray(modNames);
-        for (i = 0; i < modNames.length; i++) {
-            mod = mods[modNames[i]];
-            if (!mod || mod.status !== status) {
-                return 0;
-            }
+    var commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
+        requireRegExp = /[^.'"]\s*require\s*\(([^)]+)\)/g;
+
+    function getRequireVal(str) {
+        var m;
+        // simple string
+        if (!(m = str.match(/^\s*["']([^'"\s]+)["']\s*$/))) {
+            S.error('can not find required mod in require call: ' + str);
         }
-        return 1;
+        return  m[1];
     }
 })(KISSY);/**
  * @ignore
@@ -3965,7 +4081,9 @@ var KISSY = (function (undefined) {
         S.mix(this, cfg);
     }
 
-    S.augment(Package, {
+    Package.prototype = {
+        constructor: Package,
+
         reset: function (cfg) {
             S.mix(this, cfg);
         },
@@ -3997,7 +4115,7 @@ var KISSY = (function (undefined) {
 
         getPrefixUriForCombo: function () {
             var self = this,
-                packageName = self.getName();
+                packageName = self.name;
             return self.getBase() + (
                 packageName && !self.isIgnorePackageNameInUri() ?
                     (packageName + '/') :
@@ -4010,10 +4128,10 @@ var KISSY = (function (undefined) {
          */
         getPackageUri: function () {
             var self = this;
-            if (self.packageUri) {
-                return self.packageUri;
+            if (!self.packageUri) {
+                self.packageUri = new S.Uri(this.getPrefixUriForCombo());
             }
-            return self.packageUri = new S.Uri(this.getPrefixUriForCombo());
+            return self.packageUri;
         },
 
         /**
@@ -4063,7 +4181,7 @@ var KISSY = (function (undefined) {
         getGroup: function () {
             return forwardSystemPackage(this, 'group');
         }
-    });
+    };
 
     Loader.Package = Package;
 
@@ -4073,12 +4191,70 @@ var KISSY = (function (undefined) {
      * This class should not be instantiated manually.
      */
     function Module(cfg) {
-        this.status = Loader.Status.INIT;
-        S.mix(this, cfg);
-        this.waitedCallbacks = [];
+        var module = this;
+        /**
+         * exports of this module
+         */
+        module.exports = {};
+
+        /**
+         * status of current modules
+         */
+        module.status = Loader.Status.INIT;
+
+        /**
+         * name of this module
+         */
+        module.name = undefined;
+        /**
+         * factory of this module
+         */
+        module.factory = undefined;
+        // lazy initialize and commonjs module format
+        module.cjs = 1;
+        S.mix(module, cfg);
+        module.waitedCallbacks = [];
     }
 
-    S.augment(Module, {
+    Module.prototype = {
+        kissy: 1,
+
+        constructor: Module,
+
+        /**
+         * resolve module by name.
+         * @param {String|String[]} relativeName relative module's name
+         * @param {Function|Object} fn KISSY.use callback
+         * @returns {String} resolved module name
+         */
+        'use': function (relativeName, fn) {
+            relativeName = Utils.getModNamesAsArray(relativeName);
+            return KISSY.use(Utils.normalDepModuleName(this.name, relativeName), fn);
+        },
+
+        /**
+         * resolve path
+         * @param {String} relativePath relative path
+         * @returns {KISSY.Uri} resolve uri
+         */
+        'resolve': function (relativePath) {
+            return this.getFullPathUri().resolve(relativePath);
+        },
+
+        // use by xtemplate include
+        'resolveByName': function (relativeName) {
+            return Utils.normalDepModuleName(this.name, relativeName);
+        },
+
+        /**
+         * require other modules from current modules
+         * @param {String} moduleName name of module to be required
+         * @returns {*} required module exports
+         */
+        require: function (moduleName) {
+            return S.require(moduleName, this.name);
+        },
+
         wait: function (callback) {
             this.waitedCallbacks.push(callback);
         },
@@ -4092,20 +4268,14 @@ var KISSY = (function (undefined) {
                 try {
                     callback(this);
                 } catch (e) {
+                    S.log(e.stack || e, 'error');
+                    /*jshint loopfunc:true*/
                     setTimeout(function () {
                         throw e;
                     }, 0);
                 }
             }
             this.waitedCallbacks = [];
-        },
-
-        /**
-         * Set the value of current module
-         * @param v value to be set
-         */
-        'setValue': function (v) {
-            this.value = v;
         },
 
         /**
@@ -4116,7 +4286,7 @@ var KISSY = (function (undefined) {
             var self = this,
                 v = self.type;
             if (!v) {
-                if (Path.extname(self.name).toLowerCase() == '.css') {
+                if (Path.extname(self.name).toLowerCase() === '.css') {
                     v = 'css';
                 } else {
                     v = 'js';
@@ -4139,6 +4309,7 @@ var KISSY = (function (undefined) {
                 packageName,
                 path;
             if (!self.fullPathUri) {
+                // fullpath can be specified
                 if (self.fullpath) {
                     fullPathUri = new S.Uri(self.fullpath);
                 } else {
@@ -4148,11 +4319,11 @@ var KISSY = (function (undefined) {
                     // #262
                     if (packageInfo.isIgnorePackageNameInUri() &&
                         // native mod does not allow ignore package name
-                        (packageName = packageInfo.getName())) {
+                        (packageName = packageInfo.name)) {
                         path = Path.relative(packageName, path);
                     }
                     fullPathUri = packageBaseUri.resolve(path);
-                    if (t = self.getTag()) {
+                    if ((t = self.getTag())) {
                         t += '.' + self.getType();
                         fullPathUri.query.set('t', t);
                     }
@@ -4171,7 +4342,7 @@ var KISSY = (function (undefined) {
                 fullPathUri;
             if (!self.fullpath) {
                 fullPathUri = self.getFullPathUri();
-                self.fullpath = Utils.getMappedPath(self.runtime, fullPathUri.toString());
+                self.fullpath = fullPathUri.toString();
             }
             return self.fullpath;
         },
@@ -4182,16 +4353,7 @@ var KISSY = (function (undefined) {
          */
         getPath: function () {
             var self = this;
-            return self.path ||
-                (self.path = defaultComponentJsName(self))
-        },
-
-        /**
-         * Get the value of current module
-         * @return {*}
-         */
-        getValue: function () {
-            return this.value;
+            return self.path || (self.path = defaultComponentJsName(self));
         },
 
         /**
@@ -4232,22 +4394,14 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         * Get module objects required by this module
-         * @return {KISSY.Loader.Module[]}
+         * get alias required module names
+         * @returns {String[]} alias required module names
          */
-        'getRequiredMods': function () {
-            var self = this,
-                runtime = self.runtime;
-            return S.map(self.getNormalizedRequires(), function (r) {
-                return Utils.createModuleInfo(runtime, r);
-            });
-        },
-
         getRequiresWithAlias: function () {
             var self = this,
                 requiresWithAlias = self.requiresWithAlias,
                 requires = self.requires;
-            if (!requires || requires.length == 0) {
+            if (!requires || requires.length === 0) {
                 return requires || [];
             } else if (!requiresWithAlias) {
                 self.requiresWithAlias = requiresWithAlias =
@@ -4257,8 +4411,20 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         * Get module names required by this module
+         * Get module objects required by this module
          * @return {KISSY.Loader.Module[]}
+         */
+        getRequiredMods: function () {
+            var self = this,
+                runtime = self.runtime;
+            return S.map(self.getNormalizedRequires(), function (r) {
+                return Utils.createModuleInfo(runtime, r);
+            });
+        },
+
+        /**
+         * Get module names required by this module
+         * @return {String[]}
          */
         getNormalizedRequires: function () {
             var self = this,
@@ -4266,19 +4432,19 @@ var KISSY = (function (undefined) {
                 normalizedRequiresStatus = self.normalizedRequiresStatus,
                 status = self.status,
                 requires = self.requires;
-            if (!requires || requires.length == 0) {
+            if (!requires || requires.length === 0) {
                 return requires || [];
             } else if ((normalizedRequires = self.normalizedRequires) &&
                 // 事先声明的依赖不能当做 loaded 状态下真正的依赖
-                (normalizedRequiresStatus == status)) {
+                (normalizedRequiresStatus === status)) {
                 return normalizedRequires;
             } else {
                 self.normalizedRequiresStatus = status;
-                return self.normalizedRequires =
-                    Utils.normalizeModNames(self.runtime, requires, self.name);
+                self.normalizedRequires = Utils.normalizeModNames(self.runtime, requires, self.name);
+                return self.normalizedRequires;
             }
         }
-    });
+    };
 
     Loader.Module = Module;
 
@@ -4319,15 +4485,15 @@ var KISSY = (function (undefined) {
  * @author yiminghe@gmail.com
  */
 (function (S) {
+    var   logger = S.getLogger('s/loader/getScript');
     var CSS_POLL_INTERVAL = 30,
         UA = S.UA,
-        logger = S.getLogger('s/loader/getScript'),
+
         Utils = S.Loader.Utils,
     // central poll for link node
         timer = 0,
-        monitors = {
-            // node.id:{callback:callback,node:node}
-        };
+    // node.id:{callback:callback,node:node}
+        monitors = {};
 
     function startCssTimer() {
         if (!timer) {
@@ -4340,13 +4506,13 @@ var KISSY = (function (undefined) {
         var loaded = 0;
         if (UA.webkit) {
             // http://www.w3.org/TR/Dom-Level-2-Style/stylesheets.html
-            if (node['sheet']) {
+            if (node.sheet) {
                 logger.debug('webkit css poll loaded: ' + url);
                 loaded = 1;
             }
-        } else if (node['sheet']) {
+        } else if (node.sheet) {
             try {
-                var cssRules = node['sheet'].cssRules;
+                var cssRules = node.sheet.cssRules;
                 if (cssRules) {
                     logger.debug('same domain css poll loaded: ' + url);
                     loaded = 1;
@@ -4357,7 +4523,7 @@ var KISSY = (function (undefined) {
                 // http://www.w3.org/TR/dom/#dom-domexception-code
                 if (// exName == 'SecurityError' ||
                 // for old firefox
-                    exName == 'NS_ERROR_DOM_SECURITY_ERR') {
+                    exName === 'NS_ERROR_DOM_SECURITY_ERR') {
                     logger.debug('css poll exception: ' + exName + 'loaded : ' + url);
                     loaded = 1;
                 }
@@ -4476,11 +4642,11 @@ var KISSY = (function (undefined) {
         }
 
         if (S.isPlainObject(config)) {
-            success = config['success'];
-            error = config['error'];
-            timeout = config['timeout'];
-            charset = config['charset'];
-            attrs = config['attrs'];
+            success = config.success;
+            error = config.error;
+            timeout = config.timeout;
+            charset = config.charset;
+            attrs = config.attrs;
         }
 
         callbacks = jsCssCallbacks[url] = jsCssCallbacks[url] || [];
@@ -4524,7 +4690,7 @@ var KISSY = (function (undefined) {
                 fn;
             clearTimer();
             S.each(jsCssCallbacks[url], function (callback) {
-                if (fn = callback[index]) {
+                if ((fn = callback[index])) {
                     fn.call(node);
                 }
             });
@@ -4537,7 +4703,7 @@ var KISSY = (function (undefined) {
         // https://bugzilla.mozilla.org/show_bug.cgi?id=185236
         // https://developer.mozilla.org/en/HTML/Element/link#Stylesheet_load_events
         // phantomjs 1.7 == webkit 534.34
-        var forceCssPoll = S.Config['forceCssPoll'] || (UA.webkit && UA.webkit < 536);
+        var forceCssPoll = S.Config.forceCssPoll || (UA.webkit && UA.webkit < 536);
 
         if (css && forceCssPoll && useNative) {
             useNative = false;
@@ -4546,8 +4712,8 @@ var KISSY = (function (undefined) {
         function onload() {
             var readyState = node.readyState;
             if (!readyState ||
-                readyState == "loaded" ||
-                readyState == "complete") {
+                readyState === 'loaded' ||
+                readyState === 'complete') {
                 node.onreadystatechange = node.onload = null;
                 end(0);
             }
@@ -4612,27 +4778,11 @@ var KISSY = (function (undefined) {
         configFns = S.Config.fns;
 
     if (!S.UA.nodejs && location && (locationHref = location.href)) {
-        simulatedLocation = new S.Uri(locationHref)
+        simulatedLocation = new S.Uri(locationHref);
     }
 
     S.Config.loadModsFn = function (rs, config) {
         S.getScript(rs.fullpath, config);
-    };
-
-    configFns.map = function (rules) {
-        var Config = this.Config;
-        if (rules === false) {
-            return Config.mappedRules = [];
-        }
-        return Config.mappedRules = (Config.mappedRules || []).concat(rules || []);
-    };
-
-    configFns.mapCombo = function (rules) {
-        var Config = this.Config;
-        if (rules === false) {
-            return Config.mappedComboRules = [];
-        }
-        return Config.mappedComboRules = (Config.mappedComboRules || []).concat(rules || []);
     };
 
     configFns.packages = function (config) {
@@ -4643,7 +4793,6 @@ var KISSY = (function (undefined) {
             S.each(config, function (cfg, key) {
                 // 兼容数组方式
                 name = cfg.name || key;
-
                 // 兼容 path
                 var baseUri = normalizeBase(cfg.base || cfg.path);
 
@@ -4660,8 +4809,7 @@ var KISSY = (function (undefined) {
             });
             return undefined;
         } else if (config === false) {
-            Config.packages = {
-            };
+            Config.packages = {};
             return undefined;
         } else {
             return ps;
@@ -4674,7 +4822,7 @@ var KISSY = (function (undefined) {
             S.each(modules, function (modCfg, modName) {
                 var mod = Utils.createModuleInfo(self, modName, modCfg);
                 // #485, invalid after add
-                if (mod.status == Loader.Status.INIT) {
+                if (mod.status === Loader.Status.INIT) {
                     S.mix(mod, modCfg);
                 }
             });
@@ -4697,7 +4845,7 @@ var KISSY = (function (undefined) {
     function normalizeBase(base) {
         var baseUri;
         base = base.replace(/\\/g, '/');
-        if (base.charAt(base.length - 1) != '/') {
+        if (base.charAt(base.length - 1) !== '/') {
             base += '/';
         }
         if (simulatedLocation) {
@@ -4720,7 +4868,7 @@ var KISSY = (function (undefined) {
  */
 (function (S, undefined) {
     // ie11 is a new one!
-    var oldIE = S.UA.ie && S.UA.ie < 10;
+    var oldIE = S.UA.ieMode < 10;
 
     function loadScripts(runtime, rss, callback, charset, timeout) {
         var count = rss && rss.length,
@@ -4742,7 +4890,7 @@ var KISSY = (function (undefined) {
                     if (mod && currentMod) {
                         // standard browser(except ie9) fire load after KISSY.add immediately
                         logger.debug('standard browser get mod name after load : ' + mod.name);
-                        Utils.registerModule(runtime, mod.name, currentMod.fn, currentMod.config);
+                        Utils.registerModule(runtime, mod.name, currentMod.factory, currentMod.config);
                         currentMod = undefined;
                     }
                     complete();
@@ -4755,7 +4903,7 @@ var KISSY = (function (undefined) {
             };
             if (!rs.combine) {
                 mod = rs.mods[0];
-                if (mod.getType() == 'css') {
+                if (mod.getType() === 'css') {
                     mod = undefined;
                 }
                 else if (oldIE) {
@@ -4770,15 +4918,17 @@ var KISSY = (function (undefined) {
         });
     }
 
+    var logger = S.getLogger('s/loader');
     var Loader = S.Loader,
-        logger = S.getLogger('s/loader'),
+
         Status = Loader.Status,
         Utils = Loader.Utils,
+        getHash = Utils.getHash,
         LOADING = Status.LOADING,
         LOADED = Status.LOADED,
+        READY_TO_ATTACH = Status.READY_TO_ATTACH,
         ERROR = Status.ERROR,
-        groupTag = S.now(),
-        ATTACHED = Status.ATTACHED;
+        groupTag = S.now();
 
     ComboLoader.groupTag = groupTag;
 
@@ -4800,32 +4950,63 @@ var KISSY = (function (undefined) {
     var startLoadModName;
     var startLoadModTime;
 
-    ComboLoader.add = function (name, fn, config, runtime) {
-        if (typeof name === 'function') {
-            config = fn;
-            fn = name;
+    function checkKISSYRequire(config, factory) {
+        // use require primitive statement
+        // function(S,require){require('node')}
+        if (!config && typeof factory === 'function' && factory.length > 1) {
+            var requires = Utils.getRequiresFromFn(factory);
+            if (requires.length) {
+                config = config || {};
+                config.requires = requires;
+            }
+        } else {
+            // KISSY.add(function(){},{requires:[]})
+            if (config && config.requires && !config.cjs) {
+                config.cjs = 0;
+            }
+        }
+        return config;
+    }
+
+    ComboLoader.add = function (name, factory, config, runtime, argsLen) {
+        // KISSY.add('xx',[],function(){});
+        if (argsLen === 3 && S.isArray(factory)) {
+            var tmp = factory;
+            factory = config;
+            config = {
+                requires: tmp,
+                cjs: 1
+            };
+        }
+        // KISSY.add(function(){}), KISSY.add('a'), KISSY.add(function(){},{requires:[]})
+        if (typeof name === 'function' || argsLen === 1) {
+            config = factory;
+            factory = name;
+            config = checkKISSYRequire(config, factory);
             if (oldIE) {
                 // http://groups.google.com/group/commonjs/browse_thread/thread/5a3358ece35e688e/43145ceccfb1dc02#43145ceccfb1dc02
                 name = findModuleNameByInteractive();
                 // S.log('oldIE get modName by interactive: ' + name);
-                Utils.registerModule(runtime, name, fn, config);
+                Utils.registerModule(runtime, name, factory, config);
                 startLoadModName = null;
                 startLoadModTime = 0;
             } else {
                 // 其他浏览器 onload 时，关联模块名与模块定义
                 currentMod = {
-                    fn: fn,
+                    factory: factory,
                     config: config
                 };
             }
         } else {
+            // KISSY.add('x',function(){},{requires:[]})
             if (oldIE) {
                 startLoadModName = null;
                 startLoadModTime = 0;
             } else {
                 currentMod = undefined;
             }
-            Utils.registerModule(runtime, name, fn, config);
+            config = checkKISSYRequire(config, factory);
+            Utils.registerModule(runtime, name, factory, config);
         }
     };
 
@@ -4840,7 +5021,7 @@ var KISSY = (function (undefined) {
 
         for (i = scripts.length - 1; i >= 0; i--) {
             script = scripts[i];
-            if (script.readyState == 'interactive') {
+            if (script.readyState === 'interactive') {
                 re = script;
                 break;
             }
@@ -4864,7 +5045,7 @@ var KISSY = (function (undefined) {
         S.each(rss, function (rs) {
             var ms = [];
             S.each(rs.mods, function (m) {
-                if (m.status == LOADED) {
+                if (m.status === LOADED) {
                     ms.push(m.name);
                 }
             });
@@ -4884,18 +5065,6 @@ var KISSY = (function (undefined) {
             }
         }
         return str1.slice(0, i).join('/') + '/';
-    }
-
-
-    // Returns hash code of a stringdjb2 algorithm
-    function getHash(str) {
-        var hash = 5381,
-            i;
-        for (i = str.length; --i > -1;) {
-            hash = ((hash << 5) + hash) + str.charCodeAt(i);
-            /* hash * 33 + char */
-        }
-        return hash + '';
     }
 
     S.augment(ComboLoader, {
@@ -4924,7 +5093,7 @@ var KISSY = (function (undefined) {
 
                     S.each(success, function (one) {
                         S.each(one.mods, function (mod) {
-                            Utils.registerModule(runtime, mod.getName(), S.noop);
+                            Utils.registerModule(runtime, mod.name, S.noop);
                             // notify all loader instance
                             mod.notifyAll();
                         });
@@ -4945,7 +5114,7 @@ var KISSY = (function (undefined) {
             });
 
             // jss css download in parallel
-            S.each(comboUrls['js'], function (jsOne) {
+            S.each(comboUrls.js, function (jsOne) {
                 loadScripts(runtime, jsOne, function (success) {
                     if ('@DEBUG@') {
                         debugRemoteModules(success);
@@ -4955,7 +5124,7 @@ var KISSY = (function (undefined) {
                         S.each(one.mods, function (mod) {
                             // fix #111
                             // https://github.com/kissyteam/kissy/issues/111
-                            if (!mod.fn) {
+                            if (!mod.factory) {
                                 var msg = mod.name +
                                     ' is not loaded! can not find module in path : ' +
                                     one.fullpath;
@@ -4995,17 +5164,18 @@ var KISSY = (function (undefined) {
                 cache[m] = 1;
                 mod = Utils.createModuleInfo(runtime, m);
                 modStatus = mod.status;
-                if (modStatus === ERROR || modStatus === ATTACHED) {
+                if (modStatus >= READY_TO_ATTACH) {
                     continue;
                 }
-                if (modStatus != LOADED) {
+                if (modStatus !== LOADED) {
                     if (!waitingModules.contains(m)) {
-                        if (modStatus != LOADING) {
+                        if (modStatus !== LOADING) {
                             mod.status = LOADING;
                             ret[m] = 1;
                         }
+                        /*jshint loopfunc:true*/
                         mod.wait(function (mod) {
-                            waitingModules.remove(mod.getName());
+                            waitingModules.remove(mod.name);
                             // notify current loader instance
                             waitingModules.notifyAll();
                         });
@@ -5037,7 +5207,7 @@ var KISSY = (function (undefined) {
                 type = mod.getType();
                 fullpath = mod.getFullPath();
                 packageInfo = mod.getPackage();
-                packageName = packageInfo.getName();
+                packageName = packageInfo.name;
                 charset = packageInfo.getCharset();
                 tag = packageInfo.getTag();
                 group = packageInfo.getGroup();
@@ -5052,7 +5222,7 @@ var KISSY = (function (undefined) {
                     comboName = group + '_' + charset + '_' + groupTag;
 
                     var groupPrefixUri;
-                    if (groupPrefixUri = comboPrefixes[comboName]) {
+                    if ((groupPrefixUri = comboPrefixes[comboName])) {
                         if (groupPrefixUri.isSameOriginAs(packageUri)) {
                             groupPrefixUri.setPath(getCommonPrefix(groupPrefixUri.getPath(),
                                 packageUri.getPath()));
@@ -5073,9 +5243,7 @@ var KISSY = (function (undefined) {
                     mods.charset = charset;
                     mods.tags = [tag]; // [package tag]
                 } else {
-                    if (mods.tags.length == 1 && mods.tags[0] == tag) {
-
-                    } else {
+                    if (!(mods.tags.length === 1 && mods.tags[0] === tag)) {
                         mods.tags.push(tag);
                     }
                 }
@@ -5123,22 +5291,19 @@ var KISSY = (function (undefined) {
                     res.charset = mods.charset;
                     res.mods = [];
 
-                    function pushComboUrl() {
-                        // map the whole combo path
+                    /*jshint loopfunc:true*/
+                    var pushComboUrl = function () {
                         //noinspection JSReferencingMutableVariableFromClosure
                         res.push({
                             combine: 1,
-                            fullpath: Utils.getMappedPath(runtime, prefix +
-                                currentComboUrls.join(comboSep) + suffix,
-                                Config.mappedComboRules),
+                            fullpath: prefix + currentComboUrls.join(comboSep) + suffix,
                             mods: currentComboMods
                         });
-                    }
+                    };
 
                     for (var i = 0; i < mods.length; i++) {
                         var currentMod = mods[i];
                         res.mods.push(currentMod);
-                        // map individual module
                         var fullpath = currentMod.getFullPath();
                         if (!currentMod.canBeCombined) {
                             res.push({
@@ -5189,16 +5354,17 @@ var KISSY = (function (undefined) {
  - three status
  0: initialized
  LOADED: load into page
- ATTACHED: fn executed
+ ATTACHED: factory executed
  *//**
  * @ignore
  * mix loader into KISSY and infer KISSY baseUrl if not set
  * @author yiminghe@gmail.com
  */
 (function (S, undefined) {
+    var    logger = S.getLogger('s/loader');
     var Loader = S.Loader,
         Env = S.Env,
-        logger = S.getLogger('s/loader'),
+
         Utils = Loader.Utils,
         processImmediate = S.setImmediate,
         ComboLoader = Loader.ComboLoader;
@@ -5242,9 +5408,9 @@ var KISSY = (function (undefined) {
          * Registers a module with the KISSY global.
          * @param {String} name module name.
          * it must be set if combine is true in {@link KISSY#config}
-         * @param {Function} fn module definition function that is used to return
-         * this module value
-         * @param {KISSY} fn.S KISSY global instance
+         * @param {Function} factory module definition function that is used to return
+         * exports of this module
+         * @param {KISSY} factory.S KISSY global instance
          * @param {Object} [cfg] module optional config data
          * @param {String[]} cfg.requires this module's required module name list
          * @member KISSY
@@ -5257,8 +5423,8 @@ var KISSY = (function (undefined) {
          *          requires:['xx']
          *      });
          */
-        add: function (name, fn, cfg) {
-            ComboLoader.add(name, fn, cfg, S);
+        add: function (name, factory, cfg) {
+            ComboLoader.add(name, factory, cfg, S, arguments.length);
         },
         /**
          * Attached one or more modules to global KISSY instance.
@@ -5266,7 +5432,7 @@ var KISSY = (function (undefined) {
          * @param {Function} success callback function executed
          * when KISSY has the required functionality.
          * @param {KISSY} success.S KISSY instance
-         * @param success.x... used module values
+         * @param success.x... modules exports
          * @member KISSY
          *
          *
@@ -5279,6 +5445,7 @@ var KISSY = (function (undefined) {
                 error,
                 sync,
                 tryCount = 0,
+                finalSuccess,
                 waitingModules = new WaitingModules(loadReady);
 
             if (S.isPlainObject(success)) {
@@ -5290,6 +5457,10 @@ var KISSY = (function (undefined) {
                 success = success.success;
             }
 
+            finalSuccess = function () {
+                success.apply(S, Utils.getModules(S, modNames));
+            };
+
             modNames = Utils.getModNamesAsArray(modNames);
             modNames = Utils.normalizeModNamesWithAlias(S, modNames);
 
@@ -5300,17 +5471,16 @@ var KISSY = (function (undefined) {
                 var errorList = [],
                     start = S.now(),
                     ret;
-                ret = Utils.attachModsRecursively(normalizedModNames, S, undefined, errorList);
+                ret = Utils.checkModsLoadRecursively(normalizedModNames, S, undefined, errorList);
                 logger.debug(tryCount + ' check duration ' + (S.now() - start));
                 if (ret) {
+                    Utils.attachModsRecursively(normalizedModNames, S);
                     if (success) {
                         if (sync) {
-                            success.apply(S, Utils.getModules(S, modNames));
+                            finalSuccess();
                         } else {
                             // standalone error trace
-                            processImmediate(function () {
-                                success.apply(S, Utils.getModules(S, modNames));
-                            });
+                            processImmediate(finalSuccess);
                         }
                     }
                 } else if (errorList.length) {
@@ -5346,17 +5516,18 @@ var KISSY = (function (undefined) {
         },
 
         /**
-         * get module value from KISSY module cache
+         * get module exports from KISSY module cache
          * @param {String} moduleName module name
+         * @param {String} refName internal usage
          * @member KISSY
-         * @return {*} value of module which name is moduleName
+         * @return {*} exports of specified module
          */
-        require: function (moduleName) {
-            var moduleNames = Utils.unalias(S, Utils.normalizeModNamesWithAlias(S, [moduleName]));
-            if (Utils.attachModsRecursively(moduleNames, S)) {
+        require: function (moduleName, refName) {
+            if (moduleName) {
+                var moduleNames = Utils.unalias(S, Utils.normalizeModNamesWithAlias(S, [moduleName], refName));
+                Utils.attachModsRecursively(moduleNames, S);
                 return Utils.getModules(S, moduleNames)[1];
             }
-            return undefined;
         }
     });
 
@@ -5373,9 +5544,14 @@ var KISSY = (function (undefined) {
  */
 (function (S) {
     var doc = S.Env.host && S.Env.host.document;
-    var logger = S.getLogger('s/loader');
+    // var logger = S.getLogger('s/loader');
+    var Utils = S.Loader.Utils;
+    var TIMESTAMP = '20131209235315';
+    var defaultComboPrefix = '??';
+    var defaultComboSep = ',';
 
     function returnJson(s) {
+        /*jshint evil:true*/
         return (new Function('return ' + s))();
     }
 
@@ -5398,21 +5574,21 @@ var KISSY = (function (undefined) {
             baseInfo = {};
         }
 
-        var comboPrefix = baseInfo.comboPrefix = baseInfo.comboPrefix || '??';
-        var comboSep = baseInfo.comboSep = baseInfo.comboSep || ',';
+        var comboPrefix = baseInfo.comboPrefix || defaultComboPrefix;
+        var comboSep = baseInfo.comboSep || defaultComboSep;
 
         var parts ,
             base,
             index = src.indexOf(comboPrefix);
 
         // no combo
-        if (index == -1) {
+        if (index === -1) {
             base = src.replace(baseReg, '$1');
         } else {
             base = src.substring(0, index);
             // a.tbcdn.cn??y.js, ie does not insert / after host
             // a.tbcdn.cn/combo? comboPrefix=/combo?
-            if (base.charAt(base.length - 1) != '/') {
+            if (base.charAt(base.length - 1) !== '/') {
                 base += '/';
             }
             parts = src.substring(index + comboPrefix.length).split(comboSep);
@@ -5425,9 +5601,18 @@ var KISSY = (function (undefined) {
             });
         }
 
-        return S.mix({
-            base: base
-        }, baseInfo);
+        if (!('tag' in baseInfo)) {
+            var queryIndex = src.lastIndexOf('?');
+            if (queryIndex !== -1) {
+                var query = src.substring(queryIndex + 1);
+                // kissy 's tag will be determined by build time and user specified tag
+                baseInfo.tag = Utils.getHash(TIMESTAMP + query);
+            }
+        }
+
+        baseInfo.base = baseInfo.base || base;
+
+        return baseInfo;
     }
 
     /**
@@ -5449,19 +5634,21 @@ var KISSY = (function (undefined) {
             info;
 
         for (i = scripts.length - 1; i >= 0; i--) {
-            if (info = getBaseInfoFromOneScript(scripts[i])) {
+            if ((info = getBaseInfoFromOneScript(scripts[i]))) {
                 return info;
             }
         }
 
-        S.log('must load kissy by file name in browser environment: seed.js or seed-min.js','error');
+        S.log('must load kissy by file name in browser environment: seed.js or seed-min.js', 'error');
         return null;
     }
 
     S.config({
+        comboPrefix: defaultComboPrefix,
+        comboSep: defaultComboSep,
         charset: 'utf-8',
         lang: 'zh-cn',
-        tag: '20131105150616'
+        tag: TIMESTAMP
     });
 
     if (S.UA.nodejs) {
@@ -5469,6 +5656,7 @@ var KISSY = (function (undefined) {
         // noinspection JSUnresolvedVariable
         S.config({
             charset: 'utf-8',
+            /*global __dirname*/
             base: __dirname.replace(/\\/g, '/').replace(/\/$/, '') + '/'
         });
         // ejecta
@@ -5496,10 +5684,11 @@ KISSY.add('i18n', {
  * @author lifesinger@gmail.com, yiminghe@gmail.com
  */
 (function (S, undefined) {
+    var logger = S.getLogger('s/web');
     var win = S.Env.host,
-        logger = S.getLogger('s/web'),
+
         UA = S.UA,
-        doc = win['document'],
+        doc = win.document,
         docElem = doc && doc.documentElement,
         location = win.location,
         EMPTY = '',
@@ -5534,6 +5723,8 @@ KISSY.add('i18n', {
          * @member KISSY
          */
         isWindow: function (obj) {
+            // must use == for ie8
+            /*jshint eqeqeq:false*/
             return obj != null && obj == obj.window;
         },
 
@@ -5550,9 +5741,10 @@ KISSY.add('i18n', {
             var xml;
             try {
                 // Standard
-                if (win['DOMParser']) {
+                if (win.DOMParser) {
                     xml = new DOMParser().parseFromString(data, 'text/xml');
                 } else { // IE
+                    /*global ActiveXObject*/
                     xml = new ActiveXObject('Microsoft.XMLDOM');
                     xml.async = false;
                     xml.loadXML(data);
@@ -5576,9 +5768,14 @@ KISSY.add('i18n', {
             if (data && RE_NOT_WHITESPACE.test(data)) {
                 // http://weblogs.java.net/blog/driscoll/archive/2009/09/08/eval-javascript-global-context
                 // http://msdn.microsoft.com/en-us/library/ie/ms536420(v=vs.85).aspx always return null
-                ( win.execScript || function (data) {
-                    win[ 'eval' ].call(win, data);
-                } )(data);
+                /*jshint evil:true*/
+                if (win.execScript) {
+                    win.execScript(data);
+                } else {
+                    (function (data) {
+                        win.eval.call(win, data);
+                    })(data);
+                }
             }
         },
 
@@ -5593,6 +5790,7 @@ KISSY.add('i18n', {
                 try {
                     fn(S);
                 } catch (e) {
+                    S.log(e.stack || e, 'error');
                     setTimeout(function () {
                         throw e;
                     }, 0);
@@ -5639,6 +5837,8 @@ KISSY.add('i18n', {
             try {
                 callbacks[i](S);
             } catch (e) {
+                S.log(e.stack || e, 'error');
+                /*jshint loopfunc:true*/
                 setTimeout(function () {
                     throw e;
                 }, 0);
@@ -5686,7 +5886,7 @@ KISSY.add('i18n', {
                 doScroll = docElem && docElem.doScroll;
 
             try {
-                notframe = (win['frameElement'] === null);
+                notframe = (win.frameElement === null);
             } catch (e) {
                 notframe = false;
             }
@@ -5738,14 +5938,14 @@ KISSY.add('i18n', {
                 alias: ['dom', 'event', 'io', 'anim', 'base', 'node', 'json', 'ua', 'cookie']
             },
             ajax: {
-                alias: ['io']
+                alias: 'io'
             },
             'rich-base': {
-                alias: ['base']
+                alias: 'base'
             }
         }
     });
-    if (typeof location != 'undefined') {
+    if (typeof location !== 'undefined') {
         var https = S.startsWith(location.href, 'https');
         var prefix = https ? 'https://s.tbcdn.cn/s/kissy/' : 'http://a.tbcdn.cn/s/kissy/';
         S.config({
@@ -5761,10 +5961,15 @@ KISSY.add('i18n', {
     }
 })(KISSY);
 
+/*jshint indent:false*/
 (function(config,Features,UA){
-/*Generated By KISSY Module Compiler*/
 config({
-'anim': {requires: ['dom','anim/base','anim/timer',KISSY.Features.isTransitionSupported() ? "anim/transition" : ""]}
+    'anim/transition?':{
+        alias:KISSY.Features.isTransitionSupported() ? 'anim/transition' : ''
+    }
+});/*Generated By KISSY Module Compiler*/
+config({
+'anim': {requires: ['anim/base','anim/timer','anim/transition?']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5780,7 +5985,11 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'base': {requires: ['event/custom']}
+'attribute': {requires: ['event/custom']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
+'base': {requires: ['attribute']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5788,11 +5997,11 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'color': {requires: ['base']}
+'color': {requires: ['attribute']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'combobox': {requires: ['node','component/control','menu','base','io']}
+'combobox': {requires: ['node','component/control','menu','attribute','io']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5808,11 +6017,15 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
+'component/extension/content-render': {requires: ['component/extension/content-xtpl']}
+});
+/*Generated By KISSY Module Compiler*/
+config({
 'component/extension/delegate-children': {requires: ['node','component/manager']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'component/plugin/drag': {requires: ['base','dd']}
+'component/plugin/drag': {requires: ['dd']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5832,7 +6045,7 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'date/popup-picker': {requires: ['date/picker','component/extension/align','component/extension/shim']}
+'date/popup-picker': {requires: ['date/picker/picker-xtpl','date/picker','component/extension/shim','component/extension/align']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5840,26 +6053,26 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'dd/plugin/constrain': {requires: ['base','node']}
+'dd/plugin/constrain': {requires: ['node','base']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'dd/plugin/proxy': {requires: ['node','base','dd']}
+'dd/plugin/proxy': {requires: ['node','dd','base']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'dd/plugin/scroll': {requires: ['dd','base','node']}
+'dd/plugin/scroll': {requires: ['node','dd','base']}
 });
 config({
-    "dom/basic": {
-        "alias": [
+    'dom/basic': {
+        'alias': [
             'dom/base',
             Features.isIELessThan(9) ? 'dom/ie' : '',
             Features.isClassListSupported() ? '' : 'dom/class-list'
         ]
     },
-    "dom": {
-        "alias": [
+    'dom': {
+        'alias': [
             'dom/basic',
             !Features.isQuerySelectorSupported() ? 'dom/selector' : ''
         ]
@@ -5878,7 +6091,7 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'editor': {requires: ['node','html-parser','component/control','event']}
+'editor': {requires: ['node','html-parser','component/control']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5889,10 +6102,10 @@ config({
 'event/custom': {requires: ['event/base']}
 });
 config({
-    "event/dom": {
-        "alias": [
-            "event/dom/base",
-            Features.isTouchEventSupported() || Features.isMsPointerSupported() ?
+    'event/dom': {
+        'alias': [
+            'event/dom/base',
+            Features.isTouchGestureSupported() ?
                 'event/dom/touch' : '',
             Features.isDeviceMotionSupported() ?
                 'event/dom/shake' : '',
@@ -5929,11 +6142,11 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'filter-menu': {requires: ['menu','node','component/extension/content-render']}
+'filter-menu': {requires: ['menu','component/extension/content-xtpl','component/extension/content-render']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'io': {requires: ['dom','event/custom','promise','event']}
+'io': {requires: ['dom','event/custom','promise','event/dom']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5941,15 +6154,15 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'menu': {requires: ['node','component/container','component/extension/delegate-children','component/control','component/extension/content-render','component/extension/align','component/extension/shim']}
+'menu': {requires: ['node','component/container','component/extension/delegate-children','component/control','component/extension/content-render','component/extension/content-xtpl','component/extension/align','component/extension/shim']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'menubutton': {requires: ['node','button','component/extension/content-render','menu']}
+'menubutton': {requires: ['node','button','component/extension/content-xtpl','component/extension/content-render','menu']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'mvc': {requires: ['base','node','io','json']}
+'mvc': {requires: ['io','json','attribute','node']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5957,7 +6170,7 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'overlay': {requires: ['component/container','component/extension/shim','component/extension/align','node','component/extension/content-render']}
+'overlay': {requires: ['component/container','component/extension/shim','component/extension/align','node','component/extension/content-xtpl','component/extension/content-render']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -5965,14 +6178,11 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'resizable/plugin/proxy': {requires: ['base','node']}
+'resizable/plugin/proxy': {requires: ['node','base']}
 });
 config({
-    "scroll-view": {
-        "alias": [
-            Features.isTouchEventSupported()||Features.isMsPointerSupported()
-            ? 'scroll-view/drag' : 'scroll-view/base'
-        ]
+    'scroll-view': {
+        alias: Features.isTouchGestureSupported() ? 'scroll-view/drag' : 'scroll-view/base'
     }
 });/*Generated By KISSY Module Compiler*/
 config({
@@ -6004,7 +6214,7 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'swf': {requires: ['dom','json','base']}
+'swf': {requires: ['dom','json','attribute']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -6016,7 +6226,7 @@ config({
 });
 /*Generated By KISSY Module Compiler*/
 config({
-'tree': {requires: ['node','component/container','component/extension/content-render','component/extension/delegate-children']}
+'tree': {requires: ['node','component/container','component/extension/content-xtpl','component/extension/content-render','component/extension/delegate-children']}
 });
 /*Generated By KISSY Module Compiler*/
 config({
@@ -6030,6 +6240,10 @@ config({
 config({
 'xtemplate/nodejs': {requires: ['xtemplate']}
 });
+/*Generated By KISSY Module Compiler*/
+config({
+'xtemplate/runtime': {requires: ['path']}
+});
 
                 })(function(c){
                 KISSY.config('modules', c);
@@ -6040,9 +6254,6 @@ config({
  * 2. export light-weighted json parse
  */
 (function (S) {
-    // empty mod for conditional loading
-    S.add('empty', S.noop);
-
     S.add('ua', function () {
         return S.UA;
     });
@@ -6052,24 +6263,24 @@ config({
     });
 
     S.add('path', function () {
-        return S.Path
+        return S.Path;
     });
 
     var UA = S.UA,
         Env = S.Env,
         win = Env.host,
-        doc = win.document || {},
-        documentMode = doc.documentMode,
+    /*global global*/
         nativeJson = ((UA.nodejs && typeof global === 'object') ? global : win).JSON;
 
     // ie 8.0.7600.16315@win7 json bug!
-    if (documentMode && documentMode < 9) {
+    if (UA.ieMode < 9) {
         nativeJson = null;
     }
 
     if (nativeJson) {
         S.add('json', function () {
-            return S.JSON = nativeJson;
+            S.JSON = nativeJson;
+            return nativeJson;
         });
         // light weight json parse
         S.parseJson = function (data) {
@@ -6085,26 +6296,27 @@ config({
             if (data === null) {
                 return data;
             }
-            if (typeof data === "string") {
+            if (typeof data === 'string') {
                 // for ie
                 data = S.trim(data);
                 if (data) {
                     // from json2
-                    if (INVALID_CHARS_REG.test(data.replace(INVALID_ESCAPES_REG, "@")
-                        .replace(INVALID_TOKENS_REG, "]")
-                        .replace(INVALID_BRACES_REG, ""))) {
-
-                        return ( new Function("return " + data) )();
+                    if (INVALID_CHARS_REG.test(data.replace(INVALID_ESCAPES_REG, '@')
+                        .replace(INVALID_TOKENS_REG, ']')
+                        .replace(INVALID_BRACES_REG, ''))) {
+                        /*jshint evil:true*/
+                        return ( new Function('return ' + data) )();
                     }
                 }
             }
-            return S.error("Invalid Json: " + data);
+            return S.error('Invalid Json: ' + data);
         };
     }
 
     // exports for nodejs
     if (S.UA.nodejs) {
         S.KISSY = S;
+        /*global module*/
         module.exports = S;
     }
 })(KISSY);
