@@ -1,0 +1,32 @@
+-//Created by  RD-小小WEB on 13-10-24.
+extends layout
+
+block content
+  #msgcontent
+  input#msg(type="text")
+  #btn
+    input(value="提交",type="button")
+  script .
+    var  wsServer = 'ws://localhost:3000/socket';
+    var  websocket = new WebSocket(wsServer);
+    websocket.onopen = function (evt) { onOpen(evt) };
+    websocket.onclose = function (evt) { onClose(evt) };
+    websocket.onmessage = function (evt) { onMessage(evt) };
+    websocket.onerror = function (evt) { onError(evt) };
+    function onOpen(evt) {
+    console.log("Connected to WebSocket server.");
+    }
+    function onClose(evt) {
+    console.log("Disconnected");
+    }
+    function onMessage(evt) {
+      var div=document.createElement("div");
+      div.innerHTML= '<div>Retrieved data from server: ' + evt.data+"</div>";
+      document.getElementById("msgcontent").appendChild(div);
+    }
+    function onError(evt) {
+    console.log('Error occured: ' + evt.data);
+    }
+    document.getElementById("btn").onclick=function(){
+        websocket.send(document.getElementById("msg").value);
+    }

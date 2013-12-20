@@ -29,6 +29,8 @@ exports.route=function(app){
     app.get('/logout',user.logout);
     app.get('/logout',Islogin);
 
+    /*socket*/
+    app.get('/socket',user.socket);
     function Islogin(req,res,next){
         if(req.session.user){
             app.locals.user = true;
