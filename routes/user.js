@@ -121,7 +121,3 @@ exports.test=function(req,res){
         res.redirect("back");
     }
 };
-/*socket*/
-exports.socket=function(req,res){
-    res.render("socket");
-};

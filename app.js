@@ -9,7 +9,6 @@ var routes = require('./route');
 var app = express();
 var flash = require('express-flash');
 var kissy = require("kissy");
-var websocket = require("websocket").server;
 
 /*all environments*/
 app.set('port', process.env.PORT || 3000);
@@ -39,28 +38,3 @@ var server = http.createServer(app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
 });
 
-var wsserver = new websocket({
-    httpServer: server,
-    autoAcceptConnections: false
-});
-
-wsserver.on("request", function (request) {
-    if (request.resource == "/socket") {
-        var connection = request.accept('echo-protocol', request.origin);
-        console.log((new Date()) + ' Connection accepted.');
-        connection.on('message', function (message) {
-            if (message.type === 'utf8') {
-                console.log('Received Message: ' + message.utf8Data);
-                connection.sendUTF(message.utf8Data);
-            }
-            else if (message.type === 'binary') {
-                console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-                connection.sendBytes(message.binaryData);
-            }
-        });
-        connection.on('close', function (reasonCode, description) {
-            console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
-        });
-    }
-
-});
