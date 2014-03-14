@@ -6,13 +6,45 @@
     <script type="text/javascript" src="script/kissy/module/seed-min.js"></script>
 </head>
 <body>
-<div id="l1">
-<div class="test">1</div>
+<div><span>选择本地储蓄的信息</span>
+    <select id="sel">
+        <option>test</option>
+    </select>
+    <div id="info">
+        <p><label>姓名：</label><input id="name" type="text" /></p>
+        <p><label>年龄：</label><input id="age" type="text" /></p>
+        <p><label>爱好：</label><input id="hoy" type="text" /></p>
+        <p><label>最爱吃的水果：</label><input id="frt" type="text" /></p>
+        <input type="button" value="提交信息" id="sub" />
+    </div>
 </div>
 <script type="text/javascript">
-    KISSY.available("#l1d", function () {
-        alert(1);
-    });
+    var mol = {},
+        dom = document,
+        sub = dom.getElementById("sub");
+    mol.name = dom.getElementById("name");
+    mol.age = dom.getElementById("age");
+    mol.hoy = dom.getElementById("hoy");
+    mol.frt = dom.getElementById("frt");
+    function xie(obj){
+        mol.name.value = obj.name;
+        mol.age.value = obj.age;
+        mol.name.hoy = obj.hoy;
+        mol.name.frt = obj.frt;
+    }
+    function du(dom){
+        return {
+            name :  mol.name.value,
+            age :  mol.age.value,
+            hoy :  mol.hoy.value,
+            frt :  mol.frt.value
+        }
+    }
+    sub.onclick = function(){
+        stu.push(du());
+        localStorage.setItem("stu",JSON.stringify(stu));
+    };
+
 </script>
 </body>
 </html>

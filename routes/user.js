@@ -82,10 +82,6 @@ exports.login=function(req,res){
     if(req.method == 'GET'){
         res.render('login',{'title':"用户登陆"});
     }else if(req.method == 'POST'){
-        var cipher=crypto.createCipher("aes192",'xiaozhou');
-        var enc=cipher.update('xiao', 'utf8', 'hex');
-        enc += cipher.final('hex');
-        res.cookie('user',enc);
         model.db.user.find({email:req.body.email,password:req.body.password},function(err,data){
                 if(err){
                     console.log(err);
@@ -120,4 +116,8 @@ exports.test=function(req,res){
     }else if(req.method == 'POST'){
         res.redirect("back");
     }
+};
+/*socket*/
+exports.socket=function(req,res){
+    res.render("socket");
 };
