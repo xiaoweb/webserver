@@ -8,42 +8,76 @@
 <body>
 <div><span>选择本地储蓄的信息</span>
     <select id="sel">
-        <option>test</option>
+        <option>选择同学</option>
     </select>
-    <div id="info">
-        <p><label>姓名：</label><input id="name" type="text" /></p>
-        <p><label>年龄：</label><input id="age" type="text" /></p>
-        <p><label>爱好：</label><input id="hoy" type="text" /></p>
-        <p><label>最爱吃的水果：</label><input id="frt" type="text" /></p>
-        <input type="button" value="提交信息" id="sub" />
-    </div>
+
+    <form>
+        <div id="info">
+            <p><label>姓名：</label><input id="name" type="text"/></p>
+
+            <p><label>年龄：</label><input id="age" type="text"/></p>
+
+            <p><label>爱好：</label><input id="hoy" type="text"/></p>
+
+            <p><label>最爱吃的水果：</label><input id="frt" type="text"/></p>
+            <input type="button" value="提交信息" id="sub"/>
+            <input type="reset" value="重置信息" />
+        </div>
+    </form>
 </div>
 <script type="text/javascript">
     var mol = {},
-        dom = document,
-        sub = dom.getElementById("sub");
+            dom = document,
+            sub = dom.getElementById("sub"),
+            sel = dom.getElementById("sel"),
+            stu = JSON.parse(localStorage.getItem("stu")) || [];
     mol.name = dom.getElementById("name");
     mol.age = dom.getElementById("age");
     mol.hoy = dom.getElementById("hoy");
     mol.frt = dom.getElementById("frt");
-    function xie(obj){
+    function xie(obj) {     //写内容方法
         mol.name.value = obj.name;
         mol.age.value = obj.age;
-        mol.name.hoy = obj.hoy;
-        mol.name.frt = obj.frt;
+        mol.hoy.value = obj.hoy;
+        mol.frt.value = obj.frt;
     }
-    function du(dom){
+    function du(dom_obj) {    //读内容方法
         return {
-            name :  mol.name.value,
-            age :  mol.age.value,
-            hoy :  mol.hoy.value,
-            frt :  mol.frt.value
+            name: dom_obj.name.value,
+            age: dom_obj.age.value,
+            hoy: dom_obj.hoy.value,
+            frt: dom_obj.frt.value
         }
     }
-    sub.onclick = function(){
-        stu.push(du());
-        localStorage.setItem("stu",JSON.stringify(stu));
-    };
+    function add_date() {     //添加数组方法
+        stu.push(du(mol));
+        localStorage.setItem("stu", JSON.stringify(stu));
+        add_sel();
+    }
+    function add_sel() {      //追加option方法
+        for (var i = 0; i < stu.length; i++) {
+            var option = dom.createElement("option");
+            option.innerHTML = stu[i].name;
+            sel.appendChild(option);
+        }
+    }
+    function update() {       //更新数据方法
+        var this_val = this.value;
+        for (var i = 0; i < stu.length; i++) {
+            if (stu[i].name == this_val) {
+                xie({
+                    name: stu[i].name,
+                    age: stu[i].age,
+                    hoy: stu[i].hoy,
+                    frt: stu[i].frt
+                });
+                return;
+            }
+        }
+    }
+    sub.onclick = add_date;
+    document.body.onload = add_sel;
+    sel.onchange = update;
 
 </script>
 </body>
