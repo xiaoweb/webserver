@@ -33,9 +33,9 @@ exports.route=function(app){
     app.get('/socket',user.socket);
     function Islogin(req,res,next){
         if(req.session.user){
-            app.locals.user = true;
+            res.locals.user = true;
         }else{
-            app.locals.user = null;
+            res.locals.user = null;
         }
         next();
     }
