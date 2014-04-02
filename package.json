@@ -9,7 +9,6 @@
     "express": "3.*",
     "express-flash":"*",
     "jade": "*",
-    "mongoose":"*",
-    "kissy":"*"
+    "mongoose":"*"
   }
 }
