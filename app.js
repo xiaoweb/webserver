@@ -8,7 +8,6 @@ var path = require('path');
 var routes = require('./route');
 var app = express();
 var flash = require('express-flash');
-var kissy = require("kissy");
 
 /*all environments*/
 app.set('port', process.env.PORT || 3000);
